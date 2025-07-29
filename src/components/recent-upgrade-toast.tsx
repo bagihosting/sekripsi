@@ -92,12 +92,17 @@ export default function RecentUpgradeToast() {
                         <div className="grid gap-1">
                             <div className="flex items-center gap-3">
                                 <Avatar className="h-10 w-10 border-2 border-accent">
-                                    <AvatarImage src={currentUpgrade.photoURL} alt={currentUpgrade.displayName} />
+                                    <AvatarImage src={currentUpgrade.photoURL} alt={currentUpgrade.displayName || 'User'} />
                                     <AvatarFallback>{(currentUpgrade.displayName || 'U').charAt(0)}</AvatarFallback>
                                 </Avatar>
                                 <div>
                                     <ToastTitle className="flex items-center gap-1.5 text-base">
-                                        <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+                                        <motion.div
+                                            animate={{ scale: [1, 1.2, 1], rotate: [-5, 5, -5, 5, 0] }}
+                                            transition={{ duration: 0.8, repeat: Infinity, repeatDelay: 3 }}
+                                        >
+                                            <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+                                        </motion.div>
                                         Upgrade Berhasil!
                                     </ToastTitle>
                                     <ToastDescription>
