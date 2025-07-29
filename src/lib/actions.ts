@@ -213,9 +213,21 @@ export async function confirmPayment(values: z.infer<typeof confirmPaymentSchema
             });
         } else {
             // It's a subscription upgrade
+            const userSnap = await getDoc(userRef);
+            if (!userSnap.exists()) throw new Error("User not found");
+            const userData = userSnap.data();
+
             await updateDoc(userRef, {
                 plan: 'pro',
                 paymentStatus: 'pro',
+                upgradedAt: serverTimestamp(),
+            });
+
+            // Add to the public recent_upgrades collection for the toast notification
+            const upgradeRef = doc(collection(db, 'recent_upgrades'));
+            await setDoc(upgradeRef, {
+                displayName: userData.displayName,
+                photoURL: userData.photoURL,
                 upgradedAt: serverTimestamp(),
             });
         }

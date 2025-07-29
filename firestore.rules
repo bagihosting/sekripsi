@@ -1,40 +1,47 @@
-
 rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // Helper function to check for admin role
     function isAdmin() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      return request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
 
-    function isOwner(userId) {
-      return request.auth != null && request.auth.uid == userId;
-    }
-
+    // Users: Only authenticated users can manage their own profile. Admins have full access.
     match /users/{userId} {
-      allow read, update: if isOwner(userId) || isAdmin();
-      allow create: if request.auth != null;
+      allow read, update: if request.auth != null && request.auth.uid == userId;
+      allow read, write: if isAdmin();
     }
 
+    // Blog Posts: Public read, admin-only write.
     match /blogPosts/{postId} {
-      allow read: if resource.data.status == 'published' || isAdmin();
-      allow create, update, delete: if isAdmin();
-    }
-    
-    match /ai_tools/{toolId} {
       allow read: if true;
       allow create, update, delete: if isAdmin();
     }
     
+    // AI Tools: Public read, admin-only write.
+    match /ai_tools/{toolId} {
+        allow read: if true;
+        allow create, update, delete: if isAdmin();
+    }
+    
+    // Pricing Plans: Public read, admin-only write.
     match /pricingPlans/{planId} {
       allow read: if true;
       allow create, update, delete: if isAdmin();
     }
-
+    
+    // Payments: Users can create, admins can manage.
     match /payments/{paymentId} {
       allow create: if request.auth != null;
-      allow read, update: if isAdmin();
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Recent Upgrades: Publicly readable for social proof toast. Admin-only write.
+    match /recent_upgrades/{upgradeId} {
+      allow read: if true;
+      allow create: if isAdmin();
     }
   }
 }

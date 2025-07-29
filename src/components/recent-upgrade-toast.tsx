@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { collection, query, where, orderBy, limit, onSnapshot, Timestamp } from 'firebase/firestore';
+import { collection, query, orderBy, limit, onSnapshot, Timestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { UserProfile } from '@/lib/firestore';
 import { Toast, ToastDescription, ToastTitle } from '@/components/ui/toast';
@@ -19,9 +19,9 @@ export default function RecentUpgradeToast() {
   const [currentUpgradeIndex, setCurrentUpgradeIndex] = useState(0);
 
   useEffect(() => {
+    // Query the public 'recent_upgrades' collection instead of 'users'
     const q = query(
-      collection(db, 'users'),
-      where('plan', '==', 'pro'),
+      collection(db, 'recent_upgrades'),
       orderBy('upgradedAt', 'desc'),
       limit(5)
     );
