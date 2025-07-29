@@ -16,13 +16,14 @@ export const SiteHeader = () => {
     { href: '/produk', label: 'Produk' },
     { href: '/rekomendasi-ai', label: 'Rekomendasi AI' },
     { href: '/generator-judul', label: 'Generator Judul' },
-    { href: '/parafrase-ai', label: 'Parafrase AI' },
-    { href: '/kerangka-ai', label: 'Kerangka AI' },
-    { href: '/korektor-ai', label: 'Korektor AI' },
-    { href: '/referensi-ai', label: 'Asisten Referensi' },
-    { href: '/simulasi-sidang', label: 'Simulasi Sidang' },
-    { href: '/cek-argumen', label: 'Cek Argumen AI' },
     { href: '/pertanyaan-penelitian', label: 'Pertanyaan Penelitian' },
+    { href: '/generator-hipotesis', label: 'Generator Hipotesis' },
+    { href: '/kerangka-ai', label: 'Kerangka AI' },
+    { href: '/referensi-ai', label: 'Asisten Referensi' },
+    { href: '/parafrase-ai', label: 'Parafrase AI' },
+    { href: '/korektor-ai', label: 'Korektor AI' },
+    { href: '/cek-argumen', label: 'Cek Argumen AI' },
+    { href: '/simulasi-sidang', label: 'Simulasi Sidang' },
     { href: '/story-generator', label: 'Story Generator' },
     { href: '/blog', label: 'Blog' },
     { href: '/dukungan', label: 'Dukungan' },
@@ -64,9 +65,9 @@ export const SiteHeader = () => {
               </Button>
             </SheetTrigger>
             <SheetContent side="right">
-              <SheetHeader className="sr-only">
-                <SheetTitle>Menu</SheetTitle>
-                <SheetDescription>Main navigation menu for SkripsiKilat.</SheetDescription>
+              <SheetHeader>
+                <SheetTitle className="sr-only">Menu</SheetTitle>
+                <SheetDescription className="sr-only">Main navigation menu for SkripsiKilat.</SheetDescription>
               </SheetHeader>
               <div className="flex flex-col gap-6 pt-12">
                 <Link href="/" className="mb-4 flex items-center gap-2">
