@@ -12,7 +12,7 @@ import { requestUpgrade } from '@/lib/actions';
 import { useTransition } from 'react';
 import { Loader2, Upload } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
@@ -33,6 +33,8 @@ export default function UpgradeForm() {
   const [isPending, startTransition] = useTransition();
   const { user } = useAuth();
   const router = useRouter();
+  const params = useParams();
+  const toolId = params.toolId as string | undefined;
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -49,6 +51,9 @@ export default function UpgradeForm() {
     startTransition(async () => {
       const formData = new FormData();
       formData.append('proof', values.proof[0]);
+      if (toolId) {
+        formData.append('toolId', toolId);
+      }
       
       const result = await requestUpgrade(formData);
 

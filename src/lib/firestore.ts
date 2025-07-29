@@ -1,8 +1,7 @@
 
-
 import { doc, setDoc, serverTimestamp, Timestamp, collection } from 'firebase/firestore';
 import { db } from './firebase';
-import { allAiTools } from './plugins';
+import { initialTools } from './plugins';
 
 export interface UserProfile {
   uid: string;
@@ -15,6 +14,7 @@ export interface UserProfile {
   createdAt: Timestamp;
   upgradedAt?: Timestamp;
   activatedTools: string[];
+  purchasedTools: string[];
 }
 
 export interface Payment {
@@ -22,6 +22,10 @@ export interface Payment {
   userEmail: string;
   proofUrl: string;
   status: 'pending' | 'confirmed' | 'rejected';
+  type: 'subscription' | 'tool_purchase';
+  toolId?: string;
+  toolName?: string;
+  amount?: number;
   createdAt: Timestamp;
   processedAt?: Timestamp;
 }
@@ -63,7 +67,7 @@ export interface BlogPost {
 export const createUserProfile = async (uid: string, email: string | null): Promise<void> => {
   const userRef = doc(db, 'users', uid);
   // New users automatically get all free tools.
-  const freeTools = allAiTools.filter(tool => tool.availability === 'free').map(tool => tool.id);
+  const freeTools = initialTools.filter(tool => tool.price === 0).map(tool => tool.id);
 
   const newUserProfile: Omit<UserProfile, 'uid' | 'createdAt'> = {
     email,
@@ -73,6 +77,7 @@ export const createUserProfile = async (uid: string, email: string | null): Prom
     plan: 'free', // Default plan for new users
     paymentStatus: 'none', // Default payment status
     activatedTools: freeTools,
+    purchasedTools: [],
   };
   
   try {

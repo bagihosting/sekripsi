@@ -1,18 +1,17 @@
 
 'use client';
 
-import { getProductById, DigitalProduct } from '@/lib/data';
+import { getToolById, AiTool } from '@/lib/plugins';
 import { notFound, useRouter } from 'next/navigation';
-import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, ChevronRight, Home, ShoppingCart, Star } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
-import { activateAiTool } from '@/lib/actions';
-import { useTransition } from 'react';
+import { useTransition, useEffect, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 type Props = {
   params: { id: string }
@@ -20,56 +19,65 @@ type Props = {
 
 export default function ProductDetailPage({ params }: Props) {
   const id = params.id;
-  const product = getProductById(id);
-  const { userProfile, loading } = useAuth();
+  const [product, setProduct] = useState<AiTool | null>(null);
+  const [loadingProduct, setLoadingProduct] = useState(true);
+  
+  const { userProfile, loading: authLoading } = useAuth();
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
   const router = useRouter();
+
+  useEffect(() => {
+    async function fetchTool() {
+      const tool = await getToolById(id);
+      if (tool) {
+        setProduct(tool);
+      }
+      setLoadingProduct(false);
+    }
+    fetchTool();
+  }, [id]);
+
+  if (loadingProduct || authLoading) {
+    return <ProductDetailSkeleton />;
+  }
 
   if (!product) {
     notFound();
   }
   
   const hasTool = userProfile?.activatedTools?.includes(product.id);
-  const canActivate = userProfile?.plan === 'pro';
+  const isFree = product.price === 0;
 
-  const handleActivate = () => {
+  const handleAction = () => {
     if (!userProfile) {
         router.push(`/login?redirect=/produk/${id}`);
         return;
     }
-    if (!canActivate) {
-        router.push('/harga');
-        return;
+    if (hasTool) return; // Already have it
+    if (isFree) {
+        // In a real scenario, you'd have a server action to add free tools.
+        // For now, we assume free tools are activated on registration.
+        toast({ title: "Alat Gratis", description: "Alat ini sudah otomatis tersedia untukmu." });
+    } else {
+        router.push(`/upgrade/${product.id}`);
     }
-
-    startTransition(async () => {
-        const result = await activateAiTool({ toolId: product.id });
-        if(result.success) {
-            toast({
-                title: "Aktivasi Berhasil!",
-                description: `Alat "${product.name}" sekarang tersedia di Pusat AI Anda.`
-            });
-            router.push('/alat-ai');
-        } else {
-            toast({
-                title: "Aktivasi Gagal",
-                description: result.error,
-                variant: 'destructive'
-            });
-        }
-    });
   }
 
   const getButtonState = () => {
-      if(hasTool) return { text: 'Sudah Diaktifkan', disabled: true };
-      if(isPending) return { text: 'Mengaktifkan...', disabled: true };
-      if(!userProfile) return { text: 'Login untuk Aktivasi', disabled: false };
-      if(!canActivate) return { text: 'Upgrade ke Pro untuk Aktivasi', disabled: false };
-      return { text: 'Aktifkan Alat Ini (Gratis untuk Pro)', disabled: false };
+      if(hasTool) return { text: 'Sudah Dimiliki', disabled: true };
+      if(isPending) return { text: 'Memproses...', disabled: true };
+      if(isFree) return { text: 'Alat Gratis', disabled: true };
+      return { text: `Beli Alat Ini - Rp ${product.price?.toLocaleString('id-ID')}`, disabled: false };
   }
 
   const { text: buttonText, disabled: isButtonDisabled } = getButtonState();
+
+  const productFeatures = [
+      `Membantu dalam tahap ${product.category}`,
+      "Didukung oleh model AI canggih",
+      "Menghemat waktu pengerjaan skripsi secara signifikan"
+  ];
 
   return (
     <div className="container max-w-screen-xl py-8 md:py-12">
@@ -81,7 +89,7 @@ export default function ProductDetailPage({ params }: Props) {
                 </div>
             </div>
             <div className="flex flex-col">
-                <h1 className="font-headline text-3xl md:text-4xl font-bold">{product.name}</h1>
+                <h1 className="font-headline text-3xl md:text-4xl font-bold">{product.title}</h1>
                 <div className="flex flex-wrap items-center gap-2 mt-2">
                     <Badge variant="secondary">{product.category}</Badge>
                     {product.badge && <Badge>{product.badge}</Badge>}
@@ -91,7 +99,7 @@ export default function ProductDetailPage({ params }: Props) {
                 <div className="mt-6">
                     <h2 className="text-lg font-semibold mb-3">Kegunaan Utama:</h2>
                     <ul className="space-y-2">
-                        {product.features.map((feature, index) => (
+                        {productFeatures.map((feature, index) => (
                         <li key={index} className="flex items-center gap-2">
                             <CheckCircle className="h-5 w-5 text-green-500" />
                             <span className="text-foreground/90">{feature}</span>
@@ -101,12 +109,15 @@ export default function ProductDetailPage({ params }: Props) {
                 </div>
 
                 <div className="mt-auto pt-8">
-                     <div className="text-lg font-bold mb-4 flex items-center gap-2">
-                        <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
-                        <span>Hanya untuk member <span className="text-primary">PRO</span></span>
+                     <div className="text-2xl font-bold mb-4 flex items-center gap-2">
+                        {isFree ? (
+                            <span className="text-green-600">Gratis</span>
+                        ) : (
+                            <span>Rp {product.price?.toLocaleString('id-ID')}</span>
+                        )}
                     </div>
                     <div className="flex flex-col sm:flex-row gap-4">
-                        <Button size="lg" className="flex-1" onClick={handleActivate} disabled={isButtonDisabled || loading}>
+                        <Button size="lg" className="flex-1" onClick={handleAction} disabled={isButtonDisabled || authLoading}>
                             {isPending ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <ShoppingCart className="mr-2 h-5 w-5" />}
                             {buttonText}
                         </Button>
@@ -118,7 +129,7 @@ export default function ProductDetailPage({ params }: Props) {
   );
 }
 
-function Breadcrumbs({ product }: { product: DigitalProduct }) {
+function Breadcrumbs({ product }: { product: AiTool }) {
     return (
         <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-sm text-muted-foreground">
             <Link href="/" className="flex items-center gap-1 hover:text-primary transition-colors">
@@ -130,7 +141,29 @@ function Breadcrumbs({ product }: { product: DigitalProduct }) {
                 Toko Alat AI
             </Link>
             <ChevronRight className="h-4 w-4 shrink-0" />
-            <span className="font-medium text-foreground truncate">{product.name}</span>
+            <span className="font-medium text-foreground truncate">{product.title}</span>
         </nav>
+    )
+}
+
+function ProductDetailSkeleton() {
+    return (
+        <div className="container max-w-screen-xl py-8 md:py-12">
+            <Skeleton className="h-6 w-1/3" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 mt-6">
+                <div><Skeleton className="w-full aspect-video rounded-lg" /></div>
+                <div className="flex flex-col space-y-4">
+                    <Skeleton className="h-10 w-3/4" />
+                    <Skeleton className="h-6 w-1/4" />
+                    <Skeleton className="h-5 w-full" />
+                    <Skeleton className="h-5 w-full" />
+                    <Skeleton className="h-5 w-2/3" />
+                    <div className="mt-auto pt-8 space-y-4">
+                        <Skeleton className="h-8 w-1/3" />
+                        <Skeleton className="h-12 w-full" />
+                    </div>
+                </div>
+            </div>
+        </div>
     )
 }

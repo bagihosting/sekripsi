@@ -1,12 +1,13 @@
 
 import type { UserProfile } from '@/lib/firestore';
 import { Card, CardHeader, CardTitle, CardContent } from './ui/card';
-import { Users, BarChart, Settings, LayoutGrid, Wand2, UserCog, Banknote, Tag, Rss } from 'lucide-react';
+import { Users, BarChart, Settings, LayoutGrid, Wand2, UserCog, Banknote, Tag, Rss, Store } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import FeatureManagementCard from './feature-management-card';
 import PaymentConfirmation from './payment-confirmation';
 import PricingManagement from './pricing-management';
 import BlogManagement from './blog-management';
+import ProductManagement from './product-management';
 
 interface AdminDashboardProps {
   userProfile: UserProfile;
@@ -36,12 +37,15 @@ export default function AdminDashboard({ userProfile }: AdminDashboardProps) {
       </div>
 
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 md:grid-cols-7 mb-8">
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-8 mb-8">
           <TabsTrigger value="overview">
             <BarChart className="mr-2 h-4 w-4" /> Ringkasan
           </TabsTrigger>
            <TabsTrigger value="blog">
             <Rss className="mr-2 h-4 w-4" /> Manajemen Blog
+          </TabsTrigger>
+          <TabsTrigger value="products">
+            <Store className="mr-2 h-4 w-4" /> Manajemen Produk
           </TabsTrigger>
           <TabsTrigger value="payments">
             <Banknote className="mr-2 h-4 w-4" /> Konfirmasi Pembayaran
@@ -96,6 +100,10 @@ export default function AdminDashboard({ userProfile }: AdminDashboardProps) {
         
         <TabsContent value="blog">
             <BlogManagement />
+        </TabsContent>
+
+        <TabsContent value="products">
+            <ProductManagement />
         </TabsContent>
 
         <TabsContent value="payments">

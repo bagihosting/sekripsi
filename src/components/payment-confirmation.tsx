@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState, useTransition } from 'react';
@@ -10,19 +11,9 @@ import { Skeleton } from './ui/skeleton';
 import Image from 'next/image';
 import { confirmPayment } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Package, ShoppingCart } from 'lucide-react';
+import { Payment } from '@/lib/firestore';
 
-interface Payment {
-  id: string;
-  userId: string;
-  userEmail: string;
-  status: 'pending' | 'confirmed' | 'rejected';
-  proofUrl: string;
-  createdAt: {
-    seconds: number;
-    nanoseconds: number;
-  };
-}
 
 export default function PaymentConfirmation() {
   const [payments, setPayments] = useState<Payment[]>([]);
@@ -45,10 +36,10 @@ export default function PaymentConfirmation() {
     return () => unsubscribe();
   }, []);
 
-  const handleConfirm = (paymentId: string, userId: string) => {
+  const handleConfirm = (paymentId: string, userId: string, toolId?: string) => {
     setConfirmingId(paymentId);
     startTransition(async () => {
-      const result = await confirmPayment({ paymentId, userId });
+      const result = await confirmPayment({ paymentId, userId, toolId });
       if (result.error) {
         toast({
           title: 'Konfirmasi Gagal',
@@ -58,7 +49,7 @@ export default function PaymentConfirmation() {
       } else {
         toast({
           title: 'Konfirmasi Berhasil!',
-          description: 'Pengguna telah berhasil diupgrade ke Pro.',
+          description: 'Akses pengguna telah berhasil diperbarui.',
         });
       }
       setConfirmingId(null);
@@ -84,7 +75,7 @@ export default function PaymentConfirmation() {
     <Card>
       <CardHeader>
         <CardTitle>Konfirmasi Pembayaran Tertunda</CardTitle>
-        <CardDescription>Tinjau dan konfirmasi pembayaran dari pengguna untuk mengaktifkan paket Pro mereka.</CardDescription>
+        <CardDescription>Tinjau dan konfirmasi pembayaran dari pengguna untuk mengaktifkan akses mereka.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {payments.length === 0 ? (
@@ -92,10 +83,18 @@ export default function PaymentConfirmation() {
         ) : (
           payments.map((payment) => (
             <div key={payment.id} className="flex flex-col sm:flex-row items-start gap-4 rounded-lg border p-4">
-              <div className="flex-1 space-y-1">
+              <div className="flex-1 space-y-2">
                 <p className="font-medium">{payment.userEmail}</p>
+                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  {payment.type === 'tool_purchase' ? <Package className="h-4 w-4" /> : <ShoppingCart className="h-4 w-4" />}
+                  <span>
+                    {payment.type === 'tool_purchase' 
+                      ? `Pembelian Alat: ${payment.toolName || 'N/A'}` 
+                      : 'Langganan Pro'}
+                  </span>
+                </div>
                 <p className="text-sm text-muted-foreground">
-                  Tanggal Pengajuan: {new Date(payment.createdAt.seconds * 1000).toLocaleString()}
+                  Tanggal Pengajuan: {new Date(payment.createdAt.seconds * 1000).toLocaleString('id-ID')}
                 </p>
                  <Badge variant="secondary">{payment.status}</Badge>
               </div>
@@ -104,7 +103,7 @@ export default function PaymentConfirmation() {
                     <Image src={payment.proofUrl} alt="Bukti Pembayaran" width={100} height={100} className="rounded-md object-cover aspect-square"/>
                  </a>
                 <Button 
-                  onClick={() => handleConfirm(payment.id, payment.userId)}
+                  onClick={() => handleConfirm(payment.id, payment.userId, payment.toolId)}
                   disabled={isPending && confirmingId === payment.id}
                 >
                    {isPending && confirmingId === payment.id && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

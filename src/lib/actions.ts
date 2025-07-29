@@ -9,6 +9,7 @@ import { redirect } from 'next/navigation';
 import { collection, doc, setDoc, serverTimestamp, updateDoc, addDoc, deleteDoc, getDoc, arrayUnion } from 'firebase/firestore';
 import { uploadToCloudinary } from './cloudinary';
 import { revalidatePath } from 'next/cache';
+import { getToolById } from './plugins';
 
 const registerSchema = z.object({
   email: z.string().email(),
@@ -79,12 +80,13 @@ export async function requestUpgrade(formData: FormData) {
     }
 
     const proof = formData.get('proof') as File;
+    const toolId = formData.get('toolId') as string | null;
+
     if (!proof) {
         return { error: "File bukti transfer tidak ditemukan." };
     }
     
     try {
-        // 1. Upload image to Cloudinary
         const fileBuffer = await proof.arrayBuffer();
         const mime = proof.type;
         const encoding = 'base64';
@@ -98,17 +100,28 @@ export async function requestUpgrade(formData: FormData) {
             throw new Error("Gagal mengunggah gambar, URL tidak ditemukan.");
         }
         
-        // 2. Create a payment document in Firestore
-        const paymentRef = doc(collection(db, 'payments'));
-        await setDoc(paymentRef, {
+        const paymentData: { [key: string]: any } = {
             userId: user.uid,
             userEmail: user.email,
             proofUrl: downloadURL,
             status: 'pending',
             createdAt: serverTimestamp(),
-        });
+            type: toolId ? 'tool_purchase' : 'subscription',
+        };
+
+        if (toolId) {
+            const tool = await getToolById(toolId);
+            paymentData.toolId = toolId;
+            paymentData.toolName = tool?.title;
+            paymentData.amount = tool?.price;
+        } else {
+            // Logic for subscription pricing if needed
+            paymentData.amount = 79000;
+        }
+
+        const paymentRef = doc(collection(db, 'payments'));
+        await setDoc(paymentRef, paymentData);
         
-        // 3. Update user's payment status
         const userRef = doc(db, 'users', user.uid);
         await updateDoc(userRef, {
             paymentStatus: 'pending'
@@ -136,12 +149,10 @@ export async function updateUserProfile(formData: FormData) {
     const updates: { [key: string]: any } = {};
 
     try {
-        // Update display name
         if (displayName) {
             updates.displayName = displayName;
         }
 
-        // Update photo
         if (photo) {
             const fileBuffer = await photo.arrayBuffer();
             const mime = photo.type;
@@ -159,12 +170,10 @@ export async function updateUserProfile(formData: FormData) {
             }
         }
         
-        // Update Firestore
         if (Object.keys(updates).length > 0) {
             await updateDoc(userRef, updates);
         }
 
-        // Update password in Firebase Auth
         if (password) {
             await updatePassword(user, password);
         }
@@ -184,27 +193,33 @@ export async function updateUserProfile(formData: FormData) {
 const confirmPaymentSchema = z.object({
   paymentId: z.string(),
   userId: z.string(),
+  toolId: z.string().optional(),
 });
 
 export async function confirmPayment(values: z.infer<typeof confirmPaymentSchema>) {
     const validatedValues = confirmPaymentSchema.parse(values);
-    const { paymentId, userId } = validatedValues;
-
-    // A real app should verify that the current user is an admin.
-    // For now, we trust the call comes from the admin dashboard.
+    const { paymentId, userId, toolId } = validatedValues;
 
     try {
         const userRef = doc(db, 'users', userId);
         const paymentRef = doc(db, 'payments', paymentId);
 
-        // Update user to Pro
-        await updateDoc(userRef, {
-            plan: 'pro',
-            paymentStatus: 'pro',
-            upgradedAt: serverTimestamp(),
-        });
+        if (toolId) {
+             // It's a tool purchase
+            await updateDoc(userRef, {
+                purchasedTools: arrayUnion(toolId),
+                activatedTools: arrayUnion(toolId),
+                paymentStatus: 'pro', // or some other logic
+            });
+        } else {
+            // It's a subscription upgrade
+            await updateDoc(userRef, {
+                plan: 'pro',
+                paymentStatus: 'pro',
+                upgradedAt: serverTimestamp(),
+            });
+        }
 
-        // Update payment status to confirmed
         await updateDoc(paymentRef, {
             status: 'confirmed',
             processedAt: serverTimestamp(),
@@ -253,9 +268,9 @@ export async function updatePricingPlan(formData: FormData) {
 const generateSlug = (title: string) => {
     return title
         .toLowerCase()
-        .replace(/[^a-z0-9\s-]/g, '') // remove special characters
-        .replace(/\s+/g, '-') // replace spaces with hyphens
-        .replace(/-+/g, '-'); // remove consecutive hyphens
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-');
 };
 
 export async function saveBlogPost(formData: FormData) {
@@ -271,11 +286,10 @@ export async function saveBlogPost(formData: FormData) {
         return { error: 'Please fill all required fields.' };
     }
     
-    // Sanitize the slug, or generate if it's empty
     if (!slug) {
         slug = generateSlug(title);
     } else {
-        slug = generateSlug(slug); // Sanitize user-provided slug
+        slug = generateSlug(slug);
     }
     
     let imageUrl = formData.get('currentImageUrl') as string || '';
@@ -298,18 +312,16 @@ export async function saveBlogPost(formData: FormData) {
             category,
             status,
             imageUrl,
-            description: content.substring(0, 150), // Auto-generate description
-            author: "Tim sekripsi.com", // Or get from current user
-            aiHint: `${category.toLowerCase()} blog`, // Auto-generate aiHint
+            description: content.substring(0, 150),
+            author: "Tim sekripsi.com",
+            aiHint: `${category.toLowerCase()} blog`,
             updatedAt: serverTimestamp(),
         };
 
         if (postId) {
-            // Update existing post
             const postRef = doc(db, 'blogPosts', postId);
             await updateDoc(postRef, postData);
         } else {
-            // Create new post
             const collectionRef = collection(db, 'blogPosts');
             await addDoc(collectionRef, {
                 ...postData,
@@ -325,7 +337,8 @@ export async function saveBlogPost(formData: FormData) {
     if (status === 'published') {
         revalidatePath(`/blog/${slug}`);
     }
-    redirect('/dashboard?tab=blog');
+    revalidatePath('/dashboard');
+    return { success: true };
 }
 
 export async function deleteBlogPost(postId: string) {
@@ -344,36 +357,28 @@ export async function deleteBlogPost(postId: string) {
     revalidatePath('/dashboard');
 }
 
-const activateAiToolSchema = z.object({
-  toolId: z.string(),
-});
+export async function updateAiTool(formData: FormData) {
+    const id = formData.get('id') as string;
+    const title = formData.get('title') as string;
+    const description = formData.get('description') as string;
+    const price = formData.get('price') as string;
 
-export async function activateAiTool(values: z.infer<typeof activateAiToolSchema>) {
-    const user = auth.currentUser;
-    if (!user) {
-        return { error: 'You must be logged in to activate a tool.' };
-    }
-
-    const { toolId } = activateAiToolSchema.parse(values);
+    if (!id) return { error: 'Tool ID is required' };
 
     try {
-        const userRef = doc(db, 'users', user.uid);
-        const userDoc = await getDoc(userRef);
-        const userData = userDoc.data();
-
-        if (userData?.plan !== 'pro') {
-            return { error: 'This feature is only for Pro members.' };
-        }
-        
-        await updateDoc(userRef, {
-            activatedTools: arrayUnion(toolId),
+        const toolRef = doc(db, 'ai_tools', id);
+        await updateDoc(toolRef, {
+            title,
+            description,
+            price: Number(price) || 0,
         });
-
-    } catch (error) {
-        console.error("Failed to activate AI tool:", error);
-        return { error: 'Could not activate the tool. Please try again.' };
+    } catch (e: any) {
+        console.error("Error updating AI tool:", e);
+        return { error: 'Failed to update AI tool.' };
     }
-
-    revalidatePath('/alat-ai');
+    
+    revalidatePath('/produk');
+    revalidatePath(`/produk/${id}`);
+    revalidatePath('/dashboard');
     return { success: true };
 }

@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useMemo } from 'react';
-import { DigitalProduct } from '@/lib/data';
+import { AiTool } from '@/lib/plugins';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,7 +10,7 @@ import Link from 'next/link';
 import { Label } from '@/components/ui/label';
 import { Badge } from './ui/badge';
 
-export default function ProductGrid({ products }: { products: DigitalProduct[] }) {
+export default function ProductGrid({ products }: { products: AiTool[] }) {
   const [category, setCategory] = useState('all');
   const [sort, setSort] = useState('name-asc');
 
@@ -80,7 +80,7 @@ export default function ProductGrid({ products }: { products: DigitalProduct[] }
   );
 }
 
-const ProductCard = ({ product }: { product: DigitalProduct }) => (
+const ProductCard = ({ product }: { product: AiTool }) => (
   <Card className="group flex flex-col overflow-hidden rounded-lg shadow-sm transition-all hover:shadow-lg hover:-translate-y-1">
     <CardContent className="flex flex-1 flex-col p-4">
         <div className="flex-1">
@@ -92,13 +92,16 @@ const ProductCard = ({ product }: { product: DigitalProduct }) => (
                 {product.badge && <Badge>{product.badge}</Badge>}
             </div>
             <h3 className="font-headline text-xl font-semibold leading-snug">
-                <Link href={`/produk/${product.id}`} className="hover:text-primary transition-colors">{product.name}</Link>
+                <Link href={`/produk/${product.id}`} className="hover:text-primary transition-colors">{product.title}</Link>
             </h3>
             <p className="mt-2 text-sm text-muted-foreground h-12 line-clamp-2">{product.description}</p>
         </div>
         <div className="mt-4">
+            <div className="text-lg font-bold mb-2">
+                {product.price === 0 ? 'Gratis' : `Rp ${product.price?.toLocaleString('id-ID')}`}
+            </div>
             <Button className="w-full" asChild>
-                <Link href={`/produk/${product.id}`}>Lihat Detail & Aktifkan</Link>
+                <Link href={`/produk/${product.id}`}>Lihat Detail & Beli</Link>
             </Button>
         </div>
     </CardContent>

@@ -10,9 +10,9 @@ export default function UpgradePage() {
         <div className="space-y-8">
             <div className="text-center">
                 <Banknote className="h-16 w-16 mx-auto text-accent mb-4" />
-                <h1 className="font-headline text-3xl font-bold md:text-4xl lg:text-5xl">Selesaikan Upgrade ke Pro</h1>
+                <h1 className="font-headline text-3xl font-bold md:text-4xl lg:text-5xl">Selesaikan Pembelian Anda</h1>
                 <p className="mt-4 text-lg text-foreground/70">
-                    Satu langkah lagi untuk mendapatkan akses tak terbatas ke semua fitur canggih kami.
+                    Satu langkah lagi untuk mendapatkan akses ke alat canggih pilihanmu.
                 </p>
             </div>
           
@@ -20,7 +20,7 @@ export default function UpgradePage() {
                 <CardHeader>
                     <CardTitle>Langkah 1: Lakukan Pembayaran</CardTitle>
                     <CardDescription>
-                        Silakan transfer sejumlah <span className="font-bold text-primary">Rp 79.000</span> ke rekening berikut:
+                        Silakan transfer sejumlah harga alat yang tertera ke rekening berikut:
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
