@@ -11,12 +11,6 @@ import { ArrowRight, Menu, Sparkles, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
 
-const mainNavLinks = [
-    { href: '/alat-ai', label: 'Pusat AI' },
-    { href: '/blog', label: 'Trik Cepat Lulus' },
-    { href: '/dukungan', label: 'Bantuan Kilat' },
-];
-
 const aiToolsLinks = [
     { href: '/generator-judul', label: 'Generator Judul' },
     { href: '/pertanyaan-penelitian', label: 'Pertanyaan Penelitian' },
@@ -25,9 +19,16 @@ const aiToolsLinks = [
     { href: '/referensi-ai', label: 'Asisten Referensi' },
     { href: '/parafrase-ai', label: 'Alat Parafrase' },
     { href: '/panduan-spss', label: 'Panduan Analisis SPSS' },
+    { href: '/generator-abstrak', label: 'Generator Abstrak' },
     { href: '/korektor-ai', label: 'Korektor Tulisan' },
     { href: '/cek-argumen', label: 'Pengecek Argumen' },
     { href: '/simulasi-sidang', label: 'Simulasi Sidang' },
+];
+
+const mainNavLinks = [
+    { href: '/alat-ai', label: 'Pusat AI' },
+    { href: '/blog', label: 'Trik Cepat Lulus' },
+    { href: '/dukungan', label: 'Bantuan Kilat' },
 ];
 
 export const SiteHeader = () => {

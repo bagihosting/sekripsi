@@ -15,6 +15,7 @@ import {
   ArrowRight,
   Sparkles,
   Database,
+  BookText,
 } from 'lucide-react';
 import Link from 'next/link';
 import type { LucideIcon } from 'lucide-react';
@@ -95,6 +96,13 @@ const toolGroups = [
     title: 'Tahap Koreksi & Finalisasi',
     description: 'Poles naskahmu hingga sempurna. Periksa tata bahasa, perkuat argumen, dan siapkan dirimu untuk sidang.',
     tools: [
+      {
+        icon: BookText,
+        title: 'Generator Abstrak',
+        description: 'Sintesis Latar Belakang, Metode, Hasil, dan Kesimpulan menjadi Abstrak yang utuh dan profesional.',
+        href: '/generator-abstrak',
+        badge: 'Baru',
+      },
       {
         icon: SpellCheck,
         title: 'Korektor Tulisan',
