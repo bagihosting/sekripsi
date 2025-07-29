@@ -194,7 +194,7 @@ export async function getAllTools(): Promise<AiTool[]> {
     
     if (toolsSnapshot.empty) {
         console.warn("No AI tools found in Firestore. Returning initial toolset.");
-        return initialTools.map(t => ({...t, icon: iconMap[t.icon]}));
+        return initialTools.map(t => ({...t, icon: t.icon}));
     }
     
     const tools = toolsSnapshot.docs.map(doc => {
@@ -208,7 +208,7 @@ export async function getAllTools(): Promise<AiTool[]> {
     return tools;
   } catch (error) {
     console.error("Error fetching tools from Firestore:", error);
-    return initialTools.map(t => ({...t, icon: iconMap[t.icon]})); // Fallback
+    return initialTools.map(t => ({...t, icon: t.icon})); // Fallback
   }
 }
 
