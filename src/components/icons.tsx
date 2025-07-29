@@ -1,6 +1,6 @@
 import type { SVGProps } from 'react';
 
-export function CuanKilatIcon(props: SVGProps<SVGSVGElement>) {
+export function SkripsiKilatIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -14,14 +14,12 @@ export function CuanKilatIcon(props: SVGProps<SVGSVGElement>) {
       strokeLinejoin="round"
       {...props}
     >
-      <path d="M12 2a5 5 0 0 0-5 5c0 1.8.9 3.4 2.4 4.3" />
-      <path d="M12 7a5 5 0 0 1 5 5c0 1.8-.9 3.4-2.4 4.3" />
-      <path d="M12 22a5 5 0 0 1-5-5c0-1.8.9-3.4 2.4-4.3" />
-      <path d="M12 17a5 5 0 0 0 5-5c0-1.8-.9-3.4-2.4-4.3" />
-      <path d="M2 12a5 5 0 0 1 5-5c1.8 0 3.4.9 4.3 2.4" />
-      <path d="M7 12a5 5 0 0 0 5 5c1.8 0 3.4-.9 4.3-2.4" />
-      <path d="M22 12a5 5 0 0 0-5-5c-1.8 0-3.4.9-4.3 2.4" />
-      <path d="M17 12a5 5 0 0 1-5 5c-1.8 0-3.4-.9-4.3-2.4" />
+      <path d="M22 10v6M2 10v6" />
+      <path d="M6 12v-2a6 6 0 0 1 12 0v2" />
+      <path d="M6 18h12" />
+      <path d="m10 10-1.5 1.5L10 13" />
+      <path d="m14 10 1.5 1.5L14 13" />
+      <path d="M4 22h16" />
     </svg>
   );
 }

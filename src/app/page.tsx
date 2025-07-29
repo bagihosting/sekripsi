@@ -10,7 +10,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { getTemplates, Template } from '@/lib/data';
 import AiRecommender from '@/components/ai-recommender';
 import TemplateGrid from '@/components/template-grid';
-import { CuanKilatIcon } from '@/components/icons';
+import { SkripsiKilatIcon } from '@/components/icons';
 import { ArrowRight, Mail, Menu, Sparkles } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -46,8 +46,8 @@ const Header = () => {
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 max-w-screen-xl items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
-          <CuanKilatIcon className="h-6 w-6 text-primary" />
-          <span className="font-headline text-xl font-bold text-foreground">CuanKilat</span>
+          <SkripsiKilatIcon className="h-8 w-8 text-primary" />
+          <span className="font-headline text-xl font-bold text-foreground">SkripsiKilat</span>
         </Link>
         <nav className="hidden items-center gap-6 text-sm font-medium md:flex">
           {navLinks.map(link => (
@@ -72,8 +72,8 @@ const Header = () => {
             <SheetContent side="right">
               <div className="flex flex-col gap-6 pt-12">
                 <Link href="/" className="mb-4 flex items-center gap-2">
-                  <CuanKilatIcon className="h-6 w-6 text-primary" />
-                  <span className="font-headline text-xl font-bold text-foreground">CuanKilat</span>
+                  <SkripsiKilatIcon className="h-8 w-8 text-primary" />
+                  <span className="font-headline text-xl font-bold text-foreground">SkripsiKilat</span>
                 </Link>
                 {navLinks.map(link => (
                   <Link
@@ -166,7 +166,7 @@ const AiSection = () => (
           <Sparkles className="h-12 w-12 text-accent" />
           <h2 className="font-headline text-3xl font-bold md:text-4xl lg:text-5xl">Masih Bingung Judul TA? Biarkan AI Kami Cari Ide Terbaik!</h2>
           <p className="text-lg text-foreground/70">
-            Jangan habiskan waktu berharga Anda! Cukup jelaskan bidang minat Anda, dan AI CuanKilat akan merekomendasikan skrip & template yang paling relevan dan berpotensi dapat nilai A. Gratis!
+            Jangan habiskan waktu berharga Anda! Cukup jelaskan bidang minat Anda, dan AI SkripsiKilat akan merekomendasikan skrip & template yang paling relevan dan berpotensi dapat nilai A. Gratis!
           </p>
         </div>
         <Card className="shadow-lg">
@@ -215,11 +215,11 @@ const Footer = () => {
     <footer className="border-t py-8">
       <div className="container flex max-w-screen-xl flex-col items-center justify-between gap-6 sm:flex-row">
         <div className="flex items-center gap-2">
-          <CuanKilatIcon className="h-6 w-6 text-primary" />
-          <span className="font-headline text-xl font-bold">CuanKilat</span>
+          <SkripsiKilatIcon className="h-8 w-8 text-primary" />
+          <span className="font-headline text-xl font-bold">SkripsiKilat</span>
         </div>
         <p className="text-center text-sm text-muted-foreground sm:text-left">
-          &copy; {year} CuanKilat. Jalan Pintas Menuju Wisuda.
+          &copy; {year} SkripsiKilat. Jalan Pintas Menuju Wisuda.
         </p>
         <div className="flex items-center gap-4">
           <Link href="#" className="text-sm text-muted-foreground transition-colors hover:text-primary">Kebijakan Privasi</Link>

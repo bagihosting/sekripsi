@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster"
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'CuanKilat',
+  title: 'SkripsiKilat',
   description: 'Templat & Skrip Premium Untuk Meluncurkan Proyek Anda dalam Semalam.',
 };
 
