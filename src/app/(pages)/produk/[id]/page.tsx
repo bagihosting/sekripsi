@@ -17,7 +17,8 @@ type Props = {
   params: { id: string }
 }
 
-export default function ProductDetailPage({ params: { id } }: Props) {
+export default function ProductDetailPage({ params }: Props) {
+  const { id } = params;
   const [product, setProduct] = useState<AiTool | null>(null);
   const [loadingProduct, setLoadingProduct] = useState(true);
   
