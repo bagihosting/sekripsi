@@ -1,3 +1,6 @@
+
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -9,6 +12,7 @@ import AiRecommender from '@/components/ai-recommender';
 import TemplateGrid from '@/components/template-grid';
 import { DesignBloomIcon } from '@/components/icons';
 import { ArrowRight, Mail, Sparkles } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 export default function Home() {
   const allTemplates = getTemplates();
@@ -148,23 +152,31 @@ const SupportSection = () => (
   </section>
 );
 
-const Footer = () => (
-  <footer className="border-t py-12">
-    <div className="container flex flex-col items-center justify-between gap-6 sm:flex-row">
-      <div className="flex items-center gap-2">
-        <DesignBloomIcon className="h-6 w-6 text-primary" />
-        <span className="font-headline text-xl font-bold">DesignBloom</span>
+const Footer = () => {
+  const [year, setYear] = useState(new Date().getFullYear());
+
+  useEffect(() => {
+    setYear(new Date().getFullYear());
+  }, []);
+
+  return (
+    <footer className="border-t py-12">
+      <div className="container flex flex-col items-center justify-between gap-6 sm:flex-row">
+        <div className="flex items-center gap-2">
+          <DesignBloomIcon className="h-6 w-6 text-primary" />
+          <span className="font-headline text-xl font-bold">DesignBloom</span>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          &copy; {year} DesignBloom. Semua hak cipta dilindungi.
+        </p>
+        <div className="flex items-center gap-4">
+          <Link href="#" className="text-sm text-muted-foreground transition-colors hover:text-primary">Kebijakan Privasi</Link>
+          <Link href="#" className="text-sm text-muted-foreground transition-colors hover:text-primary">Ketentuan Layanan</Link>
+        </div>
       </div>
-      <p className="text-sm text-muted-foreground">
-        &copy; {new Date().getFullYear()} DesignBloom. Semua hak cipta dilindungi.
-      </p>
-      <div className="flex items-center gap-4">
-        <Link href="#" className="text-sm text-muted-foreground transition-colors hover:text-primary">Kebijakan Privasi</Link>
-        <Link href="#" className="text-sm text-muted-foreground transition-colors hover:text-primary">Ketentuan Layanan</Link>
-      </div>
-    </div>
-  </footer>
-);
+    </footer>
+  );
+};
 
 const TemplateCard = ({ template }: { template: Template }) => (
   <Card className="group overflow-hidden rounded-lg shadow-sm transition-all hover:shadow-xl hover:-translate-y-1">
