@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { generateOutline, GenerateOutlineOutput } from "@/ai/flows/outline-generator";
 import { Button } from "@/components/ui/button";
@@ -9,10 +9,14 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Loader2, BookMarked, FileText } from "lucide-react";
 import { Badge } from "./ui/badge";
 
-type OutlineGeneratorState = {
+const initialState: {
   result: GenerateOutlineOutput | null;
   error: string | null;
+} = {
+  result: null,
+  error: null,
 };
+
 
 async function generateOutlineAction(
   prevState: any,
@@ -37,15 +41,7 @@ async function generateOutlineAction(
 }
 
 export default function OutlineGenerator() {
-  const [state, setState] = useState<OutlineGeneratorState>({
-    result: null,
-    error: null,
-  });
-
-  const formAction = async (formData: FormData) => {
-    const newState = await generateOutlineAction(state, formData);
-    setState(newState);
-  };
+  const [state, formAction] = useActionState(generateOutlineAction, initialState);
 
   return (
     <div className="space-y-6">
@@ -56,6 +52,7 @@ export default function OutlineGenerator() {
             placeholder="cth., 'Analisis Sentimen Media Sosial Terhadap...'"
             className="bg-background"
             required
+            key={state.result ? Date.now() : 'input'}
           />
         </div>
         <SubmitButton />

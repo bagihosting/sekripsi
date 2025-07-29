@@ -1,9 +1,9 @@
-
 "use client";
 
 import { Card, CardHeader, CardTitle, CardDescription, CardFooter } from './ui/card';
 import { Switch } from './ui/switch';
 import { Label } from './ui/label';
+import { useState } from 'react';
 
 interface FeatureManagementCardProps {
   id: string;
@@ -13,7 +13,7 @@ interface FeatureManagementCardProps {
 
 export default function FeatureManagementCard({ id, title, description }: FeatureManagementCardProps) {
   // In a real application, this state would come from and be saved to your database.
-  const [isEnabled, setIsEnabled] = React.useState(true);
+  const [isEnabled, setIsEnabled] = useState(true);
 
   const handleToggle = () => {
     // Here you would typically call a server action to update the feature's status in Firestore.
@@ -41,6 +41,3 @@ export default function FeatureManagementCard({ id, title, description }: Featur
     </Card>
   );
 }
-
-// Add React to the scope if it's not globally available
-import * as React from 'react';

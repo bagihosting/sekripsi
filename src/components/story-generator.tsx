@@ -1,13 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { useFormState, useFormStatus } from "react-dom";
+import { useActionState } from "react";
+import { useFormStatus } from "react-dom";
 import { generateStory, StoryGeneratorOutput } from "@/ai/flows/story-generator";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Loader2, BookOpen, Wand } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
 
 const initialState: {
   result: StoryGeneratorOutput | null;
@@ -41,7 +40,7 @@ async function generateStoryAction(
 
 
 export default function StoryGenerator() {
-  const [state, formAction] = useFormState(generateStoryAction, initialState);
+  const [state, formAction] = useActionState(generateStoryAction, initialState);
 
   return (
     <div className="space-y-6">
@@ -53,6 +52,7 @@ export default function StoryGenerator() {
             rows={4}
             className="bg-background"
             required
+            key={state.result ? Date.now() : 'textarea'}
           />
         </div>
         <SubmitButton />

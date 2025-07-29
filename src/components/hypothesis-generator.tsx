@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { generateHypotheses, HypothesisGeneratorOutput } from "@/ai/flows/hypothesis-generator";
 import { Button } from "@/components/ui/button";
@@ -9,48 +9,49 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Loader2, TestTubeDiagonal, Beaker } from "lucide-react";
 import { Badge } from "./ui/badge";
 
-type HypothesisGeneratorState = {
+const initialState: {
   result: HypothesisGeneratorOutput | null;
   error: string | null;
+} = {
+  result: null,
+  error: null,
 };
 
-export default function HypothesisGenerator() {
-  const [state, setState] = useState<HypothesisGeneratorState>({
-    result: null,
-    error: null,
-  });
-
-  async function handleAction(formData: FormData) {
-    const researchTopic = formData.get("researchTopic") as string;
-    if (!researchTopic) {
-      setState({ result: null, error: "Silakan masukkan topik penelitian Anda." });
-      return;
-    }
-
-    setState({ result: null, error: null });
-
-    try {
-      const result = await generateHypotheses({ researchTopic });
-      if (result.hypotheses) {
-        setState({ result, error: null });
-      } else {
-        setState({ result: null, error: "Tidak dapat menghasilkan hipotesis. Silakan coba lagi." });
-      }
-    } catch (e) {
-      console.error(e);
-      setState({ result: null, error: "Terjadi kesalahan yang tidak terduga. Mohon coba lagi." });
-    }
+async function generateHypothesesAction(
+  prevState: any,
+  formData: FormData
+): Promise<{ result: HypothesisGeneratorOutput | null; error: string | null; }> {
+  const researchTopic = formData.get("researchTopic") as string;
+  if (!researchTopic) {
+    return { result: null, error: "Silakan masukkan topik penelitian Anda." };
   }
+
+  try {
+    const result = await generateHypotheses({ researchTopic });
+    if (result.hypotheses) {
+      return { result, error: null };
+    } else {
+      return { result: null, error: "Tidak dapat menghasilkan hipotesis. Silakan coba lagi." };
+    }
+  } catch (e) {
+    console.error(e);
+    return { result: null, error: "Terjadi kesalahan yang tidak terduga. Mohon coba lagi." };
+  }
+}
+
+export default function HypothesisGenerator() {
+  const [state, formAction] = useActionState(generateHypothesesAction, initialState);
 
   return (
     <div className="space-y-6">
-      <form action={handleAction} className="space-y-4">
+      <form action={formAction} className="space-y-4">
         <div>
           <Input
             name="researchTopic"
             placeholder="cth., 'Pengaruh penggunaan media sosial terhadap prestasi akademik mahasiswa'"
             className="bg-background"
             required
+            key={state.result ? Date.now() : 'input'}
           />
         </div>
         <SubmitButton />

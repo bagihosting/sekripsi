@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { checkGrammar, GrammarCheckOutput } from "@/ai/flows/grammar-checker";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, SpellCheck, CheckCircle, XCircle, ArrowRight } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Loader2, SpellCheck, CheckCircle, XCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { diffWordsWithSpace } from 'diff';
 
@@ -15,6 +15,34 @@ type GrammarCheckerState = {
   error: string | null;
   originalText: string | null;
 };
+
+const initialState: GrammarCheckerState = {
+  result: null,
+  error: null,
+  originalText: null,
+};
+
+async function checkGrammarAction(
+  prevState: GrammarCheckerState,
+  formData: FormData
+): Promise<GrammarCheckerState> {
+  const text = formData.get("originalText") as string;
+  if (!text) {
+    return { result: null, error: "Silakan masukkan teks yang ingin diperiksa.", originalText: null };
+  }
+
+  try {
+    const result = await checkGrammar({ text });
+    if (result.correctedText) {
+      return { result, error: null, originalText: text };
+    } else {
+      return { result: null, error: "Tidak dapat memeriksa teks. Silakan coba lagi.", originalText: text };
+    }
+  } catch (e) {
+    console.error(e);
+    return { result: null, error: "Terjadi kesalahan yang tidak terduga. Mohon coba lagi.", originalText: text };
+  }
+}
 
 function TextDiff({ text1, text2 }: { text1: string; text2: string }) {
     const differences = diffWordsWithSpace(text1, text2);
@@ -33,37 +61,11 @@ function TextDiff({ text1, text2 }: { text1: string; text2: string }) {
 }
 
 export default function GrammarChecker() {
-  const [state, setState] = useState<GrammarCheckerState>({
-    result: null,
-    error: null,
-    originalText: null,
-  });
-
-  async function handleAction(formData: FormData) {
-    const text = formData.get("originalText") as string;
-    if (!text) {
-      setState({ result: null, error: "Silakan masukkan teks yang ingin diperiksa.", originalText: null });
-      return;
-    }
-
-    setState({ result: null, error: null, originalText: text });
-
-    try {
-      const result = await checkGrammar({ text });
-      if (result.correctedText) {
-        setState(prevState => ({ ...prevState, result, error: null }));
-      } else {
-        setState(prevState => ({ ...prevState, result: null, error: "Tidak dapat memeriksa teks. Silakan coba lagi." }));
-      }
-    } catch (e) {
-      console.error(e);
-      setState(prevState => ({ ...prevState, result: null, error: "Terjadi kesalahan yang tidak terduga. Mohon coba lagi." }));
-    }
-  }
+  const [state, formAction] = useActionState(checkGrammarAction, initialState);
 
   return (
     <div className="space-y-6">
-      <form action={handleAction} className="space-y-4">
+      <form action={formAction} className="space-y-4">
         <div>
           <Textarea
             name="originalText"
@@ -71,6 +73,7 @@ export default function GrammarChecker() {
             rows={8}
             className="bg-background"
             required
+            key={state.result ? Date.now() : 'textarea'}
           />
         </div>
         <SubmitButton />

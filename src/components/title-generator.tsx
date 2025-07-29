@@ -1,55 +1,56 @@
 "use client";
 
-import { useState } from "react";
+import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { generateTitles, GenerateTitlesOutput } from "@/ai/flows/title-generator";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Loader2, Wand2, Lightbulb } from "lucide-react";
 
-type TitleGeneratorState = {
+const initialState: {
   result: GenerateTitlesOutput | null;
   error: string | null;
+} = {
+  result: null,
+  error: null,
 };
 
-export default function TitleGenerator() {
-  const [state, setState] = useState<TitleGeneratorState>({
-    result: null,
-    error: null,
-  });
-
-  async function handleAction(formData: FormData) {
-    const fieldOfStudy = formData.get("fieldOfStudy") as string;
-    if (!fieldOfStudy) {
-      setState({ result: null, error: "Silakan masukkan bidang studi atau kata kunci." });
-      return;
-    }
-
-    setState({ result: null, error: null });
-
-    try {
-      const result = await generateTitles({ fieldOfStudy });
-      if (result.titles) {
-        setState({ result, error: null });
-      } else {
-        setState({ result: null, error: "Tidak dapat menghasilkan judul. Silakan coba lagi." });
-      }
-    } catch (e) {
-      console.error(e);
-      setState({ result: null, error: "Terjadi kesalahan yang tidak terduga. Mohon coba lagi." });
-    }
+async function generateTitlesAction(
+  prevState: any,
+  formData: FormData
+): Promise<{ result: GenerateTitlesOutput | null; error: string | null; }> {
+  const fieldOfStudy = formData.get("fieldOfStudy") as string;
+  if (!fieldOfStudy) {
+    return { result: null, error: "Silakan masukkan bidang studi atau kata kunci." };
   }
+
+  try {
+    const result = await generateTitles({ fieldOfStudy });
+    if (result.titles) {
+      return { result, error: null };
+    } else {
+      return { result: null, error: "Tidak dapat menghasilkan judul. Silakan coba lagi." };
+    }
+  } catch (e) {
+    console.error(e);
+    return { result: null, error: "Terjadi kesalahan yang tidak terduga. Mohon coba lagi." };
+  }
+}
+
+export default function TitleGenerator() {
+  const [state, formAction] = useActionState(generateTitlesAction, initialState);
 
   return (
     <div className="space-y-6">
-      <form action={handleAction} className="space-y-4">
+      <form action={formAction} className="space-y-4">
         <div>
           <Input
             name="fieldOfStudy"
             placeholder="cth., 'Sistem Informasi', 'Manajemen Keuangan'"
             className="bg-background"
             required
+            key={state.result ? Date.now() : 'input'}
           />
         </div>
         <SubmitButton />

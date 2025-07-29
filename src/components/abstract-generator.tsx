@@ -1,54 +1,55 @@
 "use client";
 
-import { useState } from "react";
+import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { generateAbstract, AbstractGeneratorOutput } from "@/ai/flows/abstract-generator";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Loader2, BookText, Wand2 } from "lucide-react";
 import { Label } from "./ui/label";
 
-type AbstractGeneratorState = {
+const initialState: {
   result: AbstractGeneratorOutput | null;
   error: string | null;
+} = {
+  result: null,
+  error: null,
 };
 
-export default function AbstractGenerator() {
-  const [state, setState] = useState<AbstractGeneratorState>({
-    result: null,
-    error: null,
-  });
+async function generateAbstractAction(
+  prevState: any,
+  formData: FormData
+): Promise<{ result: AbstractGeneratorOutput | null; error: string | null; }> {
+  const background = formData.get("background") as string;
+  const methods = formData.get("methods") as string;
+  const results = formData.get("results") as string;
+  const conclusion = formData.get("conclusion") as string;
 
-  async function handleAction(formData: FormData) {
-    const background = formData.get("background") as string;
-    const methods = formData.get("methods") as string;
-    const results = formData.get("results") as string;
-    const conclusion = formData.get("conclusion") as string;
-
-    if (!background || !methods || !results || !conclusion) {
-      setState({ result: null, error: "Harap isi semua bagian untuk menghasilkan abstrak." });
-      return;
-    }
-
-    setState({ result: null, error: null });
-
-    try {
-      const result = await generateAbstract({ background, methods, results, conclusion });
-      if (result.abstract) {
-        setState({ result, error: null });
-      } else {
-        setState({ result: null, error: "Tidak dapat menghasilkan abstrak. Silakan coba lagi." });
-      }
-    } catch (e) {
-      console.error(e);
-      setState({ result: null, error: "Terjadi kesalahan yang tidak terduga. Mohon coba lagi." });
-    }
+  if (!background || !methods || !results || !conclusion) {
+    return { result: null, error: "Harap isi semua bagian untuk menghasilkan abstrak." };
   }
+
+  try {
+    const result = await generateAbstract({ background, methods, results, conclusion });
+    if (result.abstract) {
+      return { result, error: null };
+    } else {
+      return { result: null, error: "Tidak dapat menghasilkan abstrak. Silakan coba lagi." };
+    }
+  } catch (e) {
+    console.error(e);
+    return { result: null, error: "Terjadi kesalahan yang tidak terduga. Mohon coba lagi." };
+  }
+}
+
+
+export default function AbstractGenerator() {
+  const [state, formAction] = useActionState(generateAbstractAction, initialState);
 
   return (
     <div className="space-y-6">
-      <form action={handleAction} className="space-y-4">
+      <form action={formAction} className="space-y-4">
         <div className="grid gap-2">
             <Label htmlFor="background">Latar Belakang & Tujuan</Label>
             <Textarea

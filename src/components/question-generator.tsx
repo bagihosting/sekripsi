@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { generateQuestions, QuestionGeneratorOutput } from "@/ai/flows/question-generator";
 import { Button } from "@/components/ui/button";
@@ -9,48 +9,49 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Loader2, Target, HelpCircle } from "lucide-react";
 import { Badge } from "./ui/badge";
 
-type QuestionGeneratorState = {
+const initialState: {
   result: QuestionGeneratorOutput | null;
   error: string | null;
+} = {
+  result: null,
+  error: null,
 };
 
-export default function QuestionGenerator() {
-  const [state, setState] = useState<QuestionGeneratorState>({
-    result: null,
-    error: null,
-  });
-
-  async function handleAction(formData: FormData) {
-    const topic = formData.get("topic") as string;
-    if (!topic) {
-      setState({ result: null, error: "Silakan masukkan topik penelitian Anda." });
-      return;
-    }
-
-    setState({ result: null, error: null });
-
-    try {
-      const result = await generateQuestions({ topic });
-      if (result.questions) {
-        setState({ result, error: null });
-      } else {
-        setState({ result: null, error: "Tidak dapat menghasilkan pertanyaan. Silakan coba lagi." });
-      }
-    } catch (e) {
-      console.error(e);
-      setState({ result: null, error: "Terjadi kesalahan yang tidak terduga. Mohon coba lagi." });
-    }
+async function generateQuestionsAction(
+  prevState: any,
+  formData: FormData
+): Promise<{ result: QuestionGeneratorOutput | null; error: string | null; }> {
+  const topic = formData.get("topic") as string;
+  if (!topic) {
+    return { result: null, error: "Silakan masukkan topik penelitian Anda." };
   }
+
+  try {
+    const result = await generateQuestions({ topic });
+    if (result.questions) {
+      return { result, error: null };
+    } else {
+      return { result: null, error: "Tidak dapat menghasilkan pertanyaan. Silakan coba lagi." };
+    }
+  } catch (e) {
+    console.error(e);
+    return { result: null, error: "Terjadi kesalahan yang tidak terduga. Mohon coba lagi." };
+  }
+}
+
+export default function QuestionGenerator() {
+  const [state, formAction] = useActionState(generateQuestionsAction, initialState);
 
   return (
     <div className="space-y-6">
-      <form action={handleAction} className="space-y-4">
+      <form action={formAction} className="space-y-4">
         <div>
           <Input
             name="topic"
             placeholder="cth., 'Dampak kerja jarak jauh pada budaya perusahaan'"
             className="bg-background"
             required
+            key={state.result ? Date.now() : 'input'}
           />
         </div>
         <SubmitButton />
