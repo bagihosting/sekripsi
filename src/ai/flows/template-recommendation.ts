@@ -14,14 +14,14 @@ import {z} from 'genkit';
 const RecommendTemplatesInputSchema = z.object({
   projectDescription: z
     .string()
-    .describe('A description of the project for which a template is needed.'),
+    .describe('Deskripsi proyek yang membutuhkan template.'),
 });
 export type RecommendTemplatesInput = z.infer<typeof RecommendTemplatesInputSchema>;
 
 const RecommendTemplatesOutputSchema = z.object({
   templateRecommendations: z
     .array(z.string())
-    .describe('A list of template recommendations based on the project description.'),
+    .describe('Daftar rekomendasi template berdasarkan deskripsi proyek.'),
 });
 export type RecommendTemplatesOutput = z.infer<typeof RecommendTemplatesOutputSchema>;
 
@@ -33,12 +33,12 @@ const prompt = ai.definePrompt({
   name: 'recommendTemplatesPrompt',
   input: {schema: RecommendTemplatesInputSchema},
   output: {schema: RecommendTemplatesOutputSchema},
-  prompt: `You are an expert in recommending website templates based on project descriptions.
+  prompt: `Anda adalah seorang ahli dalam merekomendasikan template situs web berdasarkan deskripsi proyek.
 
-  Based on the following project description, recommend a list of website templates that would be suitable.
-  Project Description: {{{projectDescription}}}
+  Berdasarkan deskripsi proyek berikut, rekomendasikan daftar template situs web yang cocok.
+  Deskripsi Proyek: {{{projectDescription}}}
   
-  Return a list of template names.`,
+  Kembalikan daftar nama template dalam Bahasa Indonesia.`,
 });
 
 const recommendTemplatesFlow = ai.defineFlow(

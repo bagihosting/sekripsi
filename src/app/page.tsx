@@ -37,13 +37,13 @@ const Header = () => (
         <span className="font-headline text-xl font-bold text-foreground">DesignBloom</span>
       </Link>
       <nav className="hidden items-center gap-6 text-sm font-medium md:flex">
-        <Link href="#templates" className="transition-colors hover:text-primary">Templates</Link>
-        <Link href="#ai-recommendations" className="transition-colors hover:text-primary">AI Recommendations</Link>
-        <Link href="#support" className="transition-colors hover:text-primary">Support</Link>
+        <Link href="#templates" className="transition-colors hover:text-primary">Template</Link>
+        <Link href="#ai-recommendations" className="transition-colors hover:text-primary">Rekomendasi AI</Link>
+        <Link href="#support" className="transition-colors hover:text-primary">Dukungan</Link>
       </nav>
       <Button asChild>
         <Link href="#templates">
-          View Templates <ArrowRight className="ml-2 h-4 w-4" />
+          Lihat Template <ArrowRight className="ml-2 h-4 w-4" />
         </Link>
       </Button>
     </div>
@@ -54,20 +54,19 @@ const HeroSection = () => (
   <section className="container grid min-h-[calc(100dvh-3.5rem)] content-center text-center">
     <div className="mx-auto max-w-4xl">
       <h1 className="font-headline text-5xl font-bold tracking-tight md:text-7xl lg:text-8xl">
-        Where Creativity Blossoms into Code
+        Tempat Kreativitas Mekar Menjadi Kode
       </h1>
       <p className="mx-auto mt-6 max-w-2xl text-lg text-foreground/80 md:text-xl">
-        Discover a curated collection of exquisite website templates.
-        Elegantly designed, powerfully built, and ready to launch your next big idea.
+        Temukan koleksi pilihan template situs web yang indah. Didesain dengan elegan, dibuat dengan andal, dan siap untuk meluncurkan ide besar Anda berikutnya.
       </p>
       <div className="mt-8 flex justify-center gap-4">
         <Button size="lg" asChild>
-          <Link href="#templates">Explore Designs</Link>
+          <Link href="#templates">Jelajahi Desain</Link>
         </Button>
         <Button size="lg" variant="outline" asChild>
           <Link href="#ai-recommendations">
             <Sparkles className="mr-2 h-5 w-5" />
-            Get AI Advice
+            Dapatkan Saran AI
           </Link>
         </Button>
       </div>
@@ -79,9 +78,9 @@ const TrendingSection = ({ templates }: { templates: Template[] }) => (
   <section id="trending" className="w-full py-16 lg:py-24">
     <div className="container">
       <div className="mx-auto mb-12 max-w-2xl text-center">
-        <h2 className="font-headline text-4xl font-bold md:text-5xl">Trending Templates</h2>
+        <h2 className="font-headline text-4xl font-bold md:text-5xl">Template Populer</h2>
         <p className="mt-4 text-lg text-foreground/70">
-          The most popular and best-selling designs, loved by our community.
+          Desain paling populer dan terlaris, yang disukai oleh komunitas kami.
         </p>
       </div>
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -97,9 +96,9 @@ const AllTemplatesSection = ({ templates }: { templates: Template[] }) => (
   <section id="templates" className="w-full bg-secondary/50 py-16 lg:py-24">
     <div className="container">
        <div className="mx-auto mb-12 max-w-2xl text-center">
-        <h2 className="font-headline text-4xl font-bold md:text-5xl">Our Collection</h2>
+        <h2 className="font-headline text-4xl font-bold md:text-5xl">Koleksi Kami</h2>
         <p className="mt-4 text-lg text-foreground/70">
-          Browse our extensive library of premium templates. Find the perfect fit for your project.
+          Jelajahi pustaka lengkap template premium kami. Temukan yang paling cocok untuk proyek Anda.
         </p>
       </div>
       <TemplateGrid templates={templates} />
@@ -113,9 +112,9 @@ const AiSection = () => (
       <div className="grid items-center gap-12 lg:grid-cols-2">
         <div className="space-y-4">
           <Sparkles className="h-12 w-12 text-accent" />
-          <h2 className="font-headline text-4xl font-bold md:text-5xl">Unsure Where to Start?</h2>
+          <h2 className="font-headline text-4xl font-bold md:text-5xl">Bingung Mulai dari Mana?</h2>
           <p className="text-lg text-foreground/70">
-            Let our AI guide you. Describe your project, your brand's style, and your target audience. Our intelligent assistant will analyze your needs and recommend the perfect templates to bring your vision to life.
+            Biarkan AI kami memandu Anda. Jelaskan proyek Anda, gaya merek Anda, dan audiens target Anda. Asisten cerdas kami akan menganalisis kebutuhan Anda dan merekomendasikan template yang sempurna untuk mewujudkan visi Anda.
           </p>
         </div>
         <Card className="shadow-lg">
@@ -131,18 +130,18 @@ const AiSection = () => (
 const SupportSection = () => (
   <section id="support" className="bg-secondary/50 py-16 lg:py-24">
     <div className="container max-w-2xl text-center">
-      <h2 className="font-headline text-4xl font-bold md:text-5xl">We're Here to Help</h2>
+      <h2 className="font-headline text-4xl font-bold md:text-5xl">Kami Siap Membantu</h2>
       <p className="mt-4 text-lg text-foreground/70">
-        Have questions? Need assistance? Our dedicated support team is ready to help you on your journey.
+        Ada pertanyaan? Butuh bantuan? Tim dukungan kami yang berdedikasi siap membantu Anda dalam perjalanan Anda.
       </p>
       <form className="mt-8 space-y-4 text-left">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <Input placeholder="Your Name" />
-          <Input type="email" placeholder="Your Email" />
+          <Input placeholder="Nama Anda" />
+          <Input type="email" placeholder="Email Anda" />
         </div>
-        <Textarea placeholder="Your Message" rows={6} />
+        <Textarea placeholder="Pesan Anda" rows={6} />
         <Button type="submit" className="w-full sm:w-auto" size="lg">
-          <Mail className="mr-2 h-5 w-5" /> Send Message
+          <Mail className="mr-2 h-5 w-5" /> Kirim Pesan
         </Button>
       </form>
     </div>
@@ -157,11 +156,11 @@ const Footer = () => (
         <span className="font-headline text-xl font-bold">DesignBloom</span>
       </div>
       <p className="text-sm text-muted-foreground">
-        &copy; {new Date().getFullYear()} DesignBloom. All rights reserved.
+        &copy; {new Date().getFullYear()} DesignBloom. Semua hak cipta dilindungi.
       </p>
       <div className="flex items-center gap-4">
-        <Link href="#" className="text-sm text-muted-foreground transition-colors hover:text-primary">Privacy Policy</Link>
-        <Link href="#" className="text-sm text-muted-foreground transition-colors hover:text-primary">Terms of Service</Link>
+        <Link href="#" className="text-sm text-muted-foreground transition-colors hover:text-primary">Kebijakan Privasi</Link>
+        <Link href="#" className="text-sm text-muted-foreground transition-colors hover:text-primary">Ketentuan Layanan</Link>
       </div>
     </div>
   </footer>
@@ -192,10 +191,10 @@ const TemplateCard = ({ template }: { template: Template }) => (
         <p className="text-sm text-muted-foreground">{template.shortDescription}</p>
         <div className="mt-4 flex gap-2">
           <Button size="sm" className="flex-1" asChild>
-            <Link href="#">Live Demo</Link>
+            <Link href="#">Demo Langsung</Link>
           </Button>
           <Button size="sm" variant="outline" className="flex-1" asChild>
-            <Link href="#">Details</Link>
+            <Link href="#">Detail</Link>
           </Button>
         </div>
       </div>

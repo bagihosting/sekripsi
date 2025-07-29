@@ -22,7 +22,7 @@ export default function AiRecommender() {
   async function handleAction(formData: FormData) {
     const projectDescription = formData.get("projectDescription") as string;
     if (!projectDescription) {
-      setState({ recommendations: null, error: "Please enter a project description." });
+      setState({ recommendations: null, error: "Silakan masukkan deskripsi proyek." });
       return;
     }
 
@@ -33,10 +33,10 @@ export default function AiRecommender() {
       if (result.templateRecommendations) {
         setState({ recommendations: result.templateRecommendations, error: null });
       } else {
-        setState({ recommendations: null, error: "Could not get recommendations. Please try again." });
+        setState({ recommendations: null, error: "Tidak dapat memperoleh rekomendasi. Silakan coba lagi." });
       }
     } catch (e) {
-      setState({ recommendations: null, error: "An unexpected error occurred." });
+      setState({ recommendations: null, error: "Terjadi kesalahan yang tidak terduga." });
     }
   }
 
@@ -45,7 +45,7 @@ export default function AiRecommender() {
       <div>
         <Textarea
           name="projectDescription"
-          placeholder="e.g., 'I'm building a modern portfolio for a photographer, with a clean, minimalist style and large image galleries.'"
+          placeholder="cth., 'Saya sedang membangun portofolio modern untuk seorang fotografer, dengan gaya minimalis yang bersih dan galeri gambar yang besar.'"
           rows={5}
           className="bg-background"
           required
@@ -58,7 +58,7 @@ export default function AiRecommender() {
         <div className="pt-4">
             <h4 className="font-headline text-lg font-semibold mb-2 flex items-center">
                 <Lightbulb className="w-5 h-5 mr-2 text-primary" />
-                Our Recommendations
+                Rekomendasi Kami
             </h4>
             <ul className="list-disc list-inside space-y-1 text-foreground/80">
                 {state.recommendations.map((rec, index) => (
@@ -81,7 +81,7 @@ function SubmitButton() {
       ) : (
         <Sparkles className="mr-2 h-5 w-5" />
       )}
-      {pending ? "Analyzing..." : "Get Recommendations"}
+      {pending ? "Menganalisis..." : "Dapatkan Rekomendasi"}
     </Button>
   );
 }

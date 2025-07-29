@@ -44,29 +44,29 @@ export default function TemplateGrid({ templates }: { templates: Template[] }) {
     <div>
       <div className="mb-8 flex flex-col items-center justify-between gap-4 rounded-lg border bg-card p-4 sm:flex-row">
         <div className="flex w-full items-center gap-4 sm:w-auto">
-          <span className="text-sm font-medium">Filter by:</span>
+          <span className="text-sm font-medium">Filter berdasarkan:</span>
           <Select value={category} onValueChange={setCategory}>
             <SelectTrigger className="w-full sm:w-[180px]">
-              <SelectValue placeholder="Category" />
+              <SelectValue placeholder="Kategori" />
             </SelectTrigger>
             <SelectContent>
               {categories.map(cat => (
-                <SelectItem key={cat} value={cat} className="capitalize">{cat}</SelectItem>
+                <SelectItem key={cat} value={cat} className="capitalize">{cat === 'all' ? 'Semua' : cat}</SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
         <div className="flex w-full items-center gap-4 sm:w-auto">
-          <span className="text-sm font-medium">Sort by:</span>
+          <span className="text-sm font-medium">Urutkan berdasarkan:</span>
           <Select value={sort} onValueChange={setSort}>
             <SelectTrigger className="w-full sm:w-[180px]">
-              <SelectValue placeholder="Sort" />
+              <SelectValue placeholder="Urutkan" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="name-asc">Name (A-Z)</SelectItem>
-              <SelectItem value="name-desc">Name (Z-A)</SelectItem>
-              <SelectItem value="price-asc">Price (Low to High)</SelectItem>
-              <SelectItem value="price-desc">Price (High to Low)</SelectItem>
+              <SelectItem value="name-asc">Nama (A-Z)</SelectItem>
+              <SelectItem value="name-desc">Nama (Z-A)</SelectItem>
+              <SelectItem value="price-asc">Harga (Rendah ke Tinggi)</SelectItem>
+              <SelectItem value="price-desc">Harga (Tinggi ke Rendah)</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -106,10 +106,10 @@ const TemplateCard = ({ template }: { template: Template }) => (
         <p className="text-sm text-muted-foreground">{template.shortDescription}</p>
         <div className="mt-4 flex gap-2">
           <Button size="sm" className="flex-1" asChild>
-            <Link href="#">Live Demo</Link>
+            <Link href="#">Demo Langsung</Link>
           </Button>
           <Button size="sm" variant="outline" className="flex-1" asChild>
-            <Link href="#">Details</Link>
+            <Link href="#">Detail</Link>
           </Button>
         </div>
       </div>
