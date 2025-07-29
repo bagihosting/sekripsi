@@ -1,6 +1,6 @@
 
 import { getPricingPlans } from '@/lib/plans';
-import PricingClientPage from './harga-client-page';
+import PricingClientPage from '../harga-client-page';
 
 export default async function HargaPage() {
   const plans = await getPricingPlans();
