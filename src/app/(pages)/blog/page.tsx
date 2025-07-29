@@ -96,7 +96,7 @@ export default function BlogPage() {
 
 function FeaturedPost({ post }: { post: typeof featuredPost }) {
     return (
-        <section className="relative flex h-[60vh] min-h-[400px] w-full items-end bg-background text-white">
+        <section className="relative flex h-[70vh] min-h-[450px] w-full items-end bg-background text-white md:h-[60vh]">
             <div className="absolute inset-0">
                 <Image
                     src={post.imageUrl}
@@ -106,13 +106,13 @@ function FeaturedPost({ post }: { post: typeof featuredPost }) {
                     className="object-cover"
                     priority
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent" />
             </div>
             <div className="container relative z-10 max-w-screen-xl pb-12">
                 <Badge variant="secondary" className="mb-4">{post.category}</Badge>
-                <h1 className="font-headline text-3xl font-bold md:text-4xl lg:text-5xl max-w-4xl">{post.title}</h1>
+                <h1 className="font-headline text-3xl font-bold sm:text-4xl md:text-5xl max-w-4xl">{post.title}</h1>
                 <p className="mt-4 max-w-2xl text-lg text-white/80">{post.description}</p>
-                 <div className="mt-4 flex items-center gap-4 text-sm text-white/90">
+                 <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 text-sm text-white/90">
                     <div className="flex items-center gap-2">
                         <User className="h-4 w-4" />
                         <span>{post.author}</span>
@@ -134,7 +134,7 @@ function FeaturedPost({ post }: { post: typeof featuredPost }) {
 
 function ArticleCard({ post }: { post: typeof blogPosts[number] }) {
   return (
-    <Card className="flex flex-col overflow-hidden rounded-lg shadow-sm transition-all hover:shadow-lg hover:-translate-y-1">
+    <Card className="group flex flex-col overflow-hidden rounded-lg shadow-sm transition-all hover:shadow-lg hover:-translate-y-1">
       <Link href={post.href} className="block">
         <div className="aspect-video relative overflow-hidden">
             <Image
@@ -172,7 +172,7 @@ function ArticleCard({ post }: { post: typeof blogPosts[number] }) {
 function HorizontalArticleCard({ post }: { post: typeof blogPosts[number] }) {
     return (
         <Card className="group flex flex-col sm:flex-row overflow-hidden rounded-lg shadow-sm transition-all hover:shadow-lg hover:-translate-y-1">
-            <Link href={post.href} className="sm:w-2/5 block">
+            <Link href={post.href} className="sm:w-2/5 block flex-shrink-0">
                 <div className="aspect-video sm:aspect-square relative h-full">
                     <Image
                         src={post.imageUrl}
@@ -189,7 +189,7 @@ function HorizontalArticleCard({ post }: { post: typeof blogPosts[number] }) {
                     <h3 className="font-headline text-xl font-semibold leading-snug">
                         <Link href={post.href} className="hover:text-primary transition-colors">{post.title}</Link>
                     </h3>
-                    <p className="mt-2 text-sm text-muted-foreground line-clamp-2">{post.description}</p>
+                    <p className="mt-2 text-sm text-muted-foreground line-clamp-2 sm:line-clamp-3">{post.description}</p>
                 </div>
                 <div className="mt-4 flex items-center gap-4 text-xs text-muted-foreground">
                     <div className="flex items-center gap-1.5">

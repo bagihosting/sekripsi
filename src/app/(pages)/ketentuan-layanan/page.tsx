@@ -1,8 +1,8 @@
 
 export default function KetentuanLayananPage() {
     return (
-      <div className="container max-w-screen-md py-12 lg:py-16">
-        <article className="prose prose-lg mx-auto dark:prose-invert">
+      <div className="container max-w-screen-md py-12 lg:py-16 px-4 md:px-8">
+        <article className="prose prose-lg mx-auto dark:prose-invert max-w-none">
           <h1 className="font-headline text-3xl font-bold md:text-4xl">Ketentuan Layanan</h1>
           <p className="lead text-muted-foreground">Terakhir diperbarui: 1 Agustus 2024</p>
   

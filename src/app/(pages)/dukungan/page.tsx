@@ -7,7 +7,7 @@ import { Mail, MessageSquareHeart } from 'lucide-react';
 export default function DukunganPage() {
     return (
         <section id="support" className="py-16 lg:py-24">
-            <div className="container max-w-screen-xl">
+            <div className="container max-w-screen-xl px-4 md:px-8">
                 <div className="mx-auto max-w-3xl text-center">
                     <MessageSquareHeart className="h-16 w-16 mx-auto text-accent mb-4" />
                     <h1 className="font-headline text-3xl font-bold md:text-4xl lg:text-5xl">Kami di Sini untuk Membantumu</h1>
@@ -21,7 +21,7 @@ export default function DukunganPage() {
                         <Input type="email" placeholder="Email Kamu" aria-label="Your Email" />
                     </div>
                     <Textarea placeholder="Tulis pesan, pertanyaan, atau saranmu di sini..." rows={6} aria-label="Your Message" />
-                    <div className="text-left">
+                    <div className="text-center sm:text-left">
                         <Button type="submit" size="lg">
                             <Mail className="mr-2 h-5 w-5" /> Kirim Pesan
                         </Button>

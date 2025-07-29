@@ -8,6 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { Label } from '@/components/ui/label';
 
 export default function TemplateGrid({ templates }: { templates: Template[] }) {
   const [category, setCategory] = useState('all');
@@ -43,11 +44,11 @@ export default function TemplateGrid({ templates }: { templates: Template[] }) {
 
   return (
     <div>
-      <div className="mb-8 flex flex-col items-stretch justify-between gap-4 rounded-lg border bg-card p-4 sm:flex-row sm:items-center">
-        <div className="flex flex-1 items-center gap-4">
-          <label htmlFor="category-filter" className="text-sm font-medium shrink-0">Filter:</label>
+      <div className="mb-8 flex flex-col items-stretch justify-between gap-4 rounded-lg border bg-card p-4 md:flex-row md:items-center">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4 flex-grow">
+          <Label htmlFor="category-filter" className="text-sm font-medium shrink-0">Filter by Category:</Label>
           <Select value={category} onValueChange={setCategory}>
-            <SelectTrigger id="category-filter" className="w-full sm:w-[180px]">
+            <SelectTrigger id="category-filter" className="w-full sm:w-[200px]">
               <SelectValue placeholder="Category" />
             </SelectTrigger>
             <SelectContent>
@@ -57,10 +58,10 @@ export default function TemplateGrid({ templates }: { templates: Template[] }) {
             </SelectContent>
           </Select>
         </div>
-        <div className="flex flex-1 items-center gap-4">
-           <label htmlFor="sort-filter" className="text-sm font-medium shrink-0">Sort by:</label>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4 flex-grow">
+           <Label htmlFor="sort-filter" className="text-sm font-medium shrink-0">Sort by:</Label>
           <Select value={sort} onValueChange={setSort}>
-            <SelectTrigger id="sort-filter" className="w-full sm:w-[180px]">
+            <SelectTrigger id="sort-filter" className="w-full sm:w-[200px]">
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
             <SelectContent>
@@ -73,10 +74,13 @@ export default function TemplateGrid({ templates }: { templates: Template[] }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {filteredAndSortedTemplates.map(template => (
           <TemplateCard key={template.id} template={template} />
         ))}
+        {filteredAndSortedTemplates.length === 0 && (
+          <p className="col-span-full text-center text-muted-foreground">No templates found for this category.</p>
+        )}
       </div>
     </div>
   );

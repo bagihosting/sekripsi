@@ -52,7 +52,7 @@ const tiers = [
 export default function HargaPage() {
   return (
     <section id="pricing" className="py-16 lg:py-24">
-      <div className="container max-w-screen-xl">
+      <div className="container max-w-screen-xl px-4 md:px-8">
         <div className="mx-auto mb-12 max-w-3xl text-center">
           <h1 className="font-headline text-3xl font-bold md:text-4xl lg:text-5xl">Investasi Terbaik untuk Kelulusanmu</h1>
           <p className="mt-4 text-lg text-foreground/70">
@@ -60,9 +60,9 @@ export default function HargaPage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid max-w-md mx-auto grid-cols-1 gap-8 lg:max-w-none lg:grid-cols-3">
           {tiers.map((tier) => (
-            <Card key={tier.name} className={`flex flex-col ${tier.isRecommended ? 'border-primary shadow-lg' : ''}`}>
+            <Card key={tier.name} className={`flex flex-col ${tier.isRecommended ? 'border-primary shadow-lg ring-2 ring-primary' : ''}`}>
               {tier.isRecommended && (
                 <div className="py-2 px-4 bg-primary text-primary-foreground text-sm font-semibold rounded-t-lg flex items-center justify-center">
                   <Star className="w-4 h-4 mr-2 fill-current" />

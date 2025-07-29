@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     }
   }
 
-  const title = `${template.name} - Website Template | SkripsiKilat`;
+  const title = `${template.name} - Website Template | sekripsi.com`;
   const description = `Get the '${template.name}' website template. ${template.shortDescription}. A high-quality solution for your next project.`;
   
   return {
@@ -68,7 +68,7 @@ export default function ProductDetailPage({ params }: Props) {
   }
 
   return (
-    <div className="container max-w-screen-xl py-8">
+    <div className="container max-w-screen-xl py-8 md:py-12">
         <Breadcrumbs template={template} />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 mt-6">
             <div className="w-full">
@@ -84,7 +84,7 @@ export default function ProductDetailPage({ params }: Props) {
             </div>
             <div className="flex flex-col">
                 <h1 className="font-headline text-3xl md:text-4xl font-bold">{template.name}</h1>
-                <div className="flex items-center gap-2 mt-2">
+                <div className="flex flex-wrap items-center gap-2 mt-2">
                     <Badge variant="secondary">{template.category}</Badge>
                     <Badge variant="secondary">{template.style}</Badge>
                 </div>
@@ -132,12 +132,12 @@ function Breadcrumbs({ template }: { template: Template }) {
                 <Home className="h-4 w-4" />
                 Home
             </Link>
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-4 w-4 shrink-0" />
             <Link href="/produk" className="hover:text-primary transition-colors">
                 Templates
             </Link>
-            <ChevronRight className="h-4 w-4" />
-            <span className="font-medium text-foreground">{template.name}</span>
+            <ChevronRight className="h-4 w-4 shrink-0" />
+            <span className="font-medium text-foreground truncate">{template.name}</span>
         </nav>
     )
 }
