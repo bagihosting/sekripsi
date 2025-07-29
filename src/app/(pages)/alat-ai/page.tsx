@@ -3,10 +3,10 @@
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowRight, Lock, Star, Sparkles } from 'lucide-react';
+import { ArrowRight, Lock, Star, Sparkles, Wand } from 'lucide-react';
 import Link from 'next/link';
 import type { LucideIcon } from 'lucide-react';
-import { groupTools, AiTool, getAllTools } from '@/lib/plugins';
+import { groupTools, AiTool, getAllTools, iconMap } from '@/lib/plugins';
 import { useAuth } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
@@ -16,12 +16,13 @@ import { AiToolGroup } from '@/lib/plugins';
 import { Skeleton } from '@/components/ui/skeleton';
 
 function ToolCard({ tool }: { tool: AiTool }) {
+  const IconComponent = typeof tool.icon === 'string' ? iconMap[tool.icon] || Wand : tool.icon;
   return (
     <Card className="flex flex-col justify-between transition-all hover:shadow-lg hover:-translate-y-1">
        <CardHeader>
         <div className="flex items-center justify-between">
             <div className="bg-primary/10 text-primary p-3 rounded-lg">
-                 <tool.icon className="h-8 w-8" />
+                 <IconComponent className="h-8 w-8" />
             </div>
              <div className="flex gap-2">
                 {tool.price > 0 && (

@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useState, useTransition } from 'react';
-import { AiTool, getAllTools } from '@/lib/plugins';
+import { AiTool, getAllTools, iconMap } from '@/lib/plugins';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from './ui/card';
 import { Skeleton } from './ui/skeleton';
 import { Label } from './ui/label';
@@ -10,7 +10,7 @@ import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { updateAiTool } from '@/lib/actions';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Wand } from 'lucide-react';
 import { Textarea } from './ui/textarea';
 
 export default function ProductManagement() {
@@ -78,6 +78,8 @@ function ToolEditCard({ tool, onToolChange }: ToolEditCardProps) {
     const { toast } = useToast();
     const [isPending, startTransition] = useTransition();
     
+    const IconComponent = typeof tool.icon === 'string' ? iconMap[tool.icon] || Wand : tool.icon;
+
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         
@@ -99,7 +101,7 @@ function ToolEditCard({ tool, onToolChange }: ToolEditCardProps) {
             <Card className="flex flex-col h-full">
                 <CardHeader>
                     <div className="flex items-center gap-2">
-                        <tool.icon className="h-6 w-6 text-primary" />
+                        <IconComponent className="h-6 w-6 text-primary" />
                         <CardTitle className="text-lg">{tool.title}</CardTitle>
                     </div>
                 </CardHeader>

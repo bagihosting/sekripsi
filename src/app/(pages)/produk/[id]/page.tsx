@@ -1,12 +1,12 @@
 
 'use client';
 
-import { getToolById, AiTool } from '@/lib/plugins';
+import { getToolById, AiTool, iconMap } from '@/lib/plugins';
 import { notFound, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle, ChevronRight, Home, ShoppingCart, Star, Percent } from 'lucide-react';
+import { CheckCircle, ChevronRight, Home, ShoppingCart, Star, Percent, Wand } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { useTransition, useEffect, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
@@ -46,6 +46,7 @@ export default function ProductDetailPage({ params }: Props) {
     notFound();
   }
   
+  const IconComponent = typeof product.icon === 'string' ? iconMap[product.icon] || Wand : product.icon;
   const hasTool = userProfile?.activatedTools?.includes(product.id);
   const isFree = product.price === 0;
   const isPro = userProfile?.plan === 'pro';
@@ -87,7 +88,7 @@ export default function ProductDetailPage({ params }: Props) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 mt-6">
             <div className="w-full">
                 <div className="aspect-video relative rounded-lg shadow-lg border bg-card p-4 flex items-center justify-center">
-                    <product.icon className="h-32 w-32 text-primary" />
+                    <IconComponent className="h-32 w-32 text-primary" />
                 </div>
             </div>
             <div className="flex flex-col">

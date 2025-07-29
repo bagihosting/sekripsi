@@ -20,7 +20,7 @@ import { db } from './firebase';
 
 export interface AiTool {
   id: string;
-  icon: LucideIcon;
+  icon: LucideIcon | string; // Allow string for icon name
   title: string;
   description: string;
   href: string;
@@ -35,14 +35,11 @@ export interface AiToolGroup {
     tools: AiTool[];
 }
 
-// This is the initial data that will be populated into Firestore.
-// It is NOT the source of truth for the application.
-// The source of truth is the 'ai_tools' collection in Firestore.
-export const initialTools: AiTool[] = [
+export const initialTools: Omit<AiTool, 'icon'> & { icon: string }[] = [
     // Ideation Tools
     {
       id: 'draft-generator',
-      icon: FileText,
+      icon: 'FileText',
       title: 'Generator Draf Skripsi (Bab 1-5)',
       description: 'Alat paling jenius. Masukkan topik, dan dapatkan draf Bab 1-5 yang solid dalam sekejap.',
       href: '/generator-draf',
@@ -52,7 +49,7 @@ export const initialTools: AiTool[] = [
     },
     {
       id: 'title-generator',
-      icon: Wand2,
+      icon: 'Wand2',
       title: 'Generator Judul',
       description: 'Dapatkan ide-ide judul skripsi yang menarik dan akademis berdasarkan bidang studimu.',
       href: '/generator-judul',
@@ -61,7 +58,7 @@ export const initialTools: AiTool[] = [
     },
     {
       id: 'question-generator',
-      icon: Target,
+      icon: 'Target',
       title: 'Pertanyaan Penelitian',
       description: 'Ubah topik luas menjadi pertanyaan penelitian kualitatif & kuantitatif yang fokus dan tajam.',
       href: '/pertanyaan-penelitian',
@@ -70,7 +67,7 @@ export const initialTools: AiTool[] = [
     },
     {
       id: 'hypothesis-generator',
-      icon: TestTubeDiagonal,
+      icon: 'TestTubeDiagonal',
       title: 'Generator Hipotesis',
       description: 'Buat hipotesis nol (H0) dan alternatif (H1) yang jelas, spesifik, dan dapat diuji untuk penelitianmu.',
       href: '/generator-hipotesis',
@@ -79,7 +76,7 @@ export const initialTools: AiTool[] = [
     },
     {
       id: 'outline-generator',
-      icon: BookMarked,
+      icon: 'BookMarked',
       title: 'Generator Kerangka',
       description: 'Susun struktur bab skripsi yang logis dan komprehensif, dari pendahuluan hingga penutup.',
       href: '/kerangka-ai',
@@ -89,7 +86,7 @@ export const initialTools: AiTool[] = [
     // Research Tools
     {
       id: 'reference-finder',
-      icon: Library,
+      icon: 'Library',
       title: 'Asisten Referensi',
       description: 'Temukan artikel jurnal dan referensi akademis yang relevan lengkap dengan ringkasannya.',
       href: '/referensi-ai',
@@ -98,7 +95,7 @@ export const initialTools: AiTool[] = [
     },
     {
       id: 'paraphrase-tool',
-      icon: PenSquare,
+      icon: 'PenSquare',
       title: 'Alat Parafrase',
       description: 'Hindari plagiarisme dengan mengubah kalimatmu menjadi versi baru yang unik tanpa kehilangan makna.',
       href: '/parafrase-ai',
@@ -109,7 +106,7 @@ export const initialTools: AiTool[] = [
     // Analysis Tools
     {
       id: 'spss-guide',
-      icon: Database,
+      icon: 'Database',
       title: 'Panduan Analisis SPSS',
       description: 'Bingung pakai uji statistik apa? AI akan memandumu memilih dan menginterpretasi hasil analisis di SPSS.',
       href: '/panduan-spss',
@@ -120,7 +117,7 @@ export const initialTools: AiTool[] = [
     // Finalization Tools
     {
       id: 'abstract-generator',
-      icon: BookText,
+      icon: 'BookText',
       title: 'Generator Abstrak',
       description: 'Sintesis Latar Belakang, Metode, Hasil, dan Kesimpulan menjadi Abstrak yang utuh dan profesional.',
       href: '/generator-abstrak',
@@ -130,7 +127,7 @@ export const initialTools: AiTool[] = [
     },
     {
       id: 'grammar-checker',
-      icon: SpellCheck,
+      icon: 'SpellCheck',
       title: 'Korektor Tulisan',
       description: 'Perbaiki kesalahan ejaan, tata bahasa, dan gaya penulisan agar skripsimu terlihat profesional.',
       href: '/korektor-ai',
@@ -139,7 +136,7 @@ export const initialTools: AiTool[] = [
     },
     {
       id: 'argument-checker',
-      icon: BrainCircuit,
+      icon: 'BrainCircuit',
       title: 'Pengecek Argumen',
       description: 'Identifikasi kelemahan logis dalam argumenmu sebelum dosen pembimbing menemukannya.',
       href: '/cek-argumen',
@@ -148,7 +145,7 @@ export const initialTools: AiTool[] = [
     },
     {
       id: 'defense-simulator',
-      icon: ShieldQuestion,
+      icon: 'ShieldQuestion',
       title: 'Simulasi Sidang',
       description: 'Latih mentalmu dengan menjawab pertanyaan-pertanyaan kritis dari "dosen penguji" AI kami.',
       href: '/simulasi-sidang',
@@ -158,7 +155,7 @@ export const initialTools: AiTool[] = [
     // Creative Tools
     {
       id: 'story-generator',
-      icon: Wand,
+      icon: 'Wand',
       title: 'Generator Cerita',
       description: 'Ubah satu kalimat ide menjadi sebuah cerita pendek yang utuh untuk memancing imajinasimu.',
       href: '/story-generator',
@@ -167,8 +164,9 @@ export const initialTools: AiTool[] = [
     },
 ];
 
+
 // Map icon names to actual components
-const iconMap: { [key: string]: LucideIcon } = {
+export const iconMap: { [key: string]: LucideIcon } = {
     FileText, Wand2, Target, TestTubeDiagonal, BookMarked, Library, PenSquare, SpellCheck, BrainCircuit, ShieldQuestion, Wand, Database, BookText
 };
 
@@ -179,29 +177,24 @@ async function populateInitialTools() {
         console.log("Populating initial AI tools into Firestore...");
         const batch = [];
         for (const tool of initialTools) {
-            const toolData = { ...tool, icon: tool.icon.displayName || tool.icon.name };
-            batch.push(setDoc(doc(db, 'ai_tools', tool.id), toolData));
+            batch.push(setDoc(doc(db, 'ai_tools', tool.id), tool));
         }
         await Promise.all(batch);
         console.log("Initial tools populated.");
     }
 }
 
-// Call this function once, perhaps in a startup script or admin dashboard, to populate Firestore.
-// For this prototype, we will check on every server start.
 populateInitialTools();
 
-
-// Function to get all tools from Firestore
+// Function to get all tools from Firestore, returning icon as a string
 export async function getAllTools(): Promise<AiTool[]> {
   try {
     const toolsCollection = collection(db, 'ai_tools');
     const toolsSnapshot = await getDocs(toolsCollection);
     
     if (toolsSnapshot.empty) {
-        // This case should be rare after the initial population
         console.warn("No AI tools found in Firestore. Returning initial toolset.");
-        return initialTools;
+        return initialTools.map(t => ({...t, icon: iconMap[t.icon]}));
     }
     
     const tools = toolsSnapshot.docs.map(doc => {
@@ -209,17 +202,17 @@ export async function getAllTools(): Promise<AiTool[]> {
       return {
         ...data,
         id: doc.id,
-        icon: iconMap[data.icon as string] || Wand, // Fallback icon
+        icon: data.icon as string, // Keep icon as string
       } as AiTool;
     });
     return tools;
   } catch (error) {
     console.error("Error fetching tools from Firestore:", error);
-    return initialTools; // Fallback to initial data on error
+    return initialTools.map(t => ({...t, icon: iconMap[t.icon]})); // Fallback
   }
 }
 
-// Function to get a single tool by ID from Firestore
+// Function to get a single tool by ID from Firestore, returning icon as a string
 export async function getToolById(id: string): Promise<AiTool | null> {
     try {
         const toolRef = doc(db, 'ai_tools', id);
@@ -234,7 +227,7 @@ export async function getToolById(id: string): Promise<AiTool | null> {
         return {
             ...data,
             id: toolSnap.id,
-            icon: iconMap[data.icon as string] || Wand,
+            icon: data.icon as string, // Keep icon as string
         } as AiTool;
     } catch (error) {
         console.error(`Error fetching tool with id ${id}:`, error);

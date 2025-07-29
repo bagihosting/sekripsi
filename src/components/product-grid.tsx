@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useMemo } from 'react';
-import { AiTool } from '@/lib/plugins';
+import { AiTool, iconMap } from '@/lib/plugins';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,7 @@ import Link from 'next/link';
 import { Label } from '@/components/ui/label';
 import { Badge } from './ui/badge';
 import { useAuth } from '@/hooks/use-auth';
+import { Wand } from 'lucide-react';
 
 export default function ProductGrid({ products }: { products: AiTool[] }) {
   const [category, setCategory] = useState('all');
@@ -86,13 +87,15 @@ const ProductCard = ({ product }: { product: AiTool }) => {
     const isPro = userProfile?.plan === 'pro';
     const isFree = product.price === 0;
     const displayPrice = isPro && !isFree ? product.price / 2 : product.price;
+    const IconComponent = typeof product.icon === 'string' ? iconMap[product.icon] || Wand : product.icon;
+
 
     return (
         <Card className="group flex flex-col overflow-hidden rounded-lg shadow-sm transition-all hover:shadow-lg hover:-translate-y-1">
             <CardContent className="flex flex-1 flex-col p-4">
                 <div className="flex-1">
                     <div className="mb-4 aspect-video flex items-center justify-center rounded-md bg-secondary">
-                        <product.icon className="h-16 w-16 text-primary" />
+                        <IconComponent className="h-16 w-16 text-primary" />
                     </div>
                     <div className="flex justify-between items-start">
                         <Badge variant="outline" className="mb-2">{product.category}</Badge>

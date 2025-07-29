@@ -18,6 +18,7 @@ export interface UserProfile {
 }
 
 export interface Payment {
+  id: string; // Document ID
   userId: string;
   userEmail: string;
   proofUrl: string;
