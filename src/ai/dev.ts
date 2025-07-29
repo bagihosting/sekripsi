@@ -13,3 +13,4 @@ import '@/ai/flows/defense-simulator.ts';
 import '@/ai/flows/story-generator.ts';
 import '@/ai/flows/spss-guide.ts';
 import '@/ai/flows/abstract-generator.ts';
+import '@/ai/flows/draft-generator.ts';

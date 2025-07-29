@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
 
 const aiToolsLinks = [
+    { href: '/generator-draf', label: 'Generator Draf Instan (Bab 1-3)' },
     { href: '/generator-judul', label: 'Generator Judul' },
     { href: '/pertanyaan-penelitian', label: 'Pertanyaan Penelitian' },
     { href: '/generator-hipotesis', label: 'Generator Hipotesis' },
@@ -108,9 +109,9 @@ export const SiteHeader = () => {
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-full max-w-sm">
-                <SheetHeader className="text-left">
-                  <SheetTitle className="sr-only">Menu</SheetTitle>
-                  <SheetDescription className="sr-only">
+                <SheetHeader className="text-left sr-only">
+                  <SheetTitle>Menu</SheetTitle>
+                  <SheetDescription>
                     Navigasi utama untuk SkripsiKilat.
                   </SheetDescription>
                 </SheetHeader>

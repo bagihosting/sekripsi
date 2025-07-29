@@ -16,6 +16,7 @@ import {
   Sparkles,
   Database,
   BookText,
+  FileText,
 } from 'lucide-react';
 import Link from 'next/link';
 import type { LucideIcon } from 'lucide-react';
@@ -33,12 +34,18 @@ const toolGroups = [
     title: 'Tahap Perencanaan & Ideasi',
     description: 'Mulai perjalanan skripsimu dengan fondasi yang kuat. Dari ide mentah hingga kerangka yang matang.',
     tools: [
+       {
+        icon: FileText,
+        title: 'Generator Draf Instan (Bab 1-3)',
+        description: 'Alat paling jenius. Masukkan topik, dan dapatkan draf Bab 1-3 yang solid dalam sekejap.',
+        href: '/generator-draf',
+        badge: 'Terbaru!',
+      },
       {
         icon: Wand2,
         title: 'Generator Judul',
         description: 'Dapatkan ide-ide judul skripsi yang menarik dan akademis berdasarkan bidang studimu.',
         href: '/generator-judul',
-        badge: 'Mulai Di Sini',
       },
       {
         icon: Target,
