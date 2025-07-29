@@ -8,3 +8,4 @@ import '@/ai/flows/outline-generator.ts';
 import '@/ai/flows/grammar-checker.ts';
 import '@/ai/flows/reference-finder.ts';
 import '@/ai/flows/defense-simulator.ts';
+import '@/ai/flows/story-generator.ts';
