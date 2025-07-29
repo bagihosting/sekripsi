@@ -36,8 +36,8 @@ const toolGroups = [
     tools: [
        {
         icon: FileText,
-        title: 'Generator Draf Instan (Bab 1-3)',
-        description: 'Alat paling jenius. Masukkan topik, dan dapatkan draf Bab 1-3 yang solid dalam sekejap.',
+        title: 'Generator Draf Skripsi (Bab 1-5)',
+        description: 'Alat paling jenius. Masukkan topik, dan dapatkan draf Bab 1-5 yang solid dalam sekejap.',
         href: '/generator-draf',
         badge: 'Terbaru!',
       },

@@ -60,7 +60,7 @@ export default function DraftGenerator() {
         <div className="pt-4 space-y-4">
             <h4 className="font-headline text-xl font-semibold flex items-center">
                 <FileText className="w-6 h-6 mr-2 text-primary" />
-                Draf Instan Anda (Bab 1-3)
+                Draf Instan Anda (Bab 1-5 & Pustaka)
             </h4>
             <Accordion type="single" collapsible className="w-full" defaultValue="item-0">
                 {state.result.draft.map((chapter, index) => (
