@@ -1,4 +1,3 @@
-
 'use server';
 
 import { z } from 'zod';
@@ -174,6 +173,42 @@ export async function updateUserProfile(formData: FormData) {
             return { error: 'Sesi Anda telah berakhir. Silakan logout dan login kembali untuk mengubah kata sandi.' };
         }
         return { error: "Gagal memperbarui profil Anda. Silakan coba lagi." };
+    }
+
+    return { success: true };
+}
+
+const confirmPaymentSchema = z.object({
+  paymentId: z.string(),
+  userId: z.string(),
+});
+
+export async function confirmPayment(values: z.infer<typeof confirmPaymentSchema>) {
+    const validatedValues = confirmPaymentSchema.parse(values);
+    const { paymentId, userId } = validatedValues;
+
+    // A real app should verify that the current user is an admin.
+    // For now, we trust the call comes from the admin dashboard.
+
+    try {
+        const userRef = doc(db, 'users', userId);
+        const paymentRef = doc(db, 'payments', paymentId);
+
+        // Update user to Pro
+        await updateDoc(userRef, {
+            plan: 'pro',
+            paymentStatus: 'pro',
+        });
+
+        // Update payment status to confirmed
+        await updateDoc(paymentRef, {
+            status: 'confirmed',
+            processedAt: serverTimestamp(),
+        });
+
+    } catch (error: any) {
+        console.error("Payment confirmation failed:", error);
+        return { error: "Gagal mengonfirmasi pembayaran. Silakan coba lagi." };
     }
 
     return { success: true };

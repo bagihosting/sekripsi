@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useFormState, useFormStatus } from "react-dom";
+import { useActionState } from "react";
+import { useFormStatus } from "react-dom";
 import { checkArgument, ArgumentCheckOutput } from "@/ai/flows/argument-checker";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -41,7 +41,7 @@ async function checkArgumentAction(
 
 
 export default function ArgumentChecker() {
-  const [state, formAction] = useFormState(checkArgumentAction, initialState);
+  const [state, formAction] = useActionState(checkArgumentAction, initialState);
 
   return (
     <div className="space-y-6">

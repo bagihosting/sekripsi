@@ -1,0 +1,37 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Users Collection
+    match /users/{userId} {
+      // A user can only read their own profile
+      allow get: if request.auth.uid == userId;
+      
+      // A new user can create their own profile
+      allow create: if request.auth.uid == userId;
+
+      // A user can only update their own profile, but cannot change their role, plan, or paymentStatus
+      allow update: if request.auth.uid == userId
+                    && request.resource.data.role == resource.data.role
+                    && request.resource.data.plan == resource.data.plan
+                    && request.resource.data.paymentStatus == resource.data.paymentStatus;
+    }
+
+    // Payments Collection
+    match /payments/{paymentId} {
+      // Only authenticated users can create a payment request for themselves
+      allow create: if request.auth.uid == request.resource.data.userId;
+      
+      // Nobody can read, update or delete payment documents directly for security.
+      // This will be handled by admin logic via backend functions in the future.
+      allow read, update, delete: if false;
+    }
+    
+    // Admin access (Example: allows full access if user has admin role)
+    // This part can be expanded in the future for more granular admin controls.
+    match /{document=**} {
+      allow read, write: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+  }
+}

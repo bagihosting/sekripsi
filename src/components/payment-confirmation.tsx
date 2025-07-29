@@ -1,14 +1,16 @@
-
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from './ui/card';
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Skeleton } from './ui/skeleton';
 import Image from 'next/image';
+import { confirmPayment } from '@/lib/actions';
+import { useToast } from '@/hooks/use-toast';
+import { Loader2 } from 'lucide-react';
 
 interface Payment {
   id: string;
@@ -25,6 +27,9 @@ interface Payment {
 export default function PaymentConfirmation() {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+  const [isPending, startTransition] = useTransition();
+  const [confirmingId, setConfirmingId] = useState<string | null>(null);
 
   useEffect(() => {
     const q = query(collection(db, 'payments'), where('status', '==', 'pending'));
@@ -40,10 +45,24 @@ export default function PaymentConfirmation() {
     return () => unsubscribe();
   }, []);
 
-  const handleConfirm = async (paymentId: string, userId: string) => {
-    // Logic to confirm payment will be added in the next step.
-    console.log("Confirming payment:", paymentId, "for user:", userId);
-    alert("Fitur konfirmasi akan diimplementasikan pada langkah berikutnya.");
+  const handleConfirm = (paymentId: string, userId: string) => {
+    setConfirmingId(paymentId);
+    startTransition(async () => {
+      const result = await confirmPayment({ paymentId, userId });
+      if (result.error) {
+        toast({
+          title: 'Konfirmasi Gagal',
+          description: result.error,
+          variant: 'destructive',
+        });
+      } else {
+        toast({
+          title: 'Konfirmasi Berhasil!',
+          description: 'Pengguna telah berhasil diupgrade ke Pro.',
+        });
+      }
+      setConfirmingId(null);
+    });
   };
 
   if (loading) {
@@ -84,7 +103,11 @@ export default function PaymentConfirmation() {
                  <a href={payment.proofUrl} target="_blank" rel="noopener noreferrer">
                     <Image src={payment.proofUrl} alt="Bukti Pembayaran" width={100} height={100} className="rounded-md object-cover aspect-square"/>
                  </a>
-                <Button onClick={() => handleConfirm(payment.id, payment.userId)}>
+                <Button 
+                  onClick={() => handleConfirm(payment.id, payment.userId)}
+                  disabled={isPending && confirmingId === payment.id}
+                >
+                   {isPending && confirmingId === payment.id && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Konfirmasi Pembayaran
                 </Button>
               </div>
