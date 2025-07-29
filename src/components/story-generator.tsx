@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useFormStatus } from "react-dom";
+import { useFormState, useFormStatus } from "react-dom";
 import { generateStory, StoryGeneratorOutput } from "@/ai/flows/story-generator";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,53 +9,43 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, BookOpen, Wand } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-type StoryGeneratorState = {
+const initialState: {
   result: StoryGeneratorOutput | null;
   error: string | null;
+} = {
+  result: null,
+  error: null,
 };
 
-export default function StoryGenerator() {
-  const [state, setState] = useState<StoryGeneratorState>({
-    result: null,
-    error: null,
-  });
-  const { toast } = useToast();
-
-  async function handleAction(formData: FormData) {
+async function generateStoryAction(
+  prevState: any,
+  formData: FormData
+): Promise<{ result: StoryGeneratorOutput | null; error: string | null; }> {
     const prompt = formData.get("prompt") as string;
     if (!prompt) {
-      setState({ result: null, error: "Silakan masukkan ide cerita." });
-      return;
+      return { result: null, error: "Silakan masukkan ide cerita." };
     }
-
-    setState({ result: null, error: null });
 
     try {
       const result = await generateStory({ prompt });
       if (result.story) {
-        setState({ result, error: null });
+        return { result, error: null };
       } else {
-        setState({ result: null, error: "Tidak dapat menghasilkan cerita. Silakan coba lagi." });
-        toast({
-          variant: "destructive",
-          title: "Gagal Menghasilkan Cerita",
-          description: "Terjadi masalah saat mencoba membuat cerita. Silakan coba lagi nanti.",
-        });
+        return { result: null, error: "Tidak dapat menghasilkan cerita. Silakan coba lagi." };
       }
     } catch (e) {
       console.error(e);
-      setState({ result: null, error: "Terjadi kesalahan yang tidak terduga. Mohon coba lagi." });
-       toast({
-          variant: "destructive",
-          title: "Terjadi Kesalahan",
-          description: "Terjadi kesalahan yang tidak terduga. Mohon coba lagi.",
-        });
+      return { result: null, error: "Terjadi kesalahan yang tidak terduga. Mohon coba lagi." };
     }
-  }
+}
+
+
+export default function StoryGenerator() {
+  const [state, formAction] = useFormState(generateStoryAction, initialState);
 
   return (
     <div className="space-y-6">
-      <form action={handleAction} className="space-y-4">
+      <form action={formAction} className="space-y-4">
         <div>
           <Textarea
             name="prompt"

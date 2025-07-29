@@ -23,6 +23,7 @@ const aiToolsLinks = [
     { href: '/korektor-ai', label: 'Korektor Tulisan' },
     { href: '/cek-argumen', label: 'Pengecek Argumen' },
     { href: '/simulasi-sidang', label: 'Simulasi Sidang' },
+    { href: '/story-generator', label: 'Generator Cerita' },
 ];
 
 const mainNavLinks = [
