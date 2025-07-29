@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from 'react';
@@ -7,10 +6,12 @@ import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger } from '@/components/ui/sheet';
 import { SekripsiComIcon } from '@/components/icons';
-import { ArrowRight, Menu, Sparkles, ChevronDown, Star } from 'lucide-react';
+import { ArrowRight, Menu, Sparkles, ChevronDown, Star, User, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from './ui/dropdown-menu';
 import { Separator } from './ui/separator';
+import { useAuth } from '@/hooks/use-auth';
+import { logout } from '@/lib/actions';
 
 const aiToolsLinks = [
     { href: '/generator-draf', label: 'Generator Draf Instan (Bab 1-5)' },
@@ -36,6 +37,7 @@ const mainNavLinks = [
 export const SiteHeader = () => {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const { user, userProfile } = useAuth();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -104,12 +106,37 @@ export const SiteHeader = () => {
         </nav>
 
         <div className="flex items-center gap-2">
-          <Button asChild>
-            <Link href="/harga" prefetch={false}>
-              <Star className="h-4 w-4 fill-current"/>
-              <span className='hidden sm:inline'>Upgrade ke Pro</span>
-            </Link>
-          </Button>
+          {user ? (
+             <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="secondary" size="icon" className="rounded-full">
+                  <User className="h-5 w-5" />
+                   <span className="sr-only">User Menu</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem className="flex flex-col items-start" disabled>
+                  <p className="font-medium">{userProfile?.email}</p>
+                   <p className="text-xs text-muted-foreground capitalize">{userProfile?.role}</p>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => logout()}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Logout</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <>
+              <Button asChild variant="ghost" className="hidden sm:inline-flex">
+                <Link href="/login">Login</Link>
+              </Button>
+               <Button asChild>
+                <Link href="/register">Daftar Gratis</Link>
+              </Button>
+            </>
+          )}
+
 
           {/* Mobile Navigation */}
           <Sheet open={open} onOpenChange={setOpen}>
@@ -182,12 +209,29 @@ export const SiteHeader = () => {
                         Harga
                       </Link>
 
-                    <Button asChild className="mt-4">
-                      <Link href="/harga" onClick={() => setOpen(false)}>
-                        <Star className="mr-2 h-4 w-4 fill-current"/>
-                        Upgrade ke Pro
-                      </Link>
-                    </Button>
+                    <Separator className='my-2' />
+
+                     {user ? (
+                        <div className="p-2">
+                           <div className="mb-2">
+                             <p className="font-medium">{userProfile?.email}</p>
+                             <p className="text-sm text-muted-foreground capitalize">{userProfile?.role}</p>
+                           </div>
+                           <Button onClick={() => { logout(); setOpen(false); }} className="w-full">
+                                <LogOut className="mr-2 h-4 w-4" />
+                                Logout
+                           </Button>
+                        </div>
+                     ) : (
+                         <div className="grid grid-cols-2 gap-2 p-2">
+                            <Button asChild variant="ghost" className="w-full">
+                                <Link href="/login" onClick={() => setOpen(false)}>Login</Link>
+                            </Button>
+                            <Button asChild className="w-full">
+                                <Link href="/register" onClick={() => setOpen(false)}>Daftar</Link>
+                            </Button>
+                         </div>
+                     )}
                   </div>
                 </div>
             </SheetContent>
