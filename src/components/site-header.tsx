@@ -10,6 +10,7 @@ import { SekripsiComIcon } from '@/components/icons';
 import { ArrowRight, Menu, Sparkles, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
+import { Separator } from './ui/separator';
 
 const aiToolsLinks = [
     { href: '/generator-draf', label: 'Generator Draf Instan (Bab 1-5)' },
@@ -28,7 +29,6 @@ const aiToolsLinks = [
 ];
 
 const mainNavLinks = [
-    { href: '/alat-ai', label: 'Pusat AI' },
     { href: '/blog', label: 'Trik Cepat Lulus' },
     { href: '/dukungan', label: 'Bantuan Kilat' },
 ];
@@ -116,19 +116,44 @@ export const SiteHeader = () => {
                   </SheetDescription>
                 </SheetHeader>
                <div className="h-full overflow-y-auto">
-                  <div className="flex flex-col gap-4 pt-12">
+                  <div className="flex flex-col gap-1 pt-12">
                     <Link href="/" className="mb-4 flex items-center gap-2" onClick={() => setOpen(false)}>
                       <SekripsiComIcon className="h-8 w-8 text-primary" />
                       <span className="font-headline text-xl font-bold text-foreground">sekripsi.com</span>
                     </Link>
+
+                    <Link
+                        href="/alat-ai"
+                        onClick={() => setOpen(false)}
+                        className="px-2 py-1.5 text-lg font-medium transition-colors hover:text-primary"
+                    >
+                        Pusat AI
+                    </Link>
+                     <div className='flex flex-col gap-1 pl-6'>
+                        {aiToolsLinks.map(link => (
+                            <Link
+                                key={link.href}
+                                href={link.href}
+                                onClick={() => setOpen(false)}
+                                className={cn(
+                                    "text-sm transition-colors hover:text-primary",
+                                    pathname.startsWith(link.href) ? "text-primary" : "text-foreground/70"
+                                )}
+                            >
+                                {link.label}
+                            </Link>
+                        ))}
+                    </div>
                     
+                    <Separator className='my-2' />
+
                     {mainNavLinks.map(link => (
                       <Link
                         key={link.href}
                         href={link.href}
                         onClick={() => setOpen(false)}
                         className={cn(
-                            "text-lg font-medium transition-colors hover:text-primary",
+                            "px-2 py-1.5 text-lg font-medium transition-colors hover:text-primary",
                             pathname.startsWith(link.href) ? "text-primary" : "text-foreground/80"
                         )}
                       >
@@ -138,7 +163,7 @@ export const SiteHeader = () => {
 
                     <Button asChild className="mt-4">
                       <Link href="/alat-ai" onClick={() => setOpen(false)}>
-                        Coba Gratis
+                        Coba Semua Alat AI
                       </Link>
                     </Button>
                   </div>

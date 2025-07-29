@@ -72,7 +72,7 @@ const HeroSection = () => (
           Lulus 3.5 Tahun Bukan Mimpi! Taklukkan Skripsimu Sekarang.
         </h1>
         <p className="mx-auto mt-6 max-w-2xl text-lg text-foreground/80">
-          Dosen killer? Judul ditolak terus? Buntu di Bab 4? Lupakan semua itu. SkripsiKilat adalah senjata rahasiamu untuk lulus lebih cepat dari teman-temanmu.
+          Dosen killer? Judul ditolak terus? Buntu di Bab 4? Lupakan semua itu. sekripsi.com adalah senjata rahasiamu untuk lulus lebih cepat dari teman-temanmu.
         </p>
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
           <Button size="lg" asChild className="w-full sm:w-auto">
@@ -141,6 +141,7 @@ const CtaSection = () => (
         </div>
     </section>
 );
+
 
 
 
