@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useFormState, useFormStatus } from "react-dom";
+import { useActionState } from "react";
+import { useFormStatus } from "react-dom";
 import { guideSpssAnalysis, SpssGuideOutput } from "@/ai/flows/spss-guide";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -41,7 +41,7 @@ async function spssGuideAction(
 }
 
 export default function SpssGuide() {
-  const [state, formAction] = useFormState(spssGuideAction, initialState);
+  const [state, formAction] = useActionState(spssGuideAction, initialState);
 
   return (
     <div className="space-y-6">
