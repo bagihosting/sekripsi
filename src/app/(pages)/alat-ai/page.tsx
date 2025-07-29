@@ -14,6 +14,7 @@ import {
   Wand,
   ArrowRight,
   Sparkles,
+  Database,
 } from 'lucide-react';
 import Link from 'next/link';
 import type { LucideIcon } from 'lucide-react';
@@ -82,6 +83,19 @@ const toolGroups = [
         badge: 'Populer',
       },
     ],
+  },
+   {
+    title: 'Tahap Analisis Data',
+    description: 'Jangan tersesat di tengah angka. Dapatkan panduan ahli untuk mengolah dan menginterpretasikan data penelitianmu.',
+    tools: [
+       {
+        icon: Database,
+        title: 'Panduan Analisis SPSS',
+        description: 'Bingung pakai uji statistik apa? AI akan memandumu memilih dan menginterpretasi hasil analisis di SPSS.',
+        href: '/panduan-spss',
+        badge: 'Baru',
+      },
+    ]
   },
   {
     title: 'Tahap Koreksi & Finalisasi',
