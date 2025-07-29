@@ -105,19 +105,19 @@ const HeroSection = () => (
     <div className="container grid min-h-[calc(100dvh-3.5rem)] content-center text-center max-w-screen-xl">
       <div className="mx-auto max-w-4xl">
         <h1 className="font-headline text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
-          Stop Menunda, Mulai Hasilkan Cuan Pertama Anda Malam Ini!
+          Deadline Skripsi di Depan Mata? Lulus Cepat Tanpa Koding, Malam Ini Juga!
         </h1>
         <p className="mx-auto mt-6 max-w-2xl text-lg text-foreground/80">
-          Lupakan pusingnya koding dan desain dari nol. Pilih aset digital siap pakai dari kami, luncurkan proyek impian Anda, dan lihat keuntungan mulai mengalir. Cepat, mudah, dan terbukti berhasil!
+          Stop begadang dan stres mikirin kodingan dari nol. Skrip & template kami adalah jalan pintasmu menuju wisuda. Sudah teruji, tinggal pakai, dijamin dosen pembimbing langsung ACC!
         </p>
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
           <Button size="lg" asChild className="w-full sm:w-auto">
-            <Link href="#templates">Saya Mau Cuan Sekarang!</Link>
+            <Link href="#templates">Saya Mau Lulus Cepat!</Link>
           </Button>
           <Button size="lg" variant="outline" asChild className="w-full sm:w-auto">
             <Link href="#ai-recommendations">
               <Sparkles className="mr-2 h-5 w-5" />
-              Beri Saya Ide Ajaib
+              Carikan Ide Buat TA Saya
             </Link>
           </Button>
         </div>
@@ -130,9 +130,9 @@ const TrendingSection = ({ templates }: { templates: Template[] }) => (
   <section id="trending" className="w-full py-16 lg:py-24">
     <div className="container max-w-screen-xl">
       <div className="mx-auto mb-12 max-w-3xl text-center">
-        <h2 className="font-headline text-3xl font-bold md:text-4xl lg:text-5xl">Pilihan Para Sultan! Produk-Produk Ini Terjual Setiap Jam!</h2>
+        <h2 className="font-headline text-3xl font-bold md:text-4xl lg:text-5xl">Skrip Paling Laris di Kalangan Pejuang Skripsi!</h2>
         <p className="mt-4 text-lg text-foreground/70">
-          Ini bukan sekadar tren, ini adalah mesin pencetak uang. Ribuan developer dan pebisnis telah membuktikannya. Jangan sampai Anda ketinggalan kereta!
+          Ratusan mahasiswa sudah membuktikan. Ini bukan sekadar skrip, ini kunci kelulusan Anda. Jangan sampai teman Anda wisuda duluan!
         </p>
       </div>
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -148,9 +148,9 @@ const AllTemplatesSection = ({ templates }: { templates: Template[] }) => (
   <section id="templates" className="w-full bg-secondary/50 py-16 lg:py-24">
     <div className="container max-w-screen-xl">
        <div className="mx-auto mb-12 max-w-3xl text-center">
-        <h2 className="font-headline text-3xl font-bold md:text-4xl lg:text-5xl">Gudang Senjata Digital Anda untuk Mendominasi Pasar</h2>
+        <h2 className="font-headline text-3xl font-bold md:text-4xl lg:text-5xl">Gudang Senjata Rahasia untuk Tugas Akhir Anda</h2>
         <p className="mt-4 text-lg text-foreground/70">
-          Apapun ide Anda, kami punya solusinya. Jelajahi koleksi lengkap kami dan temukan aset yang akan mengubah proyek Anda dari sekadar ide menjadi kerajaan bisnis.
+          Apapun judul dan metode penelitian Anda, kami punya solusinya. Jelajahi koleksi skrip terlengkap dan temukan yang paling pas untuk membuat dosen terkesan.
         </p>
       </div>
       <TemplateGrid templates={templates} />
@@ -164,9 +164,9 @@ const AiSection = () => (
       <div className="grid items-center gap-12 lg:grid-cols-2">
         <div className="space-y-4">
           <Sparkles className="h-12 w-12 text-accent" />
-          <h2 className="font-headline text-3xl font-bold md:text-4xl lg:text-5xl">Bingung Pilih Mana? Biarkan AI Kami Menemukan Harta Karun untuk Anda!</h2>
+          <h2 className="font-headline text-3xl font-bold md:text-4xl lg:text-5xl">Masih Bingung Judul TA? Biarkan AI Kami Cari Ide Terbaik!</h2>
           <p className="text-lg text-foreground/70">
-            Jangan buang waktu! Cukup bisikkan ide Anda, dan asisten AI CuanKilat akan langsung merekomendasikan produk paling profitabel yang sesuai dengan visi Anda. Gratis, cepat, dan akurat!
+            Jangan habiskan waktu berharga Anda! Cukup jelaskan bidang minat Anda, dan AI CuanKilat akan merekomendasikan skrip & template yang paling relevan dan berpotensi dapat nilai A. Gratis!
           </p>
         </div>
         <Card className="shadow-lg">
@@ -183,9 +183,9 @@ const SupportSection = () => (
   <section id="support" className="bg-secondary/50 py-16 lg:py-24">
     <div className="container max-w-screen-xl">
       <div className="mx-auto max-w-3xl text-center">
-        <h2 className="font-headline text-3xl font-bold md:text-4xl lg:text-5xl">Tim Kami Siap Mengawal Anda Sampai Jadi Miliarder</h2>
+        <h2 className="font-headline text-3xl font-bold md:text-4xl lg:text-5xl">Tim Support Kami Siap Kawal Sampai Sidang!</h2>
         <p className="mt-4 text-lg text-foreground/70">
-          Punya pertanyaan? Butuh bantuan teknis? Tim support elite kami bukan sekadar menjawab, tapi memberikan solusi agar cuan Anda makin deras. Hubungi kami sekarang!
+          Ada error saat instalasi? Butuh bantuan customisasi? Tim kami bukan sekadar teknisi, tapi mentor dadakan Anda. Hubungi kami, jangan biarkan error menghalangi kelulusan!
         </p>
       </div>
       <form className="mx-auto mt-8 max-w-2xl space-y-4">
@@ -193,10 +193,10 @@ const SupportSection = () => (
           <Input placeholder="Nama Anda" aria-label="Nama Anda" />
           <Input type="email" placeholder="Email Anda" aria-label="Email Anda" />
         </div>
-        <Textarea placeholder="Pesan Anda" rows={6} aria-label="Pesan Anda" />
+        <Textarea placeholder="Pertanyaan seputar skrip..." rows={6} aria-label="Pesan Anda" />
         <div className="text-left">
           <Button type="submit" size="lg">
-            <Mail className="mr-2 h-5 w-5" /> Kirim Pesan
+            <Mail className="mr-2 h-5 w-5" /> Kirim Pertanyaan
           </Button>
         </div>
       </form>
@@ -219,7 +219,7 @@ const Footer = () => {
           <span className="font-headline text-xl font-bold">CuanKilat</span>
         </div>
         <p className="text-center text-sm text-muted-foreground sm:text-left">
-          &copy; {year} CuanKilat. Semua hak cipta dilindungi.
+          &copy; {year} CuanKilat. Jalan Pintas Menuju Wisuda.
         </p>
         <div className="flex items-center gap-4">
           <Link href="#" className="text-sm text-muted-foreground transition-colors hover:text-primary">Kebijakan Privasi</Link>
@@ -260,7 +260,7 @@ const TemplateCard = ({ template }: { template: Template }) => (
             <Link href="#">Demo Langsung</Link>
           </Button>
           <Button size="sm" variant="outline" className="flex-1" asChild>
-            <Link href="#">Detail</Link>
+            <Link href="#">Beli Skrip Ini</Link>
           </Button>
         </div>
       </div>
