@@ -1,10 +1,13 @@
+
 'use server';
 
 import { z } from 'zod';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { auth, db } from '@/lib/firebase';
 import { createUserProfile } from './firestore';
 import { redirect } from 'next/navigation';
+import { doc, setDoc, serverTimestamp, updateDoc } from 'firebase/firestore';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 const registerSchema = z.object({
   email: z.string().email(),
@@ -65,4 +68,47 @@ export async function logout() {
         console.error('Error signing out:', error);
     }
     redirect('/login');
+}
+
+
+export async function requestUpgrade(formData: FormData) {
+    const user = auth.currentUser;
+    if (!user) {
+        return { error: "Anda harus login untuk melakukan ini." };
+    }
+
+    const proof = formData.get('proof') as File;
+    if (!proof) {
+        return { error: "File bukti transfer tidak ditemukan." };
+    }
+    
+    try {
+        // 1. Upload image to Firebase Storage
+        const storage = getStorage();
+        const storageRef = ref(storage, `payment_proofs/${user.uid}/${Date.now()}_${proof.name}`);
+        const snapshot = await uploadBytes(storageRef, proof);
+        const downloadURL = await getDownloadURL(snapshot.ref);
+
+        // 2. Create a payment document in Firestore
+        const paymentRef = doc(collection(db, 'payments'));
+        await setDoc(paymentRef, {
+            userId: user.uid,
+            userEmail: user.email,
+            proofUrl: downloadURL,
+            status: 'pending',
+            createdAt: serverTimestamp(),
+        });
+        
+        // 3. Update user's payment status
+        const userRef = doc(db, 'users', user.uid);
+        await updateDoc(userRef, {
+            paymentStatus: 'pending'
+        });
+
+    } catch (error: any) {
+        console.error("Upgrade request failed:", error);
+        return { error: "Gagal memproses permintaan Anda. Silakan coba lagi." };
+    }
+
+    return { success: true };
 }

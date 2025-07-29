@@ -1,55 +1,87 @@
 
+'use client';
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { useAuth } from "@/hooks/use-auth";
 import { Check, Star } from "lucide-react";
-
-const tiers = [
-  {
-    name: "Mahasiswa Gratis",
-    price: "Rp 0",
-    priceDescription: "selamanya",
-    features: [
-      "Akses ke semua 12+ alat AI",
-      "Penggunaan terbatas harian",
-      "Dukungan komunitas",
-    ],
-    buttonText: "Paket Anda Saat Ini",
-    buttonVariant: "outline",
-    isRecommended: false,
-  },
-  {
-    name: "Pejuang Skripsi Pro",
-    price: "Rp 79.000",
-    priceDescription: "/bulan",
-    features: [
-      "Semua yang ada di paket Gratis",
-      "Penggunaan tanpa batas",
-      "Prioritas pemrosesan AI",
-      "Akses ke fitur & alat beta",
-      "Dukungan prioritas via email",
-    ],
-    buttonText: "Upgrade ke Pro",
-    buttonVariant: "default",
-    isRecommended: true,
-  },
-  {
-    name: "Profesor & Tim",
-    price: "Hubungi Kami",
-    priceDescription: "untuk demo",
-    features: [
-      "Semua yang ada di paket Pro",
-      "Manajemen multi-akun untuk tim",
-      "Analitik penggunaan",
-      "Dukungan khusus",
-      "Kustomisasi model AI (add-on)",
-    ],
-    buttonText: "Jadwalkan Demo",
-    buttonVariant: "outline",
-    isRecommended: false,
-  },
-];
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function HargaPage() {
+  const { user, userProfile } = useAuth();
+  const router = useRouter();
+
+  const handleUpgradeClick = () => {
+    if (!user) {
+      router.push('/login?redirect=/harga');
+    } else {
+      router.push('/upgrade');
+    }
+  };
+
+  const getButtonText = () => {
+    if (!userProfile) return "Upgrade ke Pro";
+    if (userProfile.plan === 'pro') return "Anda Sudah Pro";
+    if (userProfile.paymentStatus === 'pending') return "Menunggu Konfirmasi";
+    return "Upgrade ke Pro";
+  };
+
+  const isButtonDisabled = userProfile?.plan === 'pro' || userProfile?.paymentStatus === 'pending';
+
+
+  const tiers = [
+    {
+      name: "Mahasiswa Gratis",
+      price: "Rp 0",
+      priceDescription: "selamanya",
+      features: [
+        "Akses ke semua 12+ alat AI",
+        "Penggunaan terbatas harian",
+        "Dukungan komunitas",
+      ],
+      buttonText: "Paket Anda Saat Ini",
+      buttonVariant: "outline",
+      isRecommended: false,
+      isDisabled: true,
+      action: () => {}
+    },
+    {
+      name: "Pejuang Skripsi Pro",
+      price: "Rp 79.000",
+      priceDescription: "/bulan",
+      features: [
+        "Semua yang ada di paket Gratis",
+        "Penggunaan tanpa batas",
+        "Prioritas pemrosesan AI",
+        "Akses ke fitur & alat beta",
+        "Dukungan prioritas via email",
+      ],
+      buttonText: getButtonText(),
+      buttonVariant: "default",
+      isRecommended: true,
+      isDisabled: isButtonDisabled,
+      action: handleUpgradeClick
+    },
+    {
+      name: "Profesor & Tim",
+      price: "Hubungi Kami",
+      priceDescription: "untuk demo",
+      features: [
+        "Semua yang ada di paket Pro",
+        "Manajemen multi-akun untuk tim",
+        "Analitik penggunaan",
+        "Dukungan khusus",
+        "Kustomisasi model AI (add-on)",
+      ],
+      buttonText: "Jadwalkan Demo",
+      buttonVariant: "outline",
+      isRecommended: false,
+      isDisabled: false,
+      action: () => router.push('/dukungan')
+    },
+  ];
+
   return (
     <section id="pricing" className="py-16 lg:py-24">
       <div className="container max-w-screen-xl px-4 md:px-8">
@@ -90,7 +122,8 @@ export default function HargaPage() {
                 <Button 
                     className="w-full" 
                     variant={tier.buttonVariant as "default" | "outline"}
-                    disabled={tier.name === "Mahasiswa Gratis"}
+                    disabled={tier.isDisabled}
+                    onClick={tier.action}
                 >
                   {tier.buttonText}
                 </Button>

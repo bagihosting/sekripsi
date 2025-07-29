@@ -1,9 +1,10 @@
 
 import type { UserProfile } from '@/lib/firestore';
 import { Card, CardHeader, CardTitle, CardContent } from './ui/card';
-import { Users, BarChart, Settings, LayoutGrid, Wand2, UserCog } from 'lucide-react';
+import { Users, BarChart, Settings, LayoutGrid, Wand2, UserCog, Banknote } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import FeatureManagementCard from './feature-management-card';
+import PaymentConfirmation from './payment-confirmation';
 
 interface AdminDashboardProps {
   userProfile: UserProfile;
@@ -34,9 +35,12 @@ export default function AdminDashboard({ userProfile }: AdminDashboardProps) {
       </div>
 
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 mb-8">
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 mb-8">
           <TabsTrigger value="overview">
             <BarChart className="mr-2 h-4 w-4" /> Ringkasan
+          </TabsTrigger>
+          <TabsTrigger value="payments">
+            <Banknote className="mr-2 h-4 w-4" /> Konfirmasi Pembayaran
           </TabsTrigger>
           <TabsTrigger value="users">
             <UserCog className="mr-2 h-4 w-4" /> Manajemen Pengguna
@@ -81,6 +85,10 @@ export default function AdminDashboard({ userProfile }: AdminDashboardProps) {
                 </CardContent>
                 </Card>
             </div>
+        </TabsContent>
+        
+        <TabsContent value="payments">
+            <PaymentConfirmation />
         </TabsContent>
 
         <TabsContent value="users">

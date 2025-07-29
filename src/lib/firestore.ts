@@ -1,4 +1,5 @@
-import { doc, setDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
+
+import { doc, setDoc, serverTimestamp, Timestamp, collection } from 'firebase/firestore';
 import { db } from './firebase';
 
 export interface UserProfile {
@@ -6,8 +7,19 @@ export interface UserProfile {
   email: string | null;
   role: 'user' | 'admin';
   plan: 'free' | 'pro';
+  paymentStatus: 'none' | 'pending' | 'pro';
   createdAt: Timestamp;
 }
+
+export interface Payment {
+  userId: string;
+  userEmail: string;
+  proofUrl: string;
+  status: 'pending' | 'confirmed' | 'rejected';
+  createdAt: Timestamp;
+  processedAt?: Timestamp;
+}
+
 
 /**
  * Creates a user profile document in Firestore.
@@ -21,6 +33,7 @@ export const createUserProfile = async (uid: string, email: string | null): Prom
     email,
     role: 'user', // Default role for new users
     plan: 'free', // Default plan for new users
+    paymentStatus: 'none', // Default payment status
   };
   
   try {
