@@ -8,6 +8,7 @@ import { createUserProfile } from './firestore';
 import { redirect } from 'next/navigation';
 import { collection, doc, setDoc, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { uploadToCloudinary } from './cloudinary';
+import { revalidatePath } from 'next/cache';
 
 const registerSchema = z.object({
   email: z.string().email(),
@@ -175,7 +176,8 @@ export async function updateUserProfile(formData: FormData) {
         }
         return { error: "Gagal memperbarui profil Anda. Silakan coba lagi." };
     }
-
+    
+    revalidatePath('/dashboard/profil');
     return { success: true };
 }
 
@@ -213,5 +215,37 @@ export async function confirmPayment(values: z.infer<typeof confirmPaymentSchema
         return { error: "Gagal mengonfirmasi pembayaran. Silakan coba lagi." };
     }
 
+    revalidatePath('/dashboard');
+    return { success: true };
+}
+
+export async function updatePricingPlan(formData: FormData) {
+    const planId = formData.get('id') as string;
+    const name = formData.get('name') as string;
+    const price = formData.get('price') as string;
+    const priceDescription = formData.get('priceDescription') as string;
+    const features = formData.getAll('features') as string[];
+    const isRecommended = formData.get('isRecommended') === 'on';
+
+    if (!planId) {
+        return { error: "Plan ID is missing." };
+    }
+
+    try {
+        const planRef = doc(db, 'pricingPlans', planId);
+        await updateDoc(planRef, {
+            name,
+            price,
+            priceDescription,
+            features,
+            isRecommended
+        });
+    } catch(error) {
+        console.error("Error updating plan:", error);
+        return { error: "Gagal memperbarui paket harga." };
+    }
+
+    revalidatePath('/harga');
+    revalidatePath('/dashboard');
     return { success: true };
 }

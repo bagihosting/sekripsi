@@ -23,6 +23,18 @@ export interface Payment {
   processedAt?: Timestamp;
 }
 
+export interface PricingPlan {
+    id: string; // e.g., 'free', 'pro', 'team'
+    name: string;
+    price: string;
+    priceDescription: string;
+    features: string[];
+    isRecommended: boolean;
+    buttonText?: string;
+    actionType: 'link' | 'auth_action' | 'current';
+    actionLink?: string;
+}
+
 
 /**
  * Creates a user profile document in Firestore.
