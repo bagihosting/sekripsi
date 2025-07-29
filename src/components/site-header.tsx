@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from 'react';
@@ -16,6 +15,7 @@ export const SiteHeader = () => {
   const navLinks = [
     { href: '/produk', label: 'Produk' },
     { href: '/rekomendasi-ai', label: 'Rekomendasi AI' },
+    { href: '/generator-judul', label: 'Generator Judul' },
     { href: '/blog', label: 'Blog' },
     { href: '/dukungan', label: 'Dukungan' },
   ];
