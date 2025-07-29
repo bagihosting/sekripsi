@@ -19,12 +19,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!template) {
     return {
-      title: 'Produk Tidak Ditemukan',
+      title: 'Template Not Found',
     }
   }
 
-  const title = `${template.name} - Skrip Siap Pakai | SkripsiKilat`;
-  const description = `Dapatkan skrip siap pakai '${template.name}'. ${template.shortDescription}. Solusi cepat untuk tugas akhir dan skripsi Anda.`;
+  const title = `${template.name} - Website Template | DesignBloom`;
+  const description = `Get the '${template.name}' website template. ${template.shortDescription}. A high-quality solution for your next project.`;
   
   return {
     title,
@@ -91,7 +91,7 @@ export default function ProductDetailPage({ params }: Props) {
                 <p className="mt-4 text-lg text-foreground/80">{template.shortDescription}</p>
 
                 <div className="mt-6">
-                    <h2 className="text-lg font-semibold mb-3">Fitur Utama:</h2>
+                    <h2 className="text-lg font-semibold mb-3">Key Features:</h2>
                     <ul className="space-y-2">
                         {template.features.map((feature, index) => (
                         <li key={index} className="flex items-center gap-2">
@@ -104,17 +104,17 @@ export default function ProductDetailPage({ params }: Props) {
 
                 <div className="mt-auto pt-8">
                      <div className="text-3xl font-bold mb-4">
-                        Rp{template.price.toLocaleString('id-ID')}
+                        ${template.price}
                     </div>
                     <div className="flex flex-col sm:flex-row gap-4">
                         <Button size="lg" className="flex-1">
                             <ShoppingCart className="mr-2 h-5 w-5" />
-                            Beli Skrip Ini Sekarang
+                            Buy This Template
                         </Button>
                         <Button size="lg" variant="outline" className="flex-1" asChild>
                             <Link href={template.liveDemoUrl} target="_blank">
                                 <Zap className="mr-2 h-5 w-5" />
-                                Demo Langsung
+                                Live Demo
                             </Link>
                         </Button>
                     </div>
@@ -130,11 +130,11 @@ function Breadcrumbs({ template }: { template: Template }) {
         <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-sm text-muted-foreground">
             <Link href="/" className="flex items-center gap-1 hover:text-primary transition-colors">
                 <Home className="h-4 w-4" />
-                Beranda
+                Home
             </Link>
             <ChevronRight className="h-4 w-4" />
             <Link href="/produk" className="hover:text-primary transition-colors">
-                Produk
+                Templates
             </Link>
             <ChevronRight className="h-4 w-4" />
             <span className="font-medium text-foreground">{template.name}</span>

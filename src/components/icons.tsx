@@ -1,11 +1,9 @@
 import type { SVGProps } from 'react';
 
-export function SkripsiKilatIcon(props: SVGProps<SVGSVGElement>) {
+export function DesignBloomIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -14,12 +12,10 @@ export function SkripsiKilatIcon(props: SVGProps<SVGSVGElement>) {
       strokeLinejoin="round"
       {...props}
     >
-      <path d="M22 10v6M2 10v6" />
-      <path d="M6 12v-2a6 6 0 0 1 12 0v2" />
-      <path d="M6 18h12" />
-      <path d="m10 10-1.5 1.5L10 13" />
-      <path d="m14 10 1.5 1.5L14 13" />
-      <path d="M4 22h16" />
+      <path d="M12 2L6 8V16L12 22L18 16V8L12 2Z" />
+      <path d="M12 2V22" />
+      <path d="M18 16L6 8" />
+      <path d="M6 16L18 8" />
     </svg>
   );
 }

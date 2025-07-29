@@ -9,6 +9,7 @@ import { getTemplates, Template } from '@/lib/data';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
+import AiRecommender from '@/components/ai-recommender';
 
 export default function Home() {
   const allTemplates = getTemplates();
@@ -29,22 +30,22 @@ export default function Home() {
 
 const HeroSection = () => (
   <section className="w-full">
-    <div className="container grid min-h-[calc(100dvh-3.5rem)] content-center text-center max-w-screen-xl">
+    <div className="container grid min-h-[calc(100dvh-4rem)] content-center text-center max-w-screen-xl">
       <div className="mx-auto max-w-4xl">
         <h1 className="font-headline text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
-          Deadline Skripsi di Depan Mata? Lulus Cepat Tanpa Koding, Malam Ini Juga!
+          Where Creativity Blossoms into Beautiful Websites
         </h1>
         <p className="mx-auto mt-6 max-w-2xl text-lg text-foreground/80">
-          Stop begadang dan stres mikirin kodingan dari nol. Skrip & template kami adalah jalan pintasmu menuju wisuda. Sudah teruji, tinggal pakai, dijamin dosen pembimbing langsung ACC!
+          Stop wrestling with code from scratch. Our curated collection of stunning, professional templates is your shortcut to a brilliant online presence. Ready to use, easy to customize.
         </p>
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
           <Button size="lg" asChild className="w-full sm:w-auto">
-            <Link href="/produk">Saya Mau Lulus Cepat!</Link>
+            <Link href="/produk">Explore Templates</Link>
           </Button>
           <Button size="lg" variant="outline" asChild className="w-full sm:w-auto">
-            <Link href="/rekomendasi-ai">
+            <Link href="#ai-recommender">
               <Sparkles className="mr-2 h-5 w-5" />
-              Carikan Ide Buat TA Saya
+              Get AI Recommendation
             </Link>
           </Button>
         </div>
@@ -57,9 +58,9 @@ const TrendingSection = ({ templates }: { templates: Template[] }) => (
   <section id="trending" className="w-full py-16 lg:py-24 bg-secondary/50">
     <div className="container max-w-screen-xl">
       <div className="mx-auto mb-12 max-w-3xl text-center">
-        <h2 className="font-headline text-3xl font-bold md:text-4xl lg:text-5xl">Skrip Paling Laris di Kalangan Pejuang Skripsi!</h2>
+        <h2 className="font-headline text-3xl font-bold md:text-4xl lg:text-5xl">Trending Designs</h2>
         <p className="mt-4 text-lg text-foreground/70">
-          Ratusan mahasiswa sudah membuktikan. Ini bukan sekadar skrip, ini kunci kelulusan Anda. Jangan sampai teman Anda wisuda duluan!
+          Join hundreds of creatives and businesses who have launched their sites with our most popular designs. This isn't just a template; it's your next masterpiece.
         </p>
       </div>
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -70,7 +71,7 @@ const TrendingSection = ({ templates }: { templates: Template[] }) => (
       <div className="mt-12 text-center">
         <Button asChild size="lg">
           <Link href="/produk">
-            Lihat Semua Produk <ArrowRight className="ml-2 h-4 w-4" />
+            View All Templates <ArrowRight className="ml-2 h-4 w-4" />
           </Link>
         </Button>
       </div>
@@ -79,19 +80,21 @@ const TrendingSection = ({ templates }: { templates: Template[] }) => (
 );
 
 const AiSection = () => (
-  <section id="ai-recommendations" className="py-16 lg:py-24">
+  <section id="ai-recommender" className="py-16 lg:py-24">
     <div className="container max-w-screen-xl">
-      <div className="mx-auto max-w-3xl text-center">
-          <Sparkles className="h-12 w-12 text-accent mx-auto mb-4" />
-          <h2 className="font-headline text-3xl font-bold md:text-4xl lg:text-5xl">Masih Bingung Judul TA? Biarkan AI Kami Cari Ide Terbaik!</h2>
-          <p className="mt-4 text-lg text-foreground/70">
-            Jangan habiskan waktu berharga Anda! Cukup jelaskan bidang minat Anda, dan AI SkripsiKilat akan merekomendasikan skrip & template yang paling relevan dan berpotensi dapat nilai A. Gratis!
-          </p>
-           <div className="mt-8 flex items-center justify-center">
-            <Button asChild size="lg" variant="outline">
-                <Link href="/rekomendasi-ai">Coba Rekomendasi AI Sekarang</Link>
-            </Button>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div className="max-w-xl">
+            <Sparkles className="h-12 w-12 text-accent mb-4" />
+            <h2 className="font-headline text-3xl font-bold md:text-4xl lg:text-5xl">Unsure Where to Start? Let Our AI Find Your Perfect Template!</h2>
+            <p className="mt-4 text-lg text-foreground/70">
+              Don't waste precious time scrolling. Just describe your project, style, and content needs, and let DesignBloom's AI recommend the perfect template to bring your vision to life. It's fast, smart, and free!
+            </p>
         </div>
+        <Card className="shadow-lg">
+          <CardContent className="p-6">
+            <AiRecommender />
+          </CardContent>
+        </Card>
       </div>
     </div>
   </section>
@@ -116,7 +119,7 @@ const TemplateCard = ({ template }: { template: Template }) => (
             <p className="text-sm text-white/80">{template.category}</p>
           </div>
           <div className="absolute right-4 top-4 rounded-full bg-accent px-3 py-1 text-sm font-semibold text-accent-foreground">
-            Rp{template.price.toLocaleString('id-ID')}
+            ${template.price}
           </div>
         </div>
       </Link>
@@ -124,10 +127,10 @@ const TemplateCard = ({ template }: { template: Template }) => (
         <p className="mb-4 text-sm text-muted-foreground h-10">{template.shortDescription}</p>
         <div className="flex gap-2">
           <Button size="sm" className="flex-1" asChild>
-            <Link href={template.liveDemoUrl} target="_blank">Demo Langsung</Link>
+            <Link href={template.liveDemoUrl} target="_blank">Live Demo</Link>
           </Button>
           <Button size="sm" variant="outline" className="flex-1" asChild>
-            <Link href={`/produk/${template.id}`}>Detail</Link>
+            <Link href={`/produk/${template.id}`}>Details</Link>
           </Button>
         </div>
       </div>

@@ -2,34 +2,34 @@ import type {Metadata} from 'next';
 import { Toaster } from "@/components/ui/toaster"
 import './globals.css';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://skripsikilat.com';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://designbloom.com';
 
 export const metadata: Metadata = {
-  title: 'SkripsiKilat: Jual Skrip & Web Siap Pakai untuk Tugas Akhir',
-  description: 'Butuh skrip & website jadi untuk skripsi? SkripsiKilat menyediakan template & skrip siap pakai yang dijamin membuat dosen ACC. Lulus cepat tanpa pusing koding!',
-  keywords: ['jual skrip skripsi', 'tugas akhir', 'website siap pakai', 'template skripsi', 'sistem informasi', 'source code', 'lulus cepat'],
-  authors: [{ name: 'SkripsiKilat' }],
+  title: 'DesignBloom: Curated Website Templates for Creatives',
+  description: 'Discover and purchase high-quality, professionally designed website templates. Perfect for portfolios, e-commerce, blogs, and businesses.',
+  keywords: ['website templates', 'Next.js templates', 'React templates', 'creative portfolio', 'e-commerce theme', 'professional website design'],
+  authors: [{ name: 'DesignBloom' }],
   metadataBase: new URL(siteUrl),
   openGraph: {
-    title: 'SkripsiKilat: Jual Skrip & Web Siap Pakai untuk Tugas Akhir',
-    description: 'Deadline mepet? Dapatkan skrip dan website siap pakai untuk tugas akhir Anda di SkripsiKilat. Dijamin cepat, mudah, dan langsung di-ACC dosen!',
+    title: 'DesignBloom: Curated Website Templates for Creatives',
+    description: 'Find the perfect design for your next project. Explore our curated collection of beautiful and functional website templates.',
     url: siteUrl,
-    siteName: 'SkripsiKilat',
+    siteName: 'DesignBloom',
     images: [
       {
         url: `${siteUrl}/og-image.png`,
         width: 1200,
         height: 630,
-        alt: 'SkripsiKilat - Solusi Cepat Tugas Akhir',
+        alt: 'DesignBloom - Curated Website Templates',
       },
     ],
-    locale: 'id_ID',
+    locale: 'en_US',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'SkripsiKilat: Jual Skrip & Web Siap Pakai untuk Tugas Akhir',
-    description: 'Jangan biarkan skripsi menghambat kelulusanmu! Dapatkan source code dan web jadi di SkripsiKilat.',
+    title: 'DesignBloom: Curated Website Templates for Creatives',
+    description: 'Elevate your online presence with stunning templates from DesignBloom.',
     images: [`${siteUrl}/og-image.png`],
   },
   robots: {
@@ -51,7 +51,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id" className="scroll-smooth">
+    <html lang="en" className="scroll-smooth">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

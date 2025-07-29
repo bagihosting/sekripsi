@@ -3,45 +3,44 @@ export default function KetentuanLayananPage() {
     return (
       <div className="container max-w-screen-md py-12 lg:py-16">
         <article className="prose prose-lg mx-auto dark:prose-invert">
-          <h1 className="font-headline text-3xl font-bold md:text-4xl">Ketentuan Layanan</h1>
-          <p className="lead text-muted-foreground">Terakhir diperbarui: 1 Agustus 2024</p>
+          <h1 className="font-headline text-3xl font-bold md:text-4xl">Terms of Service</h1>
+          <p className="lead text-muted-foreground">Last updated: August 1, 2024</p>
   
-          <h2>1. Penerimaan Ketentuan</h2>
+          <h2>1. Acceptance of Terms</h2>
           <p>
-            Dengan mengakses dan menggunakan situs web SkripsiKilat ("Layanan"), Anda setuju untuk terikat oleh Ketentuan Layanan ini. Jika Anda tidak setuju dengan bagian mana pun dari ketentuan ini, Anda tidak diizinkan untuk menggunakan Layanan.
+            By accessing and using the DesignBloom website ("Service"), you agree to be bound by these Terms of Service. If you disagree with any part of the terms, then you may not access the Service.
           </p>
   
-          <h2>2. Penggunaan Layanan</h2>
+          <h2>2. Use of Service</h2>
           <p>
-            SkripsiKilat menyediakan skrip dan template siap pakai untuk tujuan referensi dan percepatan pengerjaan tugas akhir atau skripsi. Anda bertanggung jawab penuh atas penggunaan produk yang dibeli.
+            DesignBloom provides ready-to-use website templates and scripts for the purpose of accelerating web development projects. You are fully responsible for the use of purchased products.
           </p>
           <ul>
-            <li>Produk yang dibeli hanya boleh digunakan untuk satu proyek akhir atau klien, kecuali dinyatakan lain.</li>
-            <li>Anda tidak diizinkan untuk menjual kembali, mendistribusikan, atau membagikan produk kami dalam bentuk apa pun.</li>
-            <li>Anda bertanggung jawab untuk memastikan bahwa penggunaan produk kami mematuhi semua peraturan akademik yang berlaku di institusi Anda. SkripsiKilat tidak bertanggung jawab atas segala bentuk pelanggaran akademik, termasuk plagiarisme.</li>
+            <li>Products purchased may only be used for a single final project or client, unless otherwise stated.</li>
+            <li>You are not permitted to resell, distribute, or share our products in any form.</li>
+            <li>You are responsible for ensuring that your use of our products complies with all applicable regulations.</li>
           </ul>
   
-          <h2>3. Pembelian dan Pengembalian Dana</h2>
+          <h2>3. Purchases and Refunds</h2>
           <p>
-            Semua penjualan bersifat final. Mengingat sifat digital dari produk kami, kami tidak menawarkan pengembalian dana setelah produk diunduh atau diakses. Silakan manfaatkan fitur "Demo Langsung" untuk memastikan produk sesuai dengan kebutuhan Anda sebelum membeli.
+            All sales are final. Given the digital nature of our products, we do not offer refunds once a product has been downloaded or accessed. Please make use of the "Live Demo" feature to ensure the product meets your needs before purchasing.
           </p>
   
-          <h2>4. Batasan Tanggung Jawab</h2>
+          <h2>4. Limitation of Liability</h2>
           <p>
-            Layanan dan produk kami disediakan "sebagaimana adanya". SkripsiKilat tidak akan bertanggung jawab atas kerusakan langsung, tidak langsung, insidental, atau konsekuensial yang timbul dari penggunaan atau ketidakmampuan untuk menggunakan produk kami.
+            Our Service and products are provided "as is". DesignBloom shall not be liable for any direct, indirect, incidental, or consequential damages resulting from the use or inability to use our products.
           </p>
   
-          <h2>5. Perubahan pada Ketentuan</h2>
+          <h2>5. Changes to Terms</h2>
           <p>
-            Kami berhak untuk memodifikasi atau mengganti Ketentuan ini kapan saja. Jika revisi bersifat material, kami akan memberikan pemberitahuan setidaknya 30 hari sebelum ketentuan baru berlaku.
+            We reserve the right to modify or replace these Terms at any time. If a revision is material, we will provide at least 30 days' notice prior to any new terms taking effect.
           </p>
   
-          <h2>Hubungi Kami</h2>
+          <h2>Contact Us</h2>
           <p>
-            Jika Anda memiliki pertanyaan tentang Ketentuan Layanan ini, silakan hubungi kami melalui halaman <a href="/dukungan">Dukungan</a> kami.
+            If you have any questions about these Terms of Service, please contact us via our <a href="/dukungan">Support</a> page.
           </p>
         </article>
       </div>
     );
   }
-  
