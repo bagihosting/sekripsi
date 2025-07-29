@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useFormState, useFormStatus } from "react-dom";
+import { useActionState } from "react";
+import { useFormStatus } from "react-dom";
 import { simulateDefense, DefenseSimulatorOutput } from "@/ai/flows/defense-simulator";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -40,7 +40,7 @@ async function simulateDefenseAction(
 }
 
 export default function DefenseSimulator() {
-  const [state, formAction] = useFormState(simulateDefenseAction, initialState);
+  const [state, formAction] = useActionState(simulateDefenseAction, initialState);
 
   return (
     <div className="space-y-6">
