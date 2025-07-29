@@ -14,37 +14,42 @@ type OutlineGeneratorState = {
   error: string | null;
 };
 
+async function generateOutlineAction(
+  prevState: any,
+  formData: FormData
+): Promise<{ result: GenerateOutlineOutput | null; error: string | null; }> {
+  const topic = formData.get("topic") as string;
+  if (!topic) {
+    return { result: null, error: "Silakan masukkan topik atau judul skripsi." };
+  }
+
+  try {
+    const result = await generateOutline({ topic });
+    if (result.outline) {
+      return { result, error: null };
+    } else {
+      return { result: null, error: "Tidak dapat menghasilkan kerangka. Silakan coba lagi." };
+    }
+  } catch (e) {
+    console.error(e);
+    return { result: null, error: "Terjadi kesalahan yang tidak terduga. Mohon coba lagi." };
+  }
+}
+
 export default function OutlineGenerator() {
   const [state, setState] = useState<OutlineGeneratorState>({
     result: null,
     error: null,
   });
 
-  async function handleAction(formData: FormData) {
-    const topic = formData.get("topic") as string;
-    if (!topic) {
-      setState({ result: null, error: "Silakan masukkan topik atau judul skripsi." });
-      return;
-    }
-
-    setState({ result: null, error: null });
-
-    try {
-      const result = await generateOutline({ topic });
-      if (result.outline) {
-        setState({ result, error: null });
-      } else {
-        setState({ result: null, error: "Tidak dapat menghasilkan kerangka. Silakan coba lagi." });
-      }
-    } catch (e) {
-      console.error(e);
-      setState({ result: null, error: "Terjadi kesalahan yang tidak terduga. Mohon coba lagi." });
-    }
-  }
+  const formAction = async (formData: FormData) => {
+    const newState = await generateOutlineAction(state, formData);
+    setState(newState);
+  };
 
   return (
     <div className="space-y-6">
-      <form action={handleAction} className="space-y-4">
+      <form action={formAction} className="space-y-4">
         <div>
           <Input
             name="topic"

@@ -108,9 +108,9 @@ export const SiteHeader = () => {
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-full max-w-sm">
-                <SheetHeader className="sr-only">
-                  <SheetTitle>Menu</SheetTitle>
-                  <SheetDescription>
+                <SheetHeader className="text-left">
+                  <SheetTitle className="sr-only">Menu</SheetTitle>
+                  <SheetDescription className="sr-only">
                     Navigasi utama untuk SkripsiKilat.
                   </SheetDescription>
                 </SheetHeader>
