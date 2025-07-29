@@ -58,10 +58,10 @@ const HeroSection = () => (
   <section className="container grid min-h-[calc(100dvh-3.5rem)] content-center text-center">
     <div className="mx-auto max-w-4xl">
       <h1 className="font-headline text-5xl font-bold tracking-tight md:text-7xl lg:text-8xl">
-        Tempat Kreativitas Mekar Menjadi Kode
+        Jangan Cuma Punya Ide, Wujudkan Jadi Cuan!
       </h1>
       <p className="mx-auto mt-6 max-w-2xl text-lg text-foreground/80 md:text-xl">
-        Temukan koleksi pilihan template dan skrip aplikasi web yang indah. Didesain dengan elegan, dibuat dengan andal, dan siap untuk meluncurkan ide besar Anda berikutnya.
+        Lewati proses koding berbulan-bulan! Dapatkan akses instan ke ratusan template & skrip profesional yang terbukti menghasilkan. Proyek Anda bisa online malam ini!
       </p>
       <div className="mt-8 flex justify-center gap-4">
         <Button size="lg" asChild>
@@ -82,9 +82,9 @@ const TrendingSection = ({ templates }: { templates: Template[] }) => (
   <section id="trending" className="w-full py-16 lg:py-24">
     <div className="container">
       <div className="mx-auto mb-12 max-w-2xl text-center">
-        <h2 className="font-headline text-4xl font-bold md:text-5xl">Produk Populer</h2>
+        <h2 className="font-headline text-4xl font-bold md:text-5xl">Diborong Ribuan Orang! Jangan Sampai Ketinggalan Produk Terlaris Ini!</h2>
         <p className="mt-4 text-lg text-foreground/70">
-          Desain dan aplikasi paling populer dan terlaris, yang disukai oleh komunitas kami.
+          Lihat apa yang sedang viral! Desain dan aplikasi ini adalah yang paling dicari, terbukti disukai, dan siap melambungkan proyek Anda ke level berikutnya.
         </p>
       </div>
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -100,7 +100,7 @@ const AllTemplatesSection = ({ templates }: { templates: Template[] }) => (
   <section id="templates" className="w-full bg-secondary/50 py-16 lg:py-24">
     <div className="container">
        <div className="mx-auto mb-12 max-w-2xl text-center">
-        <h2 className="font-headline text-4xl font-bold md:text-5xl">Koleksi Kami</h2>
+        <h2 className="font-headline text-4xl font-bold md:text-5xl">Koleksi Lengkap Senjata Rahasia Anda</h2>
         <p className="mt-4 text-lg text-foreground/70">
           Jelajahi pustaka lengkap template dan skrip aplikasi premium kami. Temukan yang paling cocok untuk proyek Anda.
         </p>
@@ -116,9 +116,9 @@ const AiSection = () => (
       <div className="grid items-center gap-12 lg:grid-cols-2">
         <div className="space-y-4">
           <Sparkles className="h-12 w-12 text-accent" />
-          <h2 className="font-headline text-4xl font-bold md:text-5xl">Bingung Mulai dari Mana?</h2>
+          <h2 className="font-headline text-4xl font-bold md:text-5xl">Masih Ragu? Biarkan AI Kami Memilihkan Jodoh Proyek Anda!</h2>
           <p className="text-lg text-foreground/70">
-            Biarkan AI kami memandu Anda. Jelaskan proyek Anda, gaya merek Anda, dan audiens target Anda. Asisten cerdas kami akan menganalisis kebutuhan Anda dan merekomendasikan produk yang sempurna untuk mewujudkan visi Anda.
+            Cukup ketik ide gila Anda, dan biarkan asisten cerdas kami mengungkap produk rahasia yang akan mengubah visi Anda menjadi kenyataan dalam sekejap. Gratis!
           </p>
         </div>
         <Card className="shadow-lg">
@@ -134,9 +134,9 @@ const AiSection = () => (
 const SupportSection = () => (
   <section id="support" className="bg-secondary/50 py-16 lg:py-24">
     <div className="container max-w-2xl text-center">
-      <h2 className="font-headline text-4xl font-bold md:text-5xl">Kami Siap Membantu</h2>
+      <h2 className="font-headline text-4xl font-bold md:text-5xl">Kami Siap Membantu Anda Jadi Sultan</h2>
       <p className="mt-4 text-lg text-foreground/70">
-        Ada pertanyaan? Butuh bantuan? Tim dukungan kami yang berdedikasi siap membantu Anda dalam perjalanan Anda.
+        Ada pertanyaan? Butuh bantuan? Tim dukungan kami siap mengawal Anda menuju kesuksesan. Jangan ragu, hubungi kami!
       </p>
       <form className="mt-8 space-y-4 text-left">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
