@@ -5,6 +5,8 @@ import { db } from './firebase';
 export interface UserProfile {
   uid: string;
   email: string | null;
+  displayName?: string;
+  photoURL?: string;
   role: 'user' | 'admin';
   plan: 'free' | 'pro';
   paymentStatus: 'none' | 'pending' | 'pro';
@@ -31,6 +33,8 @@ export const createUserProfile = async (uid: string, email: string | null): Prom
   const userRef = doc(db, 'users', uid);
   const newUserProfile: Omit<UserProfile, 'uid' | 'createdAt'> = {
     email,
+    displayName: email?.split('@')[0] || 'User',
+    photoURL: '',
     role: 'user', // Default role for new users
     plan: 'free', // Default plan for new users
     paymentStatus: 'none', // Default payment status

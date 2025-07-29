@@ -2,7 +2,7 @@
 'use server';
 
 import { z } from 'zod';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updatePassword } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
 import { createUserProfile } from './firestore';
 import { redirect } from 'next/navigation';
@@ -116,6 +116,64 @@ export async function requestUpgrade(formData: FormData) {
     } catch (error: any) {
         console.error("Upgrade request failed:", error);
         return { error: "Gagal memproses permintaan Anda. Silakan coba lagi." };
+    }
+
+    return { success: true };
+}
+
+export async function updateUserProfile(formData: FormData) {
+    const user = auth.currentUser;
+    if (!user) {
+        return { error: "Anda harus login untuk melakukan ini." };
+    }
+
+    const displayName = formData.get('displayName') as string;
+    const password = formData.get('password') as string | null;
+    const photo = formData.get('photo') as File | null;
+    
+    const userRef = doc(db, 'users', user.uid);
+    const updates: { [key: string]: any } = {};
+
+    try {
+        // Update display name
+        if (displayName) {
+            updates.displayName = displayName;
+        }
+
+        // Update photo
+        if (photo) {
+            const fileBuffer = await photo.arrayBuffer();
+            const mime = photo.type;
+            const encoding = 'base64';
+            const base64Data = Buffer.from(fileBuffer).toString('base64');
+            const fileUri = `data:${mime};${encoding},${base64Data}`;
+            
+            const result = await uploadToCloudinary(fileUri, `profile_pictures/${user.uid}`);
+            const downloadURL = result.secure_url;
+
+            if (downloadURL) {
+                updates.photoURL = downloadURL;
+            } else {
+                 throw new Error("Gagal mengunggah foto profil.");
+            }
+        }
+        
+        // Update Firestore
+        if (Object.keys(updates).length > 0) {
+            await updateDoc(userRef, updates);
+        }
+
+        // Update password in Firebase Auth
+        if (password) {
+            await updatePassword(user, password);
+        }
+
+    } catch (error: any) {
+        console.error("Profile update failed:", error);
+        if (error.code === 'auth/requires-recent-login') {
+            return { error: 'Sesi Anda telah berakhir. Silakan logout dan login kembali untuk mengubah kata sandi.' };
+        }
+        return { error: "Gagal memperbarui profil Anda. Silakan coba lagi." };
     }
 
     return { success: true };

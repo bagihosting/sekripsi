@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -6,12 +7,13 @@ import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger } from '@/components/ui/sheet';
 import { SekripsiComIcon } from '@/components/icons';
-import { ArrowRight, Menu, Sparkles, ChevronDown, Star, User, LogOut, LayoutDashboard } from 'lucide-react';
+import { ArrowRight, Menu, Sparkles, ChevronDown, Star, User, LogOut, LayoutDashboard, UserCog } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from './ui/dropdown-menu';
 import { Separator } from './ui/separator';
 import { useAuth } from '@/hooks/use-auth';
 import { logout } from '@/lib/actions';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 
 const aiToolsLinks = [
     { href: '/generator-draf', label: 'Generator Draf Instan (Bab 1-5)' },
@@ -109,14 +111,17 @@ export const SiteHeader = () => {
           {user ? (
              <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="secondary" size="icon" className="rounded-full">
-                  <User className="h-5 w-5" />
+                <Button variant="ghost" size="icon" className="rounded-full">
+                    <Avatar className="h-8 w-8">
+                        <AvatarImage src={userProfile?.photoURL || undefined} alt={userProfile?.displayName || 'User Avatar'} />
+                        <AvatarFallback>{(userProfile?.displayName || userProfile?.email || 'U').charAt(0).toUpperCase()}</AvatarFallback>
+                    </Avatar>
                    <span className="sr-only">User Menu</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem className="flex flex-col items-start" disabled>
-                  <p className="font-medium">{userProfile?.email}</p>
+                  <p className="font-medium">{userProfile?.displayName || userProfile?.email}</p>
                    <p className="text-xs text-muted-foreground capitalize">{userProfile?.role} ({userProfile?.plan})</p>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
@@ -126,6 +131,13 @@ export const SiteHeader = () => {
                         <span>Dasbor</span>
                     </Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                    <Link href="/dashboard/profil">
+                        <UserCog className="mr-2 h-4 w-4" />
+                        <span>Profil Saya</span>
+                    </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => logout()}>
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Logout</span>
@@ -241,13 +253,19 @@ export const SiteHeader = () => {
                      {user ? (
                         <div className="p-2">
                            <div className="mb-4">
-                             <p className="font-medium">{userProfile?.email}</p>
+                             <p className="font-medium">{userProfile?.displayName || userProfile?.email}</p>
                              <p className="text-sm text-muted-foreground capitalize">{userProfile?.role} ({userProfile?.plan})</p>
                            </div>
                            <Button asChild className="w-full mb-2">
                                 <Link href="/dashboard" onClick={() => setOpen(false)}>
                                     <LayoutDashboard className="mr-2 h-4 w-4" />
                                     Buka Dasbor
+                                </Link>
+                           </Button>
+                            <Button asChild className="w-full mb-2" variant="outline">
+                                <Link href="/dashboard/profil" onClick={() => setOpen(false)}>
+                                    <UserCog className="mr-2 h-4 w-4" />
+                                    Profil Saya
                                 </Link>
                            </Button>
                            <Button onClick={() => { logout(); setOpen(false); }} className="w-full" variant="outline">
