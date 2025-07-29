@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     }
   }
 
-  const title = `${template.name} - Website Template | DesignBloom`;
+  const title = `${template.name} - Website Template | SkripsiKilat`;
   const description = `Get the '${template.name}' website template. ${template.shortDescription}. A high-quality solution for your next project.`;
   
   return {

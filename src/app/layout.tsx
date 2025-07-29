@@ -2,34 +2,34 @@ import type {Metadata} from 'next';
 import { Toaster } from "@/components/ui/toaster"
 import './globals.css';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://designbloom.com';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://skripsikilat.com';
 
 export const metadata: Metadata = {
-  title: 'DesignBloom: Curated Website Templates for Creatives',
-  description: 'Discover and purchase high-quality, professionally designed website templates. Perfect for portfolios, e-commerce, blogs, and businesses.',
-  keywords: ['website templates', 'Next.js templates', 'React templates', 'creative portfolio', 'e-commerce theme', 'professional website design'],
-  authors: [{ name: 'DesignBloom' }],
+  title: 'SkripsiKilat: Akselerator Skripsi Berbasis AI',
+  description: 'Percepat kelulusanmu dengan alat bantu AI canggih. Mulai dari generator judul, pemeriksa argumen, hingga simulasi sidang. Skripsi jadi lebih mudah dan cepat.',
+  keywords: ['skripsi', 'tesis', 'tugas akhir', 'bantuan skripsi', 'AI untuk skripsi', 'generator judul', 'pemeriksa plagiarisme', 'konsultasi skripsi'],
+  authors: [{ name: 'Tim SkripsiKilat' }],
   metadataBase: new URL(siteUrl),
   openGraph: {
-    title: 'DesignBloom: Curated Website Templates for Creatives',
-    description: 'Find the perfect design for your next project. Explore our curated collection of beautiful and functional website templates.',
+    title: 'SkripsiKilat: Akselerator Skripsi Berbasis AI',
+    description: 'Buntu ngerjain skripsi? Dapatkan bantuan dari AI untuk mempercepat penelitian dan penulisanmu. Coba gratis sekarang!',
     url: siteUrl,
-    siteName: 'DesignBloom',
+    siteName: 'SkripsiKilat',
     images: [
       {
         url: `${siteUrl}/og-image.png`,
         width: 1200,
         height: 630,
-        alt: 'DesignBloom - Curated Website Templates',
+        alt: 'SkripsiKilat - Alat Bantu Skripsi AI',
       },
     ],
-    locale: 'en_US',
+    locale: 'id_ID',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'DesignBloom: Curated Website Templates for Creatives',
-    description: 'Elevate your online presence with stunning templates from DesignBloom.',
+    title: 'SkripsiKilat: Akselerator Skripsi Berbasis AI',
+    description: 'Jangan biarkan skripsi menghambatmu. Gunakan alat AI dari SkripsiKilat untuk lulus lebih cepat.',
     images: [`${siteUrl}/og-image.png`],
   },
   robots: {
@@ -51,7 +51,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="scroll-smooth">
+    <html lang="id" className="scroll-smooth">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
