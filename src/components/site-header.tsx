@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { SkripsiKilatIcon } from '@/components/icons';
-import { ArrowRight, ChevronDown, Menu } from 'lucide-react';
+import { ArrowRight, ChevronDown, Menu, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const aiTools = [
@@ -40,7 +40,7 @@ export const SiteHeader = () => {
     { href: '/dukungan', label: 'Dukungan' },
   ];
 
-  const isAiToolActive = aiTools.some(tool => pathname.startsWith(tool.href));
+  const isAiToolActive = aiTools.some(tool => pathname.startsWith(tool.href)) || pathname === '/alat-ai';
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -65,24 +65,17 @@ export const SiteHeader = () => {
               {link.label}
             </Link>
           ))}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className={cn(
-                "gap-1 px-2 transition-colors hover:text-primary focus:bg-accent focus:text-accent-foreground",
-                isAiToolActive ? "text-primary" : "text-foreground/60"
-              )}>
-                Alat Bantu AI
-                <ChevronDown className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56">
-              {aiTools.map((tool) => (
-                <DropdownMenuItem key={tool.href} asChild>
-                  <Link href={tool.href}>{tool.label}</Link>
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Link
+            href="/alat-ai"
+            prefetch={false}
+            className={cn(
+              "flex items-center gap-1 transition-colors hover:text-primary",
+              isAiToolActive ? "text-primary" : "text-foreground/60"
+            )}
+          >
+            <Sparkles className="h-4 w-4" />
+            Alat Bantu AI
+          </Link>
         </nav>
 
         <div className="flex items-center gap-2">
@@ -124,9 +117,20 @@ export const SiteHeader = () => {
                     {link.label}
                   </Link>
                 ))}
+                 <Link
+                    href="/alat-ai"
+                    onClick={() => setOpen(false)}
+                    className={cn(
+                        "text-lg font-medium transition-colors hover:text-primary flex items-center gap-2",
+                        isAiToolActive ? "text-primary" : "text-foreground/80"
+                    )}
+                  >
+                    <Sparkles className="h-5 w-5" />
+                    Alat Bantu AI
+                  </Link>
 
-                <div className="border-t pt-4">
-                  <h4 className="mb-2 text-lg font-medium">Alat Bantu AI</h4>
+                <div className="border-t pt-4 mt-2">
+                  <h4 className="mb-2 text-base font-medium text-muted-foreground">Detail Alat AI:</h4>
                   <div className="flex flex-col gap-4">
                   {aiTools.map((tool) => (
                     <Link
