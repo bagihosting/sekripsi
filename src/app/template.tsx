@@ -6,23 +6,43 @@ import { SiteHeader } from "@/components/site-header";
 import { BottomNavBar } from "@/components/bottom-nav-bar";
 import RecentUpgradeToast from "@/components/recent-upgrade-toast";
 import { usePathname } from "next/navigation";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 
-const noNavRoutes = ['/login', '/register', '/dashboard', '/upgrade'];
+const specialLayoutRoutes = ['/login', '/register', '/upgrade'];
+const dashboardRoute = '/dashboard';
 
 export default function Template({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const isMobile = useIsMobile();
 
-  // Check if the current path starts with any of the noNavRoutes
-  const hideNav = noNavRoutes.some(route => pathname.startsWith(route));
-
-  if (hideNav) {
-    return <>{children}</>;
+  // Special layout for login, register, upgrade
+  if (specialLayoutRoutes.some(route => pathname.startsWith(route))) {
+    return (
+      <>
+        {children}
+        <RecentUpgradeToast />
+        {isMobile && <BottomNavBar />}
+      </>
+    );
   }
 
+  // Special layout for dashboard
+  if (pathname.startsWith(dashboardRoute)) {
+     return (
+      <>
+        {children}
+        <RecentUpgradeToast />
+        {isMobile && <BottomNavBar />}
+      </>
+    );
+  }
+
+  // Default layout for all other pages
   return (
      <div className="flex min-h-screen flex-col">
         <SiteHeader />
-        <main className="flex-1 pb-16 md:pb-0">{children}</main>
+        <main className={cn("flex-1", isMobile && "pb-16")}>{children}</main>
         <SiteFooter />
         <BottomNavBar />
         <RecentUpgradeToast />
