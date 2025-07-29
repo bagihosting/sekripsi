@@ -5,25 +5,39 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowRight, Calendar, User } from "lucide-react";
 import Link from 'next/link';
 import Image from "next/image";
-import { collection, query, where, orderBy, getDocs, limit } from "firebase/firestore";
+import { collection, query, where, orderBy, getDocs, Timestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { BlogPost } from "@/lib/firestore";
 
-async function getBlogPosts() {
+// Define a serializable version of BlogPost
+interface SerializableBlogPost extends Omit<BlogPost, 'createdAt' | 'updatedAt'> {
+    id: string;
+    createdAt: string;
+    updatedAt: string;
+    date: string;
+}
+
+
+async function getBlogPosts(): Promise<SerializableBlogPost[]> {
     const postsCollection = collection(db, 'blogPosts');
     const q = query(postsCollection, where('status', '==', 'published'), orderBy('createdAt', 'desc'));
     const querySnapshot = await getDocs(q);
 
     const posts = querySnapshot.docs.map(doc => {
-        const data = doc.data();
+        const data = doc.data() as BlogPost;
+        const createdAt = data.createdAt instanceof Timestamp ? data.createdAt.toDate() : new Date();
+        const updatedAt = data.updatedAt instanceof Timestamp ? data.updatedAt.toDate() : new Date();
+
         return {
-            id: doc.id,
             ...data,
+            id: doc.id,
+            createdAt: createdAt.toISOString(),
+            updatedAt: updatedAt.toISOString(),
             // Convert Firestore Timestamp to a serializable format (string)
-            date: data.createdAt.toDate().toLocaleDateString('id-ID', {
+            date: createdAt.toLocaleDateString('id-ID', {
                 year: 'numeric', month: 'long', day: 'numeric'
             }),
-        } as BlogPost & { id: string; date: string };
+        };
     });
 
     return posts;
@@ -75,7 +89,7 @@ export default async function BlogPage() {
 }
 
 type PostProps = {
-    post: BlogPost & { id: string; date: string };
+    post: SerializableBlogPost;
 }
 
 function FeaturedPost({ post }: PostProps) {

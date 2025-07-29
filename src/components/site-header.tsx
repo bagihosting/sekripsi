@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -14,32 +14,23 @@ import { Separator } from './ui/separator';
 import { useAuth } from '@/hooks/use-auth';
 import { logout } from '@/lib/actions';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-
-const aiToolsLinks = [
-    { href: '/generator-draf', label: 'Generator Draf Instan (Bab 1-5)' },
-    { href: '/generator-judul', label: 'Generator Judul' },
-    { href: '/pertanyaan-penelitian', label: 'Pertanyaan Penelitian' },
-    { href: '/generator-hipotesis', label: 'Generator Hipotesis' },
-    { href: '/kerangka-ai', label: 'Generator Kerangka' },
-    { href: '/referensi-ai', label: 'Asisten Referensi' },
-    { href: '/parafrase-ai', label: 'Alat Parafrase' },
-    { href: '/panduan-spss', label: 'Panduan Analisis SPSS' },
-    { href: '/generator-abstrak', label: 'Generator Abstrak' },
-    { href: '/korektor-ai', label: 'Korektor Tulisan' },
-    { href: '/cek-argumen', label: 'Pengecek Argumen' },
-    { href: '/simulasi-sidang', label: 'Simulasi Sidang' },
-    { href: '/story-generator', label: 'Generator Cerita' },
-];
-
-const mainNavLinks = [
-    { href: '/blog', label: 'Trik Cepat Lulus' },
-    { href: '/dukungan', label: 'Bantuan Kilat' },
-];
+import { getAllTools, AiTool } from '@/lib/plugins';
 
 export const SiteHeader = () => {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const { user, userProfile } = useAuth();
+  const [aiToolsLinks, setAiToolsLinks] = useState<AiTool[]>([]);
+  const [loadingTools, setLoadingTools] = useState(true);
+
+  useEffect(() => {
+    const fetchTools = async () => {
+      const tools = await getAllTools();
+      setAiToolsLinks(tools);
+      setLoadingTools(false);
+    }
+    fetchTools();
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -67,9 +58,10 @@ export const SiteHeader = () => {
                         <span>Lihat Semua Alat</span>
                     </Link>
                 </DropdownMenuItem>
-                 {aiToolsLinks.map(link => (
+                 <DropdownMenuSeparator />
+                 {!loadingTools && aiToolsLinks.map(link => (
                     <DropdownMenuItem key={link.href} asChild>
-                        <Link href={link.href}>{link.label}</Link>
+                        <Link href={link.href}>{link.title}</Link>
                     </DropdownMenuItem>
                 ))}
             </DropdownMenuContent>
@@ -80,7 +72,7 @@ export const SiteHeader = () => {
             prefetch={false}
             className={cn(
                 "transition-colors hover:text-primary",
-                pathname === '/blog' ? "text-primary" : "text-foreground/60"
+                pathname.startsWith('/blog') ? "text-primary" : "text-foreground/60"
             )}
             >
             Trik Cepat Lulus

@@ -1,5 +1,5 @@
 
-import { collection, query, where, getDocs, limit } from "firebase/firestore";
+import { collection, query, where, getDocs, limit, Timestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { BlogPost } from "@/lib/firestore";
 import { notFound } from "next/navigation";
@@ -55,6 +55,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         }
     }
     
+    const publishedAt = post.createdAt instanceof Timestamp ? post.createdAt.toDate().toISOString() : new Date().toISOString();
+
     return {
         title: `${post.title} | sekripsi.com`,
         description: post.description,
@@ -62,7 +64,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
             title: post.title,
             description: post.description,
             type: 'article',
-            publishedTime: post.createdAt.toDate().toISOString(),
+            publishedTime: publishedAt,
             authors: [post.author],
             images: [
                 {
@@ -84,7 +86,9 @@ export default async function BlogPostPage({ params }: Props) {
         notFound();
     }
     
-    const publishedDate = post.createdAt.toDate().toLocaleDateString('id-ID', {
+    const createdAtDate = post.createdAt instanceof Timestamp ? post.createdAt.toDate() : new Date();
+
+    const publishedDate = createdAtDate.toLocaleDateString('id-ID', {
         year: 'numeric', month: 'long', day: 'numeric'
     });
 
@@ -107,16 +111,18 @@ export default async function BlogPostPage({ params }: Props) {
                     </div>
                 </header>
 
-                <div className="relative aspect-video w-full mb-8">
-                    <Image
-                        src={post.imageUrl || "https://placehold.co/1200x600.png"}
-                        alt={post.title}
-                        fill
-                        data-ai-hint={post.aiHint}
-                        className="object-cover rounded-lg shadow-lg"
-                        priority
-                    />
-                </div>
+                {post.imageUrl && (
+                     <div className="relative aspect-video w-full mb-8">
+                        <Image
+                            src={post.imageUrl}
+                            alt={post.title}
+                            fill
+                            data-ai-hint={post.aiHint}
+                            className="object-cover rounded-lg shadow-lg"
+                            priority
+                        />
+                    </div>
+                )}
                 
                 <div
                     className="prose prose-lg dark:prose-invert max-w-none"
@@ -143,4 +149,3 @@ function Breadcrumbs({ post }: { post: BlogPost }) {
         </nav>
     )
 }
-
