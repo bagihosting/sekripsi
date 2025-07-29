@@ -261,6 +261,7 @@ const generateSlug = (title: string) => {
 export async function saveBlogPost(formData: FormData) {
     const postId = formData.get('postId') as string | null;
     const title = formData.get('title') as string;
+    let slug = formData.get('slug') as string;
     const content = formData.get('content') as string;
     const category = formData.get('category') as string;
     const status = formData.get('status') as 'draft' | 'published';
@@ -270,7 +271,13 @@ export async function saveBlogPost(formData: FormData) {
         return { error: 'Please fill all required fields.' };
     }
     
-    const slug = generateSlug(title);
+    // Sanitize the slug, or generate if it's empty
+    if (!slug) {
+        slug = generateSlug(title);
+    } else {
+        slug = generateSlug(slug); // Sanitize user-provided slug
+    }
+    
     let imageUrl = formData.get('currentImageUrl') as string || '';
 
     try {
@@ -315,7 +322,9 @@ export async function saveBlogPost(formData: FormData) {
     }
 
     revalidatePath('/blog');
-    revalidatePath('/dashboard');
+    if (status === 'published') {
+        revalidatePath(`/blog/${slug}`);
+    }
     redirect('/dashboard?tab=blog');
 }
 
