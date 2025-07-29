@@ -1,7 +1,6 @@
 import { config } from 'dotenv';
 config();
 
-import '@/ai/flows/template-recommendation.ts';
 import '@/ai/flows/title-generator.ts';
 import '@/ai/flows/question-generator.ts';
 import '@/ai/flows/hypothesis-generator.ts';

@@ -33,17 +33,11 @@ const toolGroups = [
     description: 'Mulai perjalanan skripsimu dengan fondasi yang kuat. Dari ide mentah hingga kerangka yang matang.',
     tools: [
       {
-        icon: Sparkles,
-        title: 'Rekomendasi Skrip AI',
-        description: 'Bingung mau mulai dari mana? Jelaskan minatmu, biarkan AI merekomendasikan template yang relevan.',
-        href: '/rekomendasi-ai',
-        badge: 'Mulai Di Sini',
-      },
-      {
         icon: Wand2,
         title: 'Generator Judul',
         description: 'Dapatkan ide-ide judul skripsi yang menarik dan akademis berdasarkan bidang studimu.',
         href: '/generator-judul',
+        badge: 'Mulai Di Sini',
       },
       {
         icon: Target,
