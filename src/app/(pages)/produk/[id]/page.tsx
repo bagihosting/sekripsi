@@ -2,7 +2,7 @@
 'use client';
 
 import { getToolById, AiTool, iconMap } from '@/lib/plugins';
-import { notFound, useRouter } from 'next/navigation';
+import { notFound, useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -13,12 +13,9 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
-type Props = {
-  params: { id: string }
-}
-
-export default function ProductDetailPage({ params }: Props) {
-  const { id } = params;
+export default function ProductDetailPage() {
+  const params = useParams();
+  const id = params.id as string;
   const [product, setProduct] = useState<AiTool | null>(null);
   const [loadingProduct, setLoadingProduct] = useState(true);
   
@@ -29,6 +26,7 @@ export default function ProductDetailPage({ params }: Props) {
 
   useEffect(() => {
     async function fetchTool() {
+      if (!id) return;
       const tool = await getToolById(id);
       if (tool) {
         setProduct(tool);
