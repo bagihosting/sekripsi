@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useFormStatus } from "react-dom";
+import { useFormState, useFormStatus } from "react-dom";
 import { guideSpssAnalysis, SpssGuideOutput } from "@/ai/flows/spss-guide";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -10,42 +10,42 @@ import { Loader2, Database, TestTube, ChevronRight, FileText, Lightbulb } from "
 import { Badge } from "./ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./ui/accordion";
 
-type SpssGuideState = {
+const initialState: {
   result: SpssGuideOutput | null;
   error: string | null;
+} = {
+  result: null,
+  error: null,
 };
 
-export default function SpssGuide() {
-  const [state, setState] = useState<SpssGuideState>({
-    result: null,
-    error: null,
-  });
-
-  async function handleAction(formData: FormData) {
-    const problemDescription = formData.get("problemDescription") as string;
-    if (!problemDescription) {
-      setState({ result: null, error: "Silakan masukkan deskripsi masalah penelitian Anda." });
-      return;
-    }
-
-    setState({ result: null, error: null });
-
-    try {
-      const result = await guideSpssAnalysis({ problemDescription });
-      if (result) {
-        setState({ result, error: null });
-      } else {
-        setState({ result: null, error: "Tidak dapat menghasilkan panduan. Silakan coba lagi." });
-      }
-    } catch (e) {
-      console.error(e);
-      setState({ result: null, error: "Terjadi kesalahan yang tidak terduga. Mohon coba lagi." });
-    }
+async function spssGuideAction(
+  prevState: any,
+  formData: FormData
+): Promise<{ result: SpssGuideOutput | null; error: string | null; }> {
+  const problemDescription = formData.get("problemDescription") as string;
+  if (!problemDescription) {
+    return { result: null, error: "Silakan masukkan deskripsi masalah penelitian Anda." };
   }
+
+  try {
+    const result = await guideSpssAnalysis({ problemDescription });
+    if (result) {
+      return { result, error: null };
+    } else {
+      return { result: null, error: "Tidak dapat menghasilkan panduan. Silakan coba lagi." };
+    }
+  } catch (e) {
+    console.error(e);
+    return { result: null, error: "Terjadi kesalahan yang tidak terduga. Mohon coba lagi." };
+  }
+}
+
+export default function SpssGuide() {
+  const [state, formAction] = useFormState(spssGuideAction, initialState);
 
   return (
     <div className="space-y-6">
-      <form action={handleAction} className="space-y-4">
+      <form action={formAction} className="space-y-4">
         <div>
           <Textarea
             name="problemDescription"
