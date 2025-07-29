@@ -106,8 +106,8 @@ export const SiteHeader = () => {
         <div className="flex items-center gap-2">
           <Button asChild>
             <Link href="/harga" prefetch={false}>
-              <Star className="mr-2 h-4 w-4 fill-current"/>
-              Upgrade ke Pro
+              <Star className="h-4 w-4 fill-current"/>
+              <span className='hidden sm:inline'>Upgrade ke Pro</span>
             </Link>
           </Button>
 
