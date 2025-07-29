@@ -117,7 +117,7 @@ export const SiteHeader = () => {
               <DropdownMenuContent align="end">
                 <DropdownMenuItem className="flex flex-col items-start" disabled>
                   <p className="font-medium">{userProfile?.email}</p>
-                   <p className="text-xs text-muted-foreground capitalize">{userProfile?.role}</p>
+                   <p className="text-xs text-muted-foreground capitalize">{userProfile?.role} ({userProfile?.plan})</p>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                  <DropdownMenuItem asChild>
@@ -142,6 +142,15 @@ export const SiteHeader = () => {
               </Button>
             </>
           )}
+          
+          {userProfile && userProfile.plan === 'free' && (
+             <Button asChild size="sm" className="hidden sm:flex items-center gap-1">
+                <Link href="/harga">
+                  <Star className="h-4 w-4 fill-current" />
+                  <span className="sm:hidden lg:inline-block">Upgrade ke Pro</span>
+                </Link>
+              </Button>
+          )}
 
 
           {/* Mobile Navigation */}
@@ -165,6 +174,15 @@ export const SiteHeader = () => {
                       <SekripsiComIcon className="h-8 w-8 text-primary" />
                       <span className="font-headline text-xl font-bold text-foreground">sekripsi.com</span>
                     </Link>
+
+                    {userProfile && userProfile.plan === 'free' && (
+                        <Button asChild className="w-full mb-4">
+                            <Link href="/harga" onClick={() => setOpen(false)}>
+                                <Star className="mr-2 h-4 w-4 fill-current" />
+                                Upgrade ke Pro
+                            </Link>
+                        </Button>
+                    )}
 
                     <Link
                         href="/alat-ai"
@@ -221,7 +239,7 @@ export const SiteHeader = () => {
                         <div className="p-2">
                            <div className="mb-4">
                              <p className="font-medium">{userProfile?.email}</p>
-                             <p className="text-sm text-muted-foreground capitalize">{userProfile?.role}</p>
+                             <p className="text-sm text-muted-foreground capitalize">{userProfile?.role} ({userProfile?.plan})</p>
                            </div>
                            <Button asChild className="w-full mb-2">
                                 <Link href="/dashboard" onClick={() => setOpen(false)}>

@@ -5,6 +5,7 @@ export interface UserProfile {
   uid: string;
   email: string | null;
   role: 'user' | 'admin';
+  plan: 'free' | 'pro';
   createdAt: Timestamp;
 }
 
@@ -16,14 +17,17 @@ export interface UserProfile {
  */
 export const createUserProfile = async (uid: string, email: string | null): Promise<void> => {
   const userRef = doc(db, 'users', uid);
-  const newUserProfile: Omit<UserProfile, 'uid'> = {
+  const newUserProfile: Omit<UserProfile, 'uid' | 'createdAt'> = {
     email,
     role: 'user', // Default role for new users
-    createdAt: serverTimestamp() as Timestamp,
+    plan: 'free', // Default plan for new users
   };
   
   try {
-    await setDoc(userRef, newUserProfile);
+    await setDoc(userRef, {
+      ...newUserProfile,
+      createdAt: serverTimestamp(),
+    });
     console.log('User profile created for UID:', uid);
   } catch (error) {
     console.error('Error creating user profile:', error);
