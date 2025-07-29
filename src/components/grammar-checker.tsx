@@ -33,7 +33,7 @@ function TextDiff({ text1, text2 }: { text1: string; text2: string }) {
 }
 
 export default function GrammarChecker() {
-  const [state, setState = useState < GrammarCheckerState >> ({
+  const [state, setState] = useState<GrammarCheckerState>({
     result: null,
     error: null,
     originalText: null,
