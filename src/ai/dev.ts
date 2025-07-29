@@ -3,3 +3,4 @@ config();
 
 import '@/ai/flows/template-recommendation.ts';
 import '@/ai/flows/title-generator.ts';
+import '@/ai/flows/paraphrase-flow.ts';
