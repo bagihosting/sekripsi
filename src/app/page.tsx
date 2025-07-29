@@ -10,7 +10,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { getTemplates, Template } from '@/lib/data';
 import AiRecommender from '@/components/ai-recommender';
 import TemplateGrid from '@/components/template-grid';
-import { DesignBloomIcon } from '@/components/icons';
+import { CuanKilatIcon } from '@/components/icons';
 import { ArrowRight, Mail, Sparkles } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
@@ -37,8 +37,8 @@ const Header = () => (
   <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
     <div className="container flex h-14 max-w-screen-2xl items-center justify-between">
       <Link href="/" className="flex items-center gap-2">
-        <DesignBloomIcon className="h-6 w-6 text-primary" />
-        <span className="font-headline text-xl font-bold text-foreground">DesignBloom</span>
+        <CuanKilatIcon className="h-6 w-6 text-primary" />
+        <span className="font-headline text-xl font-bold text-foreground">CuanKilat</span>
       </Link>
       <nav className="hidden items-center gap-6 text-sm font-medium md:flex">
         <Link href="#templates" className="transition-colors hover:text-primary">Produk</Link>
@@ -163,11 +163,11 @@ const Footer = () => {
     <footer className="border-t py-12">
       <div className="container flex flex-col items-center justify-between gap-6 sm:flex-row">
         <div className="flex items-center gap-2">
-          <DesignBloomIcon className="h-6 w-6 text-primary" />
-          <span className="font-headline text-xl font-bold">DesignBloom</span>
+          <CuanKilatIcon className="h-6 w-6 text-primary" />
+          <span className="font-headline text-xl font-bold">CuanKilat</span>
         </div>
         <p className="text-sm text-muted-foreground">
-          &copy; {year} DesignBloom. Semua hak cipta dilindungi.
+          &copy; {year} CuanKilat. Semua hak cipta dilindungi.
         </p>
         <div className="flex items-center gap-4">
           <Link href="#" className="text-sm text-muted-foreground transition-colors hover:text-primary">Kebijakan Privasi</Link>

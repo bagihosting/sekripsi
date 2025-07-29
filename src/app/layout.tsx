@@ -3,8 +3,8 @@ import { Toaster } from "@/components/ui/toaster"
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'DesignBloom',
-  description: 'Beautifully crafted templates to bring your ideas to life.',
+  title: 'CuanKilat',
+  description: 'Templat & Skrip Premium Untuk Meluncurkan Proyek Anda dalam Semalam.',
 };
 
 export default function RootLayout({
