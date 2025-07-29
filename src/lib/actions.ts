@@ -21,7 +21,6 @@ export async function register(values: z.infer<typeof registerSchema>) {
 
     await createUserProfile(user.uid, user.email);
     
-    // This will trigger a redirect on the client-side after the server action is done
   } catch (error: any) {
     if (error.code === 'auth/email-already-in-use') {
       return { error: 'Email ini sudah terdaftar.' };
@@ -31,7 +30,7 @@ export async function register(values: z.infer<typeof registerSchema>) {
     };
   }
 
-  redirect('/');
+  redirect('/dashboard');
 }
 
 const loginSchema = z.object({
@@ -56,7 +55,7 @@ export async function login(values: z.infer<typeof loginSchema>) {
         };
     }
     
-    redirect('/');
+    redirect('/dashboard');
 }
 
 export async function logout() {
@@ -64,7 +63,6 @@ export async function logout() {
         await signOut(auth);
     } catch (error) {
         console.error('Error signing out:', error);
-        // Even if there's an error, we redirect to login
     }
     redirect('/login');
 }

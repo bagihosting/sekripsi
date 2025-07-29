@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger } from '@/components/ui/sheet';
 import { SekripsiComIcon } from '@/components/icons';
-import { ArrowRight, Menu, Sparkles, ChevronDown, Star, User, LogOut } from 'lucide-react';
+import { ArrowRight, Menu, Sparkles, ChevronDown, Star, User, LogOut, LayoutDashboard } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from './ui/dropdown-menu';
 import { Separator } from './ui/separator';
@@ -120,6 +120,12 @@ export const SiteHeader = () => {
                    <p className="text-xs text-muted-foreground capitalize">{userProfile?.role}</p>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
+                 <DropdownMenuItem asChild>
+                    <Link href="/dashboard">
+                        <LayoutDashboard className="mr-2 h-4 w-4" />
+                        <span>Dasbor</span>
+                    </Link>
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => logout()}>
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Logout</span>
@@ -213,11 +219,17 @@ export const SiteHeader = () => {
 
                      {user ? (
                         <div className="p-2">
-                           <div className="mb-2">
+                           <div className="mb-4">
                              <p className="font-medium">{userProfile?.email}</p>
                              <p className="text-sm text-muted-foreground capitalize">{userProfile?.role}</p>
                            </div>
-                           <Button onClick={() => { logout(); setOpen(false); }} className="w-full">
+                           <Button asChild className="w-full mb-2">
+                                <Link href="/dashboard" onClick={() => setOpen(false)}>
+                                    <LayoutDashboard className="mr-2 h-4 w-4" />
+                                    Buka Dasbor
+                                </Link>
+                           </Button>
+                           <Button onClick={() => { logout(); setOpen(false); }} className="w-full" variant="outline">
                                 <LogOut className="mr-2 h-4 w-4" />
                                 Logout
                            </Button>
