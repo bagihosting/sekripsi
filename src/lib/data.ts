@@ -117,6 +117,32 @@ export interface Template {
         liveDemoUrl: "#",
         trending: false,
     },
+    {
+        id: 9,
+        name: "Dasbor SaaS",
+        category: "Aplikasi Web",
+        style: "Modern",
+        price: 129.99,
+        imageUrl: "https://placehold.co/600x400.png",
+        aiHint: "saas dashboard",
+        shortDescription: "Dasbor analitik yang komprehensif untuk proyek SaaS Anda berikutnya.",
+        features: ["Manajemen Pengguna", "Analitik", "Pengaturan Langganan"],
+        liveDemoUrl: "#",
+        trending: true,
+    },
+    {
+        id: 10,
+        name: "Platform E-Learning",
+        category: "Aplikasi Web",
+        style: "Clean",
+        price: 149.99,
+        imageUrl: "https://placehold.co/600x400.png",
+        aiHint: "elearning platform",
+        shortDescription: "Platform kaya fitur untuk membuat dan menjual kursus online.",
+        features: ["Manajemen Kursus", "Progres Siswa", "Gateway Pembayaran"],
+        liveDemoUrl: "#",
+        trending: false,
+    }
   ];
   
   export const getTemplates = (): Template[] => {

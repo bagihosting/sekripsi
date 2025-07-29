@@ -41,13 +41,13 @@ const Header = () => (
         <span className="font-headline text-xl font-bold text-foreground">DesignBloom</span>
       </Link>
       <nav className="hidden items-center gap-6 text-sm font-medium md:flex">
-        <Link href="#templates" className="transition-colors hover:text-primary">Template</Link>
+        <Link href="#templates" className="transition-colors hover:text-primary">Produk</Link>
         <Link href="#ai-recommendations" className="transition-colors hover:text-primary">Rekomendasi AI</Link>
         <Link href="#support" className="transition-colors hover:text-primary">Dukungan</Link>
       </nav>
       <Button asChild>
         <Link href="#templates">
-          Lihat Template <ArrowRight className="ml-2 h-4 w-4" />
+          Lihat Produk <ArrowRight className="ml-2 h-4 w-4" />
         </Link>
       </Button>
     </div>
@@ -61,11 +61,11 @@ const HeroSection = () => (
         Tempat Kreativitas Mekar Menjadi Kode
       </h1>
       <p className="mx-auto mt-6 max-w-2xl text-lg text-foreground/80 md:text-xl">
-        Temukan koleksi pilihan template situs web yang indah. Didesain dengan elegan, dibuat dengan andal, dan siap untuk meluncurkan ide besar Anda berikutnya.
+        Temukan koleksi pilihan template dan skrip aplikasi web yang indah. Didesain dengan elegan, dibuat dengan andal, dan siap untuk meluncurkan ide besar Anda berikutnya.
       </p>
       <div className="mt-8 flex justify-center gap-4">
         <Button size="lg" asChild>
-          <Link href="#templates">Jelajahi Desain</Link>
+          <Link href="#templates">Jelajahi Produk</Link>
         </Button>
         <Button size="lg" variant="outline" asChild>
           <Link href="#ai-recommendations">
@@ -82,9 +82,9 @@ const TrendingSection = ({ templates }: { templates: Template[] }) => (
   <section id="trending" className="w-full py-16 lg:py-24">
     <div className="container">
       <div className="mx-auto mb-12 max-w-2xl text-center">
-        <h2 className="font-headline text-4xl font-bold md:text-5xl">Template Populer</h2>
+        <h2 className="font-headline text-4xl font-bold md:text-5xl">Produk Populer</h2>
         <p className="mt-4 text-lg text-foreground/70">
-          Desain paling populer dan terlaris, yang disukai oleh komunitas kami.
+          Desain dan aplikasi paling populer dan terlaris, yang disukai oleh komunitas kami.
         </p>
       </div>
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -102,7 +102,7 @@ const AllTemplatesSection = ({ templates }: { templates: Template[] }) => (
        <div className="mx-auto mb-12 max-w-2xl text-center">
         <h2 className="font-headline text-4xl font-bold md:text-5xl">Koleksi Kami</h2>
         <p className="mt-4 text-lg text-foreground/70">
-          Jelajahi pustaka lengkap template premium kami. Temukan yang paling cocok untuk proyek Anda.
+          Jelajahi pustaka lengkap template dan skrip aplikasi premium kami. Temukan yang paling cocok untuk proyek Anda.
         </p>
       </div>
       <TemplateGrid templates={templates} />
@@ -118,7 +118,7 @@ const AiSection = () => (
           <Sparkles className="h-12 w-12 text-accent" />
           <h2 className="font-headline text-4xl font-bold md:text-5xl">Bingung Mulai dari Mana?</h2>
           <p className="text-lg text-foreground/70">
-            Biarkan AI kami memandu Anda. Jelaskan proyek Anda, gaya merek Anda, dan audiens target Anda. Asisten cerdas kami akan menganalisis kebutuhan Anda dan merekomendasikan template yang sempurna untuk mewujudkan visi Anda.
+            Biarkan AI kami memandu Anda. Jelaskan proyek Anda, gaya merek Anda, dan audiens target Anda. Asisten cerdas kami akan menganalisis kebutuhan Anda dan merekomendasikan produk yang sempurna untuk mewujudkan visi Anda.
           </p>
         </div>
         <Card className="shadow-lg">
