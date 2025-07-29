@@ -5,7 +5,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger } from '@/components/ui/sheet';
 import { SkripsiKilatIcon } from '@/components/icons';
 import { ArrowRight, Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -56,6 +56,10 @@ export const SiteHeader = () => {
               </Button>
             </SheetTrigger>
             <SheetContent side="right">
+              <SheetHeader className="sr-only">
+                <SheetTitle>Menu</SheetTitle>
+                <SheetDescription>Main navigation menu for SkripsiKilat.</SheetDescription>
+              </SheetHeader>
               <div className="flex flex-col gap-6 pt-12">
                 <Link href="/" className="mb-4 flex items-center gap-2">
                   <SkripsiKilatIcon className="h-8 w-8 text-primary" />
