@@ -6,13 +6,13 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger } from '@/components/ui/sheet';
-import { SkripsiKilatIcon } from '@/components/icons';
+import { SekripsiComIcon } from '@/components/icons';
 import { ArrowRight, Menu, Sparkles, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
 
 const aiToolsLinks = [
-    { href: '/generator-draf', label: 'Generator Draf Instan (Bab 1-3)' },
+    { href: '/generator-draf', label: 'Generator Draf Instan (Bab 1-5)' },
     { href: '/generator-judul', label: 'Generator Judul' },
     { href: '/pertanyaan-penelitian', label: 'Pertanyaan Penelitian' },
     { href: '/generator-hipotesis', label: 'Generator Hipotesis' },
@@ -41,8 +41,8 @@ export const SiteHeader = () => {
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 max-w-screen-xl items-center justify-between">
         <Link href="/" className="flex items-center gap-2" prefetch={false}>
-          <SkripsiKilatIcon className="h-8 w-8 text-primary" />
-          <span className="font-headline text-2xl font-bold text-foreground">SkripsiKilat</span>
+          <SekripsiComIcon className="h-8 w-8 text-primary" />
+          <span className="font-headline text-2xl font-bold text-foreground">sekripsi.com</span>
         </Link>
         
         {/* Desktop Navigation */}
@@ -112,14 +112,14 @@ export const SiteHeader = () => {
                 <SheetHeader className="text-left sr-only">
                   <SheetTitle>Menu</SheetTitle>
                   <SheetDescription>
-                    Navigasi utama untuk SkripsiKilat.
+                    Navigasi utama untuk sekripsi.com.
                   </SheetDescription>
                 </SheetHeader>
                <div className="h-full overflow-y-auto">
                   <div className="flex flex-col gap-4 pt-12">
                     <Link href="/" className="mb-4 flex items-center gap-2" onClick={() => setOpen(false)}>
-                      <SkripsiKilatIcon className="h-8 w-8 text-primary" />
-                      <span className="font-headline text-xl font-bold text-foreground">SkripsiKilat</span>
+                      <SekripsiComIcon className="h-8 w-8 text-primary" />
+                      <span className="font-headline text-xl font-bold text-foreground">sekripsi.com</span>
                     </Link>
                     
                     {mainNavLinks.map(link => (

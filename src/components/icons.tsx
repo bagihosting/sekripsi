@@ -1,8 +1,8 @@
 import type { SVGProps } from 'react';
-import { GraduationCap } from 'lucide-react';
+import { BookOpenCheck } from 'lucide-react';
 
-export function SkripsiKilatIcon(props: SVGProps<SVGSVGElement>) {
+export function SekripsiComIcon(props: SVGProps<SVGSVGElement>) {
   return (
-    <GraduationCap {...props} />
+    <BookOpenCheck {...props} />
   );
 }
