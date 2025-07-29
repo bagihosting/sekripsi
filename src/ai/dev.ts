@@ -10,3 +10,4 @@ import '@/ai/flows/reference-finder.ts';
 import '@/ai/flows/defense-simulator.ts';
 import '@/ai/flows/story-generator.ts';
 import '@/ai/flows/argument-checker.ts';
+import '@/ai/flows/question-generator.ts';

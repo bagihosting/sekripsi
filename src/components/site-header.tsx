@@ -22,6 +22,7 @@ export const SiteHeader = () => {
     { href: '/referensi-ai', label: 'Asisten Referensi' },
     { href: '/simulasi-sidang', label: 'Simulasi Sidang' },
     { href: '/cek-argumen', label: 'Cek Argumen AI' },
+    { href: '/pertanyaan-penelitian', label: 'Pertanyaan Penelitian' },
     { href: '/story-generator', label: 'Story Generator' },
     { href: '/blog', label: 'Blog' },
     { href: '/dukungan', label: 'Dukungan' },
