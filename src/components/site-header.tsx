@@ -19,6 +19,7 @@ export const SiteHeader = () => {
     { href: '/parafrase-ai', label: 'Parafrase AI' },
     { href: '/kerangka-ai', label: 'Kerangka AI' },
     { href: '/korektor-ai', label: 'Korektor AI' },
+    { href: '/referensi-ai', label: 'Asisten Referensi' },
     { href: '/blog', label: 'Blog' },
     { href: '/dukungan', label: 'Dukungan' },
   ];
