@@ -12,9 +12,9 @@ import { cn } from '@/lib/utils';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
 
 const mainNavLinks = [
-    { href: '/alat-ai', label: 'Alat Bantu AI' },
-    { href: '/blog', label: 'Blog & Tips' },
-    { href: '/dukungan', label: 'Dukungan' },
+    { href: '/alat-ai', label: 'Pusat AI' },
+    { href: '/blog', label: 'Trik & Rahasia' },
+    { href: '/dukungan', label: 'Bantuan' },
 ];
 
 const aiToolsLinks = [
@@ -50,7 +50,7 @@ export const SiteHeader = () => {
                     "flex items-center gap-1 transition-colors hover:text-primary",
                     pathname.startsWith('/alat-ai') || aiToolsLinks.some(l => pathname === l.href) ? "text-primary" : "text-foreground/60"
                 )}>
-                    Alat Bantu AI <ChevronDown className="h-4 w-4" />
+                    Pusat AI <ChevronDown className="h-4 w-4" />
                 </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
@@ -76,7 +76,7 @@ export const SiteHeader = () => {
                 pathname === '/blog' ? "text-primary" : "text-foreground/60"
             )}
             >
-            Blog & Tips
+            Trik & Rahasia
           </Link>
           <Link 
             href="/dukungan"
@@ -86,7 +86,7 @@ export const SiteHeader = () => {
                 pathname === '/dukungan' ? "text-primary" : "text-foreground/60"
             )}
             >
-            Dukungan
+            Bantuan
           </Link>
         </nav>
 

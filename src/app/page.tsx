@@ -69,18 +69,18 @@ const HeroSection = () => (
     <div className="container grid min-h-[calc(100dvh-4rem)] content-center text-center max-w-screen-xl">
       <div className="mx-auto max-w-4xl">
         <h1 className="font-headline text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
-          Skripsi Buntu? Biarkan AI Jadi Solusimu!
+          Lulus 3.5 Tahun Bukan Mimpi! Taklukkan Skripsimu Sekarang.
         </h1>
         <p className="mx-auto mt-6 max-w-2xl text-lg text-foreground/80">
-          Dari cari judul sampai persiapan sidang, SkripsiKilat adalah asisten pribadimu. Manfaatkan kecerdasan buatan untuk mempercepat kelulusanmu dengan percaya diri.
+          Dosen killer? Judul ditolak terus? Buntu di Bab 4? Lupakan semua itu. SkripsiKilat adalah senjata rahasiamu untuk lulus lebih cepat dari teman-temanmu.
         </p>
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
           <Button size="lg" asChild className="w-full sm:w-auto">
-            <Link href="/alat-ai">Lihat Semua Alat AI</Link>
+            <Link href="/alat-ai">Coba Senjata AI Gratis</Link>
           </Button>
           <Button size="lg" variant="outline" asChild className="w-full sm:w-auto">
             <Link href="/blog">
-              Baca Tips & Trik
+              Intip Trik Rahasia
             </Link>
           </Button>
         </div>
@@ -93,9 +93,9 @@ const FeatureGrid = () => (
   <section id="features" className="w-full py-16 lg:py-24 bg-secondary/50">
     <div className="container max-w-screen-xl">
       <div className="mx-auto mb-12 max-w-3xl text-center">
-        <h2 className="font-headline text-3xl font-bold md:text-4xl lg:text-5xl">Kotak Perkakas Super untuk Mahasiswa</h2>
+        <h2 className="font-headline text-3xl font-bold md:text-4xl lg:text-5xl">Gudang Senjata Pejuang Skripsi</h2>
         <p className="mt-4 text-lg text-foreground/70">
-          Setiap alat dirancang untuk mengatasi tantangan spesifik dalam pengerjaan skripsi. Pilih yang kamu butuhkan, atau coba semuanya!
+          Setiap alat adalah jalan pintas cerdas untuk melewati rintangan skripsi. Jangan kerja keras, kerja cerdas!
         </p>
       </div>
       <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
@@ -128,17 +128,18 @@ const CtaSection = () => (
     <section id="cta" className="py-16 lg:py-24">
         <div className="container max-w-screen-xl text-center">
             <div className="mx-auto max-w-2xl">
-                <h2 className="font-headline text-3xl font-bold md:text-4xl lg:text-5xl">Siap Mempercepat Kelulusanmu?</h2>
+                <h2 className="font-headline text-3xl font-bold md:text-4xl lg:text-5xl">Masih Mau Nunda Kelulusan?</h2>
                 <p className="mt-4 text-lg text-foreground/70">
-                    Jangan tunda lagi. Semua alat canggih yang kamu butuhkan untuk menaklukkan skripsi ada di sini. Coba gratis dan rasakan bedanya.
+                   Waktu terus berjalan. Teman-temanmu sudah mulai wisuda. Giliranmu kapan? Semua alat untuk menaklukkan skripsi sudah di depan mata.
                 </p>
                 <Button size="lg" className="mt-8" asChild>
                     <Link href="/alat-ai">
-                        Jelajahi Semua Alat AI <ArrowRight className="ml-2 h-5 w-5" />
+                        Saya Mau Lulus Cepat! <ArrowRight className="ml-2 h-5 w-5" />
                     </Link>
                 </Button>
             </div>
         </div>
     </section>
 );
+
 
