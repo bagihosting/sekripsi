@@ -6,8 +6,8 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } f
 import { auth, db } from '@/lib/firebase';
 import { createUserProfile } from './firestore';
 import { redirect } from 'next/navigation';
-import { doc, setDoc, serverTimestamp, updateDoc } from 'firebase/firestore';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { collection, doc, setDoc, serverTimestamp, updateDoc } from 'firebase/firestore';
+import { uploadToCloudinary } from './cloudinary';
 
 const registerSchema = z.object({
   email: z.string().email(),
@@ -83,12 +83,20 @@ export async function requestUpgrade(formData: FormData) {
     }
     
     try {
-        // 1. Upload image to Firebase Storage
-        const storage = getStorage();
-        const storageRef = ref(storage, `payment_proofs/${user.uid}/${Date.now()}_${proof.name}`);
-        const snapshot = await uploadBytes(storageRef, proof);
-        const downloadURL = await getDownloadURL(snapshot.ref);
+        // 1. Upload image to Cloudinary
+        const fileBuffer = await proof.arrayBuffer();
+        const mime = proof.type;
+        const encoding = 'base64';
+        const base64Data = Buffer.from(fileBuffer).toString('base64');
+        const fileUri = 'data:' + mime + ';' + encoding + ',' + base64Data;
+        
+        const result = await uploadToCloudinary(fileUri, `payment_proofs/${user.uid}`);
+        const downloadURL = result.secure_url;
 
+        if (!downloadURL) {
+            throw new Error("Gagal mengunggah gambar, URL tidak ditemukan.");
+        }
+        
         // 2. Create a payment document in Firestore
         const paymentRef = doc(collection(db, 'payments'));
         await setDoc(paymentRef, {
