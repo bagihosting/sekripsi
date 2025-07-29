@@ -13,8 +13,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 
 const mainNavLinks = [
     { href: '/alat-ai', label: 'Pusat AI' },
-    { href: '/blog', label: 'Trik & Rahasia' },
-    { href: '/dukungan', label: 'Bantuan' },
+    { href: '/blog', label: 'Trik Cepat Lulus' },
+    { href: '/dukungan', label: 'Bantuan Kilat' },
 ];
 
 const aiToolsLinks = [
@@ -76,7 +76,7 @@ export const SiteHeader = () => {
                 pathname === '/blog' ? "text-primary" : "text-foreground/60"
             )}
             >
-            Trik & Rahasia
+            Trik Cepat Lulus
           </Link>
           <Link 
             href="/dukungan"
@@ -86,14 +86,14 @@ export const SiteHeader = () => {
                 pathname === '/dukungan' ? "text-primary" : "text-foreground/60"
             )}
             >
-            Bantuan
+            Bantuan Kilat
           </Link>
         </nav>
 
         <div className="flex items-center gap-2">
           <Button asChild className="hidden sm:inline-flex">
             <Link href="/alat-ai" prefetch={false}>
-              Coba Alat AI <ArrowRight className="ml-2 h-4 w-4" />
+              Coba Gratis <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>
 
@@ -106,9 +106,9 @@ export const SiteHeader = () => {
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-full max-w-sm">
-                <SheetHeader>
-                  <SheetTitle className="sr-only">Menu</SheetTitle>
-                  <SheetDescription className="sr-only">
+                <SheetHeader className="sr-only">
+                  <SheetTitle>Menu</SheetTitle>
+                  <SheetDescription>
                     Navigasi utama untuk SkripsiKilat.
                   </SheetDescription>
                 </SheetHeader>
@@ -135,7 +135,7 @@ export const SiteHeader = () => {
 
                     <Button asChild className="mt-4">
                       <Link href="/alat-ai" onClick={() => setOpen(false)}>
-                        Coba Alat AI
+                        Coba Gratis
                       </Link>
                     </Button>
                   </div>
