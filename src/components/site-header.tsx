@@ -20,6 +20,7 @@ export const SiteHeader = () => {
     { href: '/kerangka-ai', label: 'Kerangka AI' },
     { href: '/korektor-ai', label: 'Korektor AI' },
     { href: '/referensi-ai', label: 'Asisten Referensi' },
+    { href: '/simulasi-sidang', label: 'Simulasi Sidang' },
     { href: '/blog', label: 'Blog' },
     { href: '/dukungan', label: 'Dukungan' },
   ];
