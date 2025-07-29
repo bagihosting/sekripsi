@@ -23,8 +23,8 @@ export const SiteFooter = () => {
                     &copy; {year} SkripsiKilat. Jalan Pintas Menuju Wisuda.
                 </p>
                 <div className="flex items-center gap-4">
-                    <Link href="#" className="text-sm text-muted-foreground transition-colors hover:text-primary">Kebijakan Privasi</Link>
-                    <Link href="#" className="text-sm text-muted-foreground transition-colors hover:text-primary">Ketentuan Layanan</Link>
+                    <Link href="/kebijakan-privasi" className="text-sm text-muted-foreground transition-colors hover:text-primary">Kebijakan Privasi</Link>
+                    <Link href="/ketentuan-layanan" className="text-sm text-muted-foreground transition-colors hover:text-primary">Ketentuan Layanan</Link>
                 </div>
             </div>
         </footer>
