@@ -208,6 +208,7 @@ const Footer = () => {
   const [year, setYear] = useState(new Date().getFullYear());
 
   useEffect(() => {
+    // This code only runs on the client, after hydration
     setYear(new Date().getFullYear());
   }, []);
 
