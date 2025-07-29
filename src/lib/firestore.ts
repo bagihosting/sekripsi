@@ -11,6 +11,7 @@ export interface UserProfile {
   plan: 'free' | 'pro';
   paymentStatus: 'none' | 'pending' | 'pro';
   createdAt: Timestamp;
+  upgradedAt?: Timestamp;
 }
 
 export interface Payment {

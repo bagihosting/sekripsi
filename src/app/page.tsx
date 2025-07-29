@@ -9,6 +9,7 @@ import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
 import AiRecommender from '@/components/ai-recommender';
 import type { LucideIcon } from 'lucide-react';
+import RecentUpgradeToast from '@/components/recent-upgrade-toast';
 
 const tools: { icon: LucideIcon; title: string; description: string, href: string }[] = [
   {
@@ -60,13 +61,14 @@ export default function Home() {
         <CtaSection />
       </main>
       <SiteFooter />
+      <RecentUpgradeToast />
     </div>
   );
 }
 
 const HeroSection = () => (
   <section className="w-full">
-    <div className="container flex min-h-[calc(80dvh-4rem)] items-center text-center max-w-screen-xl">
+    <div className="container flex min-h-[calc(60dvh-4rem)] items-center text-center max-w-screen-xl">
       <div className="mx-auto max-w-4xl">
         <h1 className="font-headline text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
           Lulus 3.5 Tahun Bukan Mimpi! Taklukkan Skripsimu Sekarang.

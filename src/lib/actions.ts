@@ -1,3 +1,4 @@
+
 'use server';
 
 import { z } from 'zod';
@@ -198,6 +199,7 @@ export async function confirmPayment(values: z.infer<typeof confirmPaymentSchema
         await updateDoc(userRef, {
             plan: 'pro',
             paymentStatus: 'pro',
+            upgradedAt: serverTimestamp(),
         });
 
         // Update payment status to confirmed
