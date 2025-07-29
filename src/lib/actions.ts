@@ -6,7 +6,7 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, up
 import { auth, db } from '@/lib/firebase';
 import { createUserProfile } from './firestore';
 import { redirect } from 'next/navigation';
-import { collection, doc, setDoc, serverTimestamp, updateDoc } from 'firebase/firestore';
+import { collection, doc, setDoc, serverTimestamp, updateDoc, addDoc, deleteDoc, getDoc } from 'firebase/firestore';
 import { uploadToCloudinary } from './cloudinary';
 import { revalidatePath } from 'next/cache';
 
@@ -248,4 +248,89 @@ export async function updatePricingPlan(formData: FormData) {
     revalidatePath('/harga');
     revalidatePath('/dashboard');
     return { success: true };
+}
+
+const generateSlug = (title: string) => {
+    return title
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '') // remove special characters
+        .replace(/\s+/g, '-') // replace spaces with hyphens
+        .replace(/-+/g, '-'); // remove consecutive hyphens
+};
+
+export async function saveBlogPost(formData: FormData) {
+    const postId = formData.get('postId') as string | null;
+    const title = formData.get('title') as string;
+    const content = formData.get('content') as string;
+    const category = formData.get('category') as string;
+    const status = formData.get('status') as 'draft' | 'published';
+    const image = formData.get('image') as File | null;
+
+    if (!title || !content || !category || !status) {
+        return { error: 'Please fill all required fields.' };
+    }
+    
+    const slug = generateSlug(title);
+    let imageUrl = formData.get('currentImageUrl') as string || '';
+
+    try {
+        if (image && image.size > 0) {
+            const fileBuffer = await image.arrayBuffer();
+            const mime = image.type;
+            const encoding = 'base64';
+            const base64Data = Buffer.from(fileBuffer).toString('base64');
+            const fileUri = `data:${mime};${encoding},${base64Data}`;
+            const result = await uploadToCloudinary(fileUri, `blog_images/${slug}`);
+            imageUrl = result.secure_url;
+        }
+
+        const postData = {
+            title,
+            slug,
+            content,
+            category,
+            status,
+            imageUrl,
+            description: content.substring(0, 150), // Auto-generate description
+            author: "Tim sekripsi.com", // Or get from current user
+            aiHint: `${category.toLowerCase()} blog`, // Auto-generate aiHint
+            updatedAt: serverTimestamp(),
+        };
+
+        if (postId) {
+            // Update existing post
+            const postRef = doc(db, 'blogPosts', postId);
+            await updateDoc(postRef, postData);
+        } else {
+            // Create new post
+            const collectionRef = collection(db, 'blogPosts');
+            await addDoc(collectionRef, {
+                ...postData,
+                createdAt: serverTimestamp(),
+            });
+        }
+    } catch (e: any) {
+        console.error(e);
+        return { error: 'Failed to save blog post.' };
+    }
+
+    revalidatePath('/blog');
+    revalidatePath('/dashboard');
+    redirect('/dashboard?tab=blog');
+}
+
+export async function deleteBlogPost(postId: string) {
+    if (!postId) {
+        return { error: "Post ID is required." };
+    }
+    try {
+        const postRef = doc(db, 'blogPosts', postId);
+        await deleteDoc(postRef);
+    } catch(e) {
+        console.error(e);
+        return { error: "Failed to delete post." };
+    }
+    
+    revalidatePath('/blog');
+    revalidatePath('/dashboard');
 }

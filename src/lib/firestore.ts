@@ -35,6 +35,21 @@ export interface PricingPlan {
     actionLink?: string;
 }
 
+export interface BlogPost {
+  id?: string;
+  slug: string;
+  title: string;
+  description: string;
+  content: string;
+  category: string;
+  author: string;
+  imageUrl: string;
+  aiHint: string;
+  status: 'published' | 'draft';
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
 
 /**
  * Creates a user profile document in Firestore.
