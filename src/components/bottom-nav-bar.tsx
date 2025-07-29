@@ -22,7 +22,14 @@ export const BottomNavBar = () => {
     <div className="md:hidden fixed bottom-0 left-0 right-0 h-16 border-t bg-background shadow-t-lg z-50">
       <div className="grid h-full grid-cols-4">
         {navLinks.map((link) => {
-          const isActive = (pathname === "/" && link.href === "/") || (link.href !== "/" && pathname.startsWith(link.href));
+          // The logic to determine if a link is active.
+          // For the homepage, it must be an exact match.
+          // For other links, it's active if the current path starts with the link's href.
+          const isActive =
+            link.href === "/"
+              ? pathname === link.href
+              : pathname.startsWith(link.href);
+
           return (
             <Link
               key={link.href}
