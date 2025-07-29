@@ -11,8 +11,9 @@ import { getTemplates, Template } from '@/lib/data';
 import AiRecommender from '@/components/ai-recommender';
 import TemplateGrid from '@/components/template-grid';
 import { CuanKilatIcon } from '@/components/icons';
-import { ArrowRight, Mail, Sparkles } from 'lucide-react';
+import { ArrowRight, Mail, Menu, Sparkles } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 export default function Home() {
   const allTemplates = getTemplates();
@@ -33,46 +34,93 @@ export default function Home() {
   );
 }
 
-const Header = () => (
-  <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-    <div className="container flex h-14 max-w-screen-2xl items-center justify-between">
-      <Link href="/" className="flex items-center gap-2">
-        <CuanKilatIcon className="h-6 w-6 text-primary" />
-        <span className="font-headline text-xl font-bold text-foreground">CuanKilat</span>
-      </Link>
-      <nav className="hidden items-center gap-6 text-sm font-medium md:flex">
-        <Link href="#templates" className="transition-colors hover:text-primary">Produk</Link>
-        <Link href="#ai-recommendations" className="transition-colors hover:text-primary">Rekomendasi AI</Link>
-        <Link href="#support" className="transition-colors hover:text-primary">Dukungan</Link>
-      </nav>
-      <Button asChild>
-        <Link href="#templates">
-          Lihat Produk <ArrowRight className="ml-2 h-4 w-4" />
+const Header = () => {
+  const [open, setOpen] = useState(false);
+  const navLinks = [
+    { href: '#templates', label: 'Produk' },
+    { href: '#ai-recommendations', label: 'Rekomendasi AI' },
+    { href: '#support', label: 'Dukungan' },
+  ];
+
+  return (
+    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-14 max-w-screen-xl items-center justify-between">
+        <Link href="/" className="flex items-center gap-2">
+          <CuanKilatIcon className="h-6 w-6 text-primary" />
+          <span className="font-headline text-xl font-bold text-foreground">CuanKilat</span>
         </Link>
-      </Button>
-    </div>
-  </header>
-);
+        <nav className="hidden items-center gap-6 text-sm font-medium md:flex">
+          {navLinks.map(link => (
+            <Link key={link.href} href={link.href} className="transition-colors hover:text-primary">
+              {link.label}
+            </Link>
+          ))}
+        </nav>
+        <div className="flex items-center gap-2">
+          <Button asChild className="hidden sm:inline-flex">
+            <Link href="#templates">
+              Lihat Produk <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          </Button>
+          <Sheet open={open} onOpenChange={setOpen}>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="icon" className="md:hidden">
+                <Menu className="h-5 w-5" />
+                <span className="sr-only">Buka Menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right">
+              <div className="flex flex-col gap-6 pt-12">
+                <Link href="/" className="mb-4 flex items-center gap-2">
+                  <CuanKilatIcon className="h-6 w-6 text-primary" />
+                  <span className="font-headline text-xl font-bold text-foreground">CuanKilat</span>
+                </Link>
+                {navLinks.map(link => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setOpen(false)}
+                    className="text-lg font-medium transition-colors hover:text-primary"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+                <Button asChild className="mt-4">
+                  <Link href="#templates" onClick={() => setOpen(false)}>
+                    Lihat Produk
+                  </Link>
+                </Button>
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
+      </div>
+    </header>
+  );
+};
+
 
 const HeroSection = () => (
-  <section className="container grid min-h-[calc(100dvh-3.5rem)] content-center text-center">
-    <div className="mx-auto max-w-4xl">
-      <h1 className="font-headline text-5xl font-bold tracking-tight md:text-7xl lg:text-8xl">
-        Stop Menunda, Mulai Hasilkan Cuan Pertama Anda Malam Ini!
-      </h1>
-      <p className="mx-auto mt-6 max-w-2xl text-lg text-foreground/80 md:text-xl">
-        Lupakan pusingnya koding dan desain dari nol. Pilih aset digital siap pakai dari kami, luncurkan proyek impian Anda, dan lihat keuntungan mulai mengalir. Cepat, mudah, dan terbukti berhasil!
-      </p>
-      <div className="mt-8 flex justify-center gap-4">
-        <Button size="lg" asChild>
-          <Link href="#templates">Saya Mau Cuan Sekarang!</Link>
-        </Button>
-        <Button size="lg" variant="outline" asChild>
-          <Link href="#ai-recommendations">
-            <Sparkles className="mr-2 h-5 w-5" />
-            Beri Saya Ide Ajaib
-          </Link>
-        </Button>
+  <section className="w-full">
+    <div className="container grid min-h-[calc(100dvh-3.5rem)] content-center text-center max-w-screen-xl">
+      <div className="mx-auto max-w-4xl">
+        <h1 className="font-headline text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
+          Stop Menunda, Mulai Hasilkan Cuan Pertama Anda Malam Ini!
+        </h1>
+        <p className="mx-auto mt-6 max-w-2xl text-lg text-foreground/80">
+          Lupakan pusingnya koding dan desain dari nol. Pilih aset digital siap pakai dari kami, luncurkan proyek impian Anda, dan lihat keuntungan mulai mengalir. Cepat, mudah, dan terbukti berhasil!
+        </p>
+        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+          <Button size="lg" asChild className="w-full sm:w-auto">
+            <Link href="#templates">Saya Mau Cuan Sekarang!</Link>
+          </Button>
+          <Button size="lg" variant="outline" asChild className="w-full sm:w-auto">
+            <Link href="#ai-recommendations">
+              <Sparkles className="mr-2 h-5 w-5" />
+              Beri Saya Ide Ajaib
+            </Link>
+          </Button>
+        </div>
       </div>
     </div>
   </section>
@@ -80,9 +128,9 @@ const HeroSection = () => (
 
 const TrendingSection = ({ templates }: { templates: Template[] }) => (
   <section id="trending" className="w-full py-16 lg:py-24">
-    <div className="container">
-      <div className="mx-auto mb-12 max-w-2xl text-center">
-        <h2 className="font-headline text-4xl font-bold md:text-5xl">Pilihan Para Sultan! Produk-Produk Ini Terjual Setiap Jam!</h2>
+    <div className="container max-w-screen-xl">
+      <div className="mx-auto mb-12 max-w-3xl text-center">
+        <h2 className="font-headline text-3xl font-bold md:text-4xl lg:text-5xl">Pilihan Para Sultan! Produk-Produk Ini Terjual Setiap Jam!</h2>
         <p className="mt-4 text-lg text-foreground/70">
           Ini bukan sekadar tren, ini adalah mesin pencetak uang. Ribuan developer dan pebisnis telah membuktikannya. Jangan sampai Anda ketinggalan kereta!
         </p>
@@ -98,9 +146,9 @@ const TrendingSection = ({ templates }: { templates: Template[] }) => (
 
 const AllTemplatesSection = ({ templates }: { templates: Template[] }) => (
   <section id="templates" className="w-full bg-secondary/50 py-16 lg:py-24">
-    <div className="container">
-       <div className="mx-auto mb-12 max-w-2xl text-center">
-        <h2 className="font-headline text-4xl font-bold md:text-5xl">Gudang Senjata Digital Anda untuk Mendominasi Pasar</h2>
+    <div className="container max-w-screen-xl">
+       <div className="mx-auto mb-12 max-w-3xl text-center">
+        <h2 className="font-headline text-3xl font-bold md:text-4xl lg:text-5xl">Gudang Senjata Digital Anda untuk Mendominasi Pasar</h2>
         <p className="mt-4 text-lg text-foreground/70">
           Apapun ide Anda, kami punya solusinya. Jelajahi koleksi lengkap kami dan temukan aset yang akan mengubah proyek Anda dari sekadar ide menjadi kerajaan bisnis.
         </p>
@@ -112,11 +160,11 @@ const AllTemplatesSection = ({ templates }: { templates: Template[] }) => (
 
 const AiSection = () => (
   <section id="ai-recommendations" className="py-16 lg:py-24">
-    <div className="container">
+    <div className="container max-w-screen-xl">
       <div className="grid items-center gap-12 lg:grid-cols-2">
         <div className="space-y-4">
           <Sparkles className="h-12 w-12 text-accent" />
-          <h2 className="font-headline text-4xl font-bold md:text-5xl">Bingung Pilih Mana? Biarkan AI Kami Menemukan Harta Karun untuk Anda!</h2>
+          <h2 className="font-headline text-3xl font-bold md:text-4xl lg:text-5xl">Bingung Pilih Mana? Biarkan AI Kami Menemukan Harta Karun untuk Anda!</h2>
           <p className="text-lg text-foreground/70">
             Jangan buang waktu! Cukup bisikkan ide Anda, dan asisten AI CuanKilat akan langsung merekomendasikan produk paling profitabel yang sesuai dengan visi Anda. Gratis, cepat, dan akurat!
           </p>
@@ -133,20 +181,24 @@ const AiSection = () => (
 
 const SupportSection = () => (
   <section id="support" className="bg-secondary/50 py-16 lg:py-24">
-    <div className="container max-w-2xl text-center">
-      <h2 className="font-headline text-4xl font-bold md:text-5xl">Tim Kami Siap Mengawal Anda Sampai Jadi Miliarder</h2>
-      <p className="mt-4 text-lg text-foreground/70">
-        Punya pertanyaan? Butuh bantuan teknis? Tim support elite kami bukan sekadar menjawab, tapi memberikan solusi agar cuan Anda makin deras. Hubungi kami sekarang!
-      </p>
-      <form className="mt-8 space-y-4 text-left">
+    <div className="container max-w-screen-xl">
+      <div className="mx-auto max-w-3xl text-center">
+        <h2 className="font-headline text-3xl font-bold md:text-4xl lg:text-5xl">Tim Kami Siap Mengawal Anda Sampai Jadi Miliarder</h2>
+        <p className="mt-4 text-lg text-foreground/70">
+          Punya pertanyaan? Butuh bantuan teknis? Tim support elite kami bukan sekadar menjawab, tapi memberikan solusi agar cuan Anda makin deras. Hubungi kami sekarang!
+        </p>
+      </div>
+      <form className="mx-auto mt-8 max-w-2xl space-y-4">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <Input placeholder="Nama Anda" />
-          <Input type="email" placeholder="Email Anda" />
+          <Input placeholder="Nama Anda" aria-label="Nama Anda" />
+          <Input type="email" placeholder="Email Anda" aria-label="Email Anda" />
         </div>
-        <Textarea placeholder="Pesan Anda" rows={6} />
-        <Button type="submit" className="w-full sm:w-auto" size="lg">
-          <Mail className="mr-2 h-5 w-5" /> Kirim Pesan
-        </Button>
+        <Textarea placeholder="Pesan Anda" rows={6} aria-label="Pesan Anda" />
+        <div className="text-left">
+          <Button type="submit" size="lg">
+            <Mail className="mr-2 h-5 w-5" /> Kirim Pesan
+          </Button>
+        </div>
       </form>
     </div>
   </section>
@@ -160,13 +212,13 @@ const Footer = () => {
   }, []);
 
   return (
-    <footer className="border-t py-12">
-      <div className="container flex flex-col items-center justify-between gap-6 sm:flex-row">
+    <footer className="border-t py-8">
+      <div className="container flex max-w-screen-xl flex-col items-center justify-between gap-6 sm:flex-row">
         <div className="flex items-center gap-2">
           <CuanKilatIcon className="h-6 w-6 text-primary" />
           <span className="font-headline text-xl font-bold">CuanKilat</span>
         </div>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-center text-sm text-muted-foreground sm:text-left">
           &copy; {year} CuanKilat. Semua hak cipta dilindungi.
         </p>
         <div className="flex items-center gap-4">
@@ -179,29 +231,31 @@ const Footer = () => {
 };
 
 const TemplateCard = ({ template }: { template: Template }) => (
-  <Card className="group overflow-hidden rounded-lg shadow-sm transition-all hover:shadow-xl hover:-translate-y-1">
+  <Card className="group overflow-hidden rounded-lg shadow-sm transition-all hover:shadow-lg hover:-translate-y-1">
     <CardContent className="p-0">
-      <div className="relative">
-        <Image
-          src={template.imageUrl}
-          alt={template.name}
-          width={600}
-          height={400}
-          data-ai-hint={template.aiHint}
-          className="aspect-[3/2] w-full object-cover transition-transform group-hover:scale-105"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-        <div className="absolute bottom-4 left-4">
-          <h3 className="font-headline text-xl font-semibold text-white">{template.name}</h3>
-          <p className="text-sm text-white/80">{template.category}</p>
+      <Link href="#">
+        <div className="relative">
+          <Image
+            src={template.imageUrl}
+            alt={template.name}
+            width={600}
+            height={400}
+            data-ai-hint={template.aiHint}
+            className="aspect-[3/2] w-full object-cover transition-transform group-hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+          <div className="absolute bottom-4 left-4">
+            <h3 className="font-headline text-xl font-semibold text-white">{template.name}</h3>
+            <p className="text-sm text-white/80">{template.category}</p>
+          </div>
+          <div className="absolute right-4 top-4 rounded-full bg-accent px-3 py-1 text-sm font-semibold text-accent-foreground">
+            Rp{template.price.toLocaleString('id-ID')}
+          </div>
         </div>
-        <div className="absolute right-4 top-4 rounded-full bg-accent px-3 py-1 text-sm font-semibold text-accent-foreground">
-          ${template.price.toFixed(2)}
-        </div>
-      </div>
+      </Link>
       <div className="p-4">
-        <p className="text-sm text-muted-foreground">{template.shortDescription}</p>
-        <div className="mt-4 flex gap-2">
+        <p className="mb-4 text-sm text-muted-foreground h-10">{template.shortDescription}</p>
+        <div className="flex gap-2">
           <Button size="sm" className="flex-1" asChild>
             <Link href="#">Demo Langsung</Link>
           </Button>
