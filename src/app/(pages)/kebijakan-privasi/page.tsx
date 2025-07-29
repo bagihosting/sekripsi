@@ -7,7 +7,7 @@ export default function KebijakanPrivasiPage() {
           <p className="lead text-muted-foreground">Terakhir diperbarui: 1 Agustus 2024</p>
           
           <p>
-            Selamat datang di SkripsiKilat. Kami menghargai privasi Anda dan berkomitmen untuk melindunginya. Kebijakan Privasi ini menjelaskan bagaimana kami mengumpulkan, menggunakan, dan menjaga informasi Anda saat Anda mengunjungi atau menggunakan layanan kami.
+            Selamat datang di sekripsi.com. Kami menghargai privasi Anda dan berkomitmen untuk melindunginya. Kebijakan Privasi ini menjelaskan bagaimana kami mengumpulkan, menggunakan, dan menjaga informasi Anda saat Anda mengunjungi atau menggunakan layanan kami.
           </p>
   
           <h2>Informasi yang Kami Kumpulkan</h2>

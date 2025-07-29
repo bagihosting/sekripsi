@@ -148,7 +148,7 @@ export default function AiToolsPage() {
   return (
     <div className="container max-w-screen-xl py-12 lg:py-16">
       <div className="mx-auto mb-12 max-w-3xl text-center">
-        <h1 className="font-headline text-3xl font-bold md:text-4xl lg:text-5xl">Pusat Senjata AI SkripsiKilat</h1>
+        <h1 className="font-headline text-3xl font-bold md:text-4xl lg:text-5xl">Pusat Senjata AI sekripsi.com</h1>
         <p className="mt-4 text-lg text-foreground/70">
           Semua yang kamu butuhkan untuk mempercepat kelulusan ada di sini. Pilih alat yang sesuai dengan tahap pengerjaan skripsimu, dari perencanaan hingga persiapan sidang.
         </p>

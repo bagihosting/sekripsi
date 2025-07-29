@@ -8,22 +8,22 @@ export default function KetentuanLayananPage() {
   
           <h2>1. Penerimaan Ketentuan</h2>
           <p>
-            Dengan mengakses dan menggunakan situs web SkripsiKilat ("Layanan"), Anda setuju untuk terikat oleh Ketentuan Layanan ini. Jika Anda tidak setuju dengan bagian mana pun dari ketentuan ini, maka Anda tidak boleh mengakses Layanan.
+            Dengan mengakses dan menggunakan situs web sekripsi.com ("Layanan"), Anda setuju untuk terikat oleh Ketentuan Layanan ini. Jika Anda tidak setuju dengan bagian mana pun dari ketentuan ini, maka Anda tidak boleh mengakses Layanan.
           </p>
   
           <h2>2. Penggunaan Layanan</h2>
           <p>
-            SkripsiKilat menyediakan alat bantu berbasis AI untuk membantu proses penulisan skripsi, tesis, dan karya ilmiah lainnya.
+            sekripsi.com menyediakan alat bantu berbasis AI untuk membantu proses penulisan skripsi, tesis, dan karya ilmiah lainnya.
           </p>
           <ul>
             <li>Layanan ini dimaksudkan sebagai alat bantu dan bukan pengganti dari bimbingan dosen, penelitian mandiri, atau integritas akademik.</li>
-            <li>Anda bertanggung jawab penuh atas penggunaan hasil yang dihasilkan oleh layanan kami. SkripsiKilat tidak bertanggung jawab atas nilai, keakuratan, atau konsekuensi apa pun dari penggunaan output alat kami.</li>
+            <li>Anda bertanggung jawab penuh atas penggunaan hasil yang dihasilkan oleh layanan kami. sekripsi.com tidak bertanggung jawab atas nilai, keakuratan, atau konsekuensi apa pun dari penggunaan output alat kami.</li>
             <li>Anda tidak diizinkan untuk menyalahgunakan layanan, termasuk melakukan permintaan otomatis dalam jumlah besar yang dapat mengganggu server kami.</li>
           </ul>
   
           <h2>3. Pembatasan Tanggung Jawab</h2>
           <p>
-            Layanan kami disediakan "sebagaimana adanya". SkripsiKilat tidak akan bertanggung jawab atas kerusakan langsung, tidak langsung, insidental, atau konsekuensial yang diakibatkan dari penggunaan atau ketidakmampuan untuk menggunakan produk kami.
+            Layanan kami disediakan "sebagaimana adanya". sekripsi.com tidak akan bertanggung jawab atas kerusakan langsung, tidak langsung, insidental, atau konsekuensial yang diakibatkan dari penggunaan atau ketidakmampuan untuk menggunakan produk kami.
           </p>
   
           <h2>4. Perubahan Ketentuan</h2>
