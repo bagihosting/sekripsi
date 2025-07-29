@@ -1,10 +1,11 @@
 
-import { getProducts } from '@/lib/data';
 import ProductGrid from '@/components/product-grid';
 import { getAllTools } from '@/lib/plugins';
+import type { AiTool } from '@/lib/plugins';
 
 export default async function ProdukPage() {
-  const allProducts = await getAllTools();
+  const allProducts: AiTool[] = await getAllTools();
+  
   return (
     <section id="templates" className="w-full bg-background py-16 lg:py-24">
       <div className="container max-w-screen-xl">

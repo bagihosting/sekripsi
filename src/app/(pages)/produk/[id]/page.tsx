@@ -1,79 +1,27 @@
 
-'use client';
-
 import { getToolById, AiTool, iconMap } from '@/lib/plugins';
-import { notFound, useRouter, useParams } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle, ChevronRight, Home, ShoppingCart, Star, Percent, Wand } from 'lucide-react';
-import { useAuth } from '@/hooks/use-auth';
-import { useTransition, useEffect, useState } from 'react';
-import { useToast } from '@/hooks/use-toast';
-import { Loader2 } from 'lucide-react';
-import { Skeleton } from '@/components/ui/skeleton';
+import { CheckCircle, ChevronRight, Home, Percent, Wand } from 'lucide-react';
+import ProductPurchaseButton from '@/components/product-purchase-button';
 
-export default function ProductDetailPage() {
-  const params = useParams();
-  const id = params.id as string;
-  const [product, setProduct] = useState<AiTool | null>(null);
-  const [loadingProduct, setLoadingProduct] = useState(true);
-  
-  const { userProfile, loading: authLoading } = useAuth();
-  const [isPending, startTransition] = useTransition();
-  const { toast } = useToast();
-  const router = useRouter();
+type Props = {
+    params: { id: string };
+};
 
-  useEffect(() => {
-    async function fetchTool() {
-      if (!id) return;
-      const tool = await getToolById(id);
-      if (tool) {
-        setProduct(tool);
-      }
-      setLoadingProduct(false);
-    }
-    fetchTool();
-  }, [id]);
-
-  if (loadingProduct || authLoading) {
-    return <ProductDetailSkeleton />;
-  }
+// This Server Component fetches the data.
+export default async function ProductDetailPage({ params }: Props) {
+  const { id } = params;
+  const product = await getToolById(id);
 
   if (!product) {
     notFound();
   }
   
   const IconComponent = typeof product.icon === 'string' ? iconMap[product.icon] || Wand : product.icon;
-  const hasTool = userProfile?.activatedTools?.includes(product.id);
-  const isFree = product.price === 0;
-  const isPro = userProfile?.plan === 'pro';
-  const displayPrice = isPro && !isFree ? product.price / 2 : product.price;
-
-  const handleAction = () => {
-    if (!userProfile) {
-        router.push(`/login?redirect=/produk/${id}`);
-        return;
-    }
-    if (hasTool) return; // Already have it
-    if (isFree) {
-        // In a real scenario, you'd have a server action to add free tools.
-        // For now, we assume free tools are activated on registration.
-        toast({ title: "Alat Gratis", description: "Alat ini sudah otomatis tersedia untukmu." });
-    } else {
-        router.push(`/upgrade/${product.id}`);
-    }
-  }
-
-  const getButtonState = () => {
-      if(hasTool) return { text: 'Sudah Dimiliki', disabled: true };
-      if(isPending) return { text: 'Memproses...', disabled: true };
-      if(isFree) return { text: 'Alat Gratis', disabled: true };
-      return { text: `Beli Alat Ini - Rp ${displayPrice?.toLocaleString('id-ID')}`, disabled: false };
-  }
-
-  const { text: buttonText, disabled: isButtonDisabled } = getButtonState();
-
+  
   const productFeatures = [
       `Membantu dalam tahap ${product.category}`,
       "Didukung oleh model AI canggih",
@@ -108,35 +56,9 @@ export default function ProductDetailPage() {
                         ))}
                     </ul>
                 </div>
-
-                <div className="mt-auto pt-8">
-                     <div className="mb-4">
-                        {isFree ? (
-                             <p className="text-2xl font-bold text-green-600">Gratis</p>
-                        ) : isPro ? (
-                            <div className="flex items-center gap-3">
-                                <p className="text-3xl font-bold text-primary">Rp {displayPrice.toLocaleString('id-ID')}</p>
-                                <p className="text-xl font-medium text-muted-foreground line-through">Rp {product.price.toLocaleString('id-ID')}</p>
-                                <Badge variant="destructive" className="flex gap-1">
-                                    <Percent className="h-4 w-4" /> 50% OFF
-                                </Badge>
-                            </div>
-                        ) : (
-                            <p className="text-3xl font-bold">Rp {displayPrice.toLocaleString('id-ID')}</p>
-                        )}
-                        {!isFree && !isPro && userProfile && (
-                            <p className="text-sm text-muted-foreground mt-1">
-                                <Link href="/harga" className="text-primary font-semibold hover:underline">Upgrade ke Pro</Link> untuk diskon 50%!
-                            </p>
-                        )}
-                     </div>
-                    <div className="flex flex-col sm:flex-row gap-4">
-                        <Button size="lg" className="flex-1" onClick={handleAction} disabled={isButtonDisabled || authLoading}>
-                            {isPending ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <ShoppingCart className="mr-2 h-5 w-5" />}
-                            {buttonText}
-                        </Button>
-                    </div>
-                </div>
+                
+                {/* Client component for handling purchase logic */}
+                <ProductPurchaseButton product={product} />
             </div>
         </div>
     </div>
@@ -157,27 +79,5 @@ function Breadcrumbs({ product }: { product: AiTool }) {
             <ChevronRight className="h-4 w-4 shrink-0" />
             <span className="font-medium text-foreground truncate">{product.title}</span>
         </nav>
-    )
-}
-
-function ProductDetailSkeleton() {
-    return (
-        <div className="container max-w-screen-xl py-8 md:py-12">
-            <Skeleton className="h-6 w-1/3" />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 mt-6">
-                <div><Skeleton className="w-full aspect-video rounded-lg" /></div>
-                <div className="flex flex-col space-y-4">
-                    <Skeleton className="h-10 w-3/4" />
-                    <Skeleton className="h-6 w-1/4" />
-                    <Skeleton className="h-5 w-full" />
-                    <Skeleton className="h-5 w-full" />
-                    <Skeleton className="h-5 w-2/3" />
-                    <div className="mt-auto pt-8 space-y-4">
-                        <Skeleton className="h-8 w-1/3" />
-                        <Skeleton className="h-12 w-full" />
-                    </div>
-                </div>
-            </div>
-        </div>
     )
 }
