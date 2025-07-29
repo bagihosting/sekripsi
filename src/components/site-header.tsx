@@ -18,6 +18,7 @@ export const SiteHeader = () => {
     { href: '/generator-judul', label: 'Generator Judul' },
     { href: '/parafrase-ai', label: 'Parafrase AI' },
     { href: '/kerangka-ai', label: 'Kerangka AI' },
+    { href: '/korektor-ai', label: 'Korektor AI' },
     { href: '/blog', label: 'Blog' },
     { href: '/dukungan', label: 'Dukungan' },
   ];
