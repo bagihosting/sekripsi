@@ -85,7 +85,7 @@ export default function TemplateGrid({ templates }: { templates: Template[] }) {
 const TemplateCard = ({ template }: { template: Template }) => (
   <Card className="group overflow-hidden rounded-lg shadow-sm transition-all hover:shadow-lg hover:-translate-y-1">
     <CardContent className="p-0">
-      <Link href="#">
+      <Link href={`/produk/${template.id}`} className="focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-t-lg">
         <div className="relative">
           <Image
             src={template.imageUrl}
@@ -108,11 +108,11 @@ const TemplateCard = ({ template }: { template: Template }) => (
       <div className="p-4">
         <p className="mb-4 h-10 text-sm text-muted-foreground">{template.shortDescription}</p>
         <div className="flex gap-2">
-          <Button size="sm" className="flex-1" asChild>
-            <Link href="#">Demo Langsung</Link>
+           <Button size="sm" className="flex-1" asChild>
+            <Link href={template.liveDemoUrl} target="_blank">Demo Langsung</Link>
           </Button>
           <Button size="sm" variant="outline" className="flex-1" asChild>
-            <Link href="#">Detail</Link>
+            <Link href={`/produk/${template.id}`}>Detail</Link>
           </Button>
         </div>
       </div>

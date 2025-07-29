@@ -23,7 +23,7 @@ export const SiteHeader = () => {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 max-w-screen-xl items-center justify-between">
-        <Link href="/" className="flex items-center gap-2">
+        <Link href="/" className="flex items-center gap-2" prefetch={false}>
           <SkripsiKilatIcon className="h-8 w-8 text-primary" />
           <span className="font-headline text-xl font-bold text-foreground">SkripsiKilat</span>
         </Link>
@@ -31,10 +31,11 @@ export const SiteHeader = () => {
           {navLinks.map(link => (
             <Link 
               key={link.href} 
-              href={link.href} 
+              href={link.href}
+              prefetch={false}
               className={cn(
                 "transition-colors hover:text-primary",
-                pathname === link.href ? "text-primary" : "text-foreground/60"
+                pathname.startsWith(link.href) ? "text-primary" : "text-foreground/60"
               )}
             >
               {link.label}
@@ -43,7 +44,7 @@ export const SiteHeader = () => {
         </nav>
         <div className="flex items-center gap-2">
           <Button asChild className="hidden sm:inline-flex">
-            <Link href="/produk">
+            <Link href="/produk" prefetch={false}>
               Lihat Produk <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>
@@ -67,7 +68,7 @@ export const SiteHeader = () => {
                     onClick={() => setOpen(false)}
                     className={cn(
                         "text-lg font-medium transition-colors hover:text-primary",
-                        pathname === link.href ? "text-primary" : "text-foreground/80"
+                        pathname.startsWith(link.href) ? "text-primary" : "text-foreground/80"
                     )}
                   >
                     {link.label}

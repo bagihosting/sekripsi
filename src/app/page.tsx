@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { getTemplates, Template } from '@/lib/data';
-import { SkripsiKilatIcon } from '@/components/icons';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
@@ -101,7 +100,7 @@ const AiSection = () => (
 const TemplateCard = ({ template }: { template: Template }) => (
   <Card className="group overflow-hidden rounded-lg shadow-sm transition-all hover:shadow-lg hover:-translate-y-1">
     <CardContent className="p-0">
-      <Link href="#">
+      <Link href={`/produk/${template.id}`} className="focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-t-lg">
         <div className="relative">
           <Image
             src={template.imageUrl}
@@ -125,10 +124,10 @@ const TemplateCard = ({ template }: { template: Template }) => (
         <p className="mb-4 text-sm text-muted-foreground h-10">{template.shortDescription}</p>
         <div className="flex gap-2">
           <Button size="sm" className="flex-1" asChild>
-            <Link href="#">Demo Langsung</Link>
+            <Link href={template.liveDemoUrl} target="_blank">Demo Langsung</Link>
           </Button>
           <Button size="sm" variant="outline" className="flex-1" asChild>
-            <Link href="#">Beli Skrip Ini</Link>
+            <Link href={`/produk/${template.id}`}>Detail</Link>
           </Button>
         </div>
       </div>
