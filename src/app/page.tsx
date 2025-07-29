@@ -58,19 +58,19 @@ const HeroSection = () => (
   <section className="container grid min-h-[calc(100dvh-3.5rem)] content-center text-center">
     <div className="mx-auto max-w-4xl">
       <h1 className="font-headline text-5xl font-bold tracking-tight md:text-7xl lg:text-8xl">
-        Jangan Cuma Punya Ide, Wujudkan Jadi Cuan!
+        Stop Menunda, Mulai Hasilkan Cuan Pertama Anda Malam Ini!
       </h1>
       <p className="mx-auto mt-6 max-w-2xl text-lg text-foreground/80 md:text-xl">
-        Lewati proses koding berbulan-bulan! Dapatkan akses instan ke ratusan template & skrip profesional yang terbukti menghasilkan. Proyek Anda bisa online malam ini!
+        Lupakan pusingnya koding dan desain dari nol. Pilih aset digital siap pakai dari kami, luncurkan proyek impian Anda, dan lihat keuntungan mulai mengalir. Cepat, mudah, dan terbukti berhasil!
       </p>
       <div className="mt-8 flex justify-center gap-4">
         <Button size="lg" asChild>
-          <Link href="#templates">Jelajahi Produk</Link>
+          <Link href="#templates">Saya Mau Cuan Sekarang!</Link>
         </Button>
         <Button size="lg" variant="outline" asChild>
           <Link href="#ai-recommendations">
             <Sparkles className="mr-2 h-5 w-5" />
-            Dapatkan Saran AI
+            Beri Saya Ide Ajaib
           </Link>
         </Button>
       </div>
@@ -82,9 +82,9 @@ const TrendingSection = ({ templates }: { templates: Template[] }) => (
   <section id="trending" className="w-full py-16 lg:py-24">
     <div className="container">
       <div className="mx-auto mb-12 max-w-2xl text-center">
-        <h2 className="font-headline text-4xl font-bold md:text-5xl">Diborong Ribuan Orang! Jangan Sampai Ketinggalan Produk Terlaris Ini!</h2>
+        <h2 className="font-headline text-4xl font-bold md:text-5xl">Pilihan Para Sultan! Produk-Produk Ini Terjual Setiap Jam!</h2>
         <p className="mt-4 text-lg text-foreground/70">
-          Lihat apa yang sedang viral! Desain dan aplikasi ini adalah yang paling dicari, terbukti disukai, dan siap melambungkan proyek Anda ke level berikutnya.
+          Ini bukan sekadar tren, ini adalah mesin pencetak uang. Ribuan developer dan pebisnis telah membuktikannya. Jangan sampai Anda ketinggalan kereta!
         </p>
       </div>
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -100,9 +100,9 @@ const AllTemplatesSection = ({ templates }: { templates: Template[] }) => (
   <section id="templates" className="w-full bg-secondary/50 py-16 lg:py-24">
     <div className="container">
        <div className="mx-auto mb-12 max-w-2xl text-center">
-        <h2 className="font-headline text-4xl font-bold md:text-5xl">Koleksi Lengkap Senjata Rahasia Anda</h2>
+        <h2 className="font-headline text-4xl font-bold md:text-5xl">Gudang Senjata Digital Anda untuk Mendominasi Pasar</h2>
         <p className="mt-4 text-lg text-foreground/70">
-          Jelajahi pustaka lengkap template dan skrip aplikasi premium kami. Temukan yang paling cocok untuk proyek Anda.
+          Apapun ide Anda, kami punya solusinya. Jelajahi koleksi lengkap kami dan temukan aset yang akan mengubah proyek Anda dari sekadar ide menjadi kerajaan bisnis.
         </p>
       </div>
       <TemplateGrid templates={templates} />
@@ -116,9 +116,9 @@ const AiSection = () => (
       <div className="grid items-center gap-12 lg:grid-cols-2">
         <div className="space-y-4">
           <Sparkles className="h-12 w-12 text-accent" />
-          <h2 className="font-headline text-4xl font-bold md:text-5xl">Masih Ragu? Biarkan AI Kami Memilihkan Jodoh Proyek Anda!</h2>
+          <h2 className="font-headline text-4xl font-bold md:text-5xl">Bingung Pilih Mana? Biarkan AI Kami Menemukan Harta Karun untuk Anda!</h2>
           <p className="text-lg text-foreground/70">
-            Cukup ketik ide gila Anda, dan biarkan asisten cerdas kami mengungkap produk rahasia yang akan mengubah visi Anda menjadi kenyataan dalam sekejap. Gratis!
+            Jangan buang waktu! Cukup bisikkan ide Anda, dan asisten AI CuanKilat akan langsung merekomendasikan produk paling profitabel yang sesuai dengan visi Anda. Gratis, cepat, dan akurat!
           </p>
         </div>
         <Card className="shadow-lg">
@@ -134,9 +134,9 @@ const AiSection = () => (
 const SupportSection = () => (
   <section id="support" className="bg-secondary/50 py-16 lg:py-24">
     <div className="container max-w-2xl text-center">
-      <h2 className="font-headline text-4xl font-bold md:text-5xl">Kami Siap Membantu Anda Jadi Sultan</h2>
+      <h2 className="font-headline text-4xl font-bold md:text-5xl">Tim Kami Siap Mengawal Anda Sampai Jadi Miliarder</h2>
       <p className="mt-4 text-lg text-foreground/70">
-        Ada pertanyaan? Butuh bantuan? Tim dukungan kami siap mengawal Anda menuju kesuksesan. Jangan ragu, hubungi kami!
+        Punya pertanyaan? Butuh bantuan teknis? Tim support elite kami bukan sekadar menjawab, tapi memberikan solusi agar cuan Anda makin deras. Hubungi kami sekarang!
       </p>
       <form className="mt-8 space-y-4 text-left">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
