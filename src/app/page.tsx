@@ -5,11 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getTemplates, Template } from '@/lib/data';
 import { ArrowRight, Sparkles, Wand2, Target, TestTubeDiagonal, BookMarked, Library, PenSquare, SpellCheck, BrainCircuit, ShieldQuestion, Wand, Database } from 'lucide-react';
-import { SiteHeader } from '@/components/site-header';
-import { SiteFooter } from '@/components/site-footer';
-import AiRecommender from '@/components/ai-recommender';
 import type { LucideIcon } from 'lucide-react';
-import RecentUpgradeToast from '@/components/recent-upgrade-toast';
 
 const tools: { icon: LucideIcon; title: string; description: string, href: string }[] = [
   {
@@ -51,18 +47,12 @@ const tools: { icon: LucideIcon; title: string; description: string, href: strin
 ];
 
 export default function Home() {
-
   return (
-    <div className="flex min-h-dvh flex-col bg-background">
-      <SiteHeader />
-      <main className="flex-1">
-        <HeroSection />
-        <FeatureGrid />
-        <CtaSection />
-      </main>
-      <SiteFooter />
-      <RecentUpgradeToast />
-    </div>
+    <>
+      <HeroSection />
+      <FeatureGrid />
+      <CtaSection />
+    </>
   );
 }
 
