@@ -153,6 +153,12 @@ export const SiteHeader = () => {
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-full max-w-sm">
+               <SheetHeader className="sr-only">
+                  <SheetTitle>Menu</SheetTitle>
+                  <SheetDescription>
+                    Navigasi utama untuk SkripsiKilat. Pilih dari produk, blog, dukungan, atau jelajahi alat bantu AI kami.
+                  </SheetDescription>
+                </SheetHeader>
                <div className="h-full overflow-y-auto">
                   <div className="flex flex-col gap-4 pt-12">
                     <Link href="/" className="mb-4 flex items-center gap-2">
