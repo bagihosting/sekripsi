@@ -7,7 +7,7 @@ import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger } from '@/components/ui/sheet';
 import { SekripsiComIcon } from '@/components/icons';
-import { ArrowRight, Menu, Sparkles, ChevronDown } from 'lucide-react';
+import { ArrowRight, Menu, Sparkles, ChevronDown, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
 import { Separator } from './ui/separator';
@@ -82,6 +82,16 @@ export const SiteHeader = () => {
             Trik Cepat Lulus
           </Link>
           <Link 
+            href="/harga"
+            prefetch={false}
+            className={cn(
+                "transition-colors hover:text-primary",
+                pathname === '/harga' ? "text-primary" : "text-foreground/60"
+            )}
+            >
+            Harga
+          </Link>
+          <Link 
             href="/dukungan"
             prefetch={false}
             className={cn(
@@ -94,9 +104,10 @@ export const SiteHeader = () => {
         </nav>
 
         <div className="flex items-center gap-2">
-          <Button asChild className="hidden sm:inline-flex">
-            <Link href="/alat-ai" prefetch={false}>
-              Coba Gratis <ArrowRight className="ml-2 h-4 w-4" />
+          <Button asChild>
+            <Link href="/harga" prefetch={false}>
+              <Star className="mr-2 h-4 w-4 fill-current"/>
+              Upgrade ke Pro
             </Link>
           </Button>
 
@@ -160,10 +171,21 @@ export const SiteHeader = () => {
                         {link.label}
                       </Link>
                     ))}
+                     <Link
+                        href="/harga"
+                        onClick={() => setOpen(false)}
+                        className={cn(
+                            "px-2 py-1.5 text-lg font-medium transition-colors hover:text-primary",
+                            pathname.startsWith('/harga') ? "text-primary" : "text-foreground/80"
+                        )}
+                      >
+                        Harga
+                      </Link>
 
                     <Button asChild className="mt-4">
-                      <Link href="/alat-ai" onClick={() => setOpen(false)}>
-                        Coba Semua Alat AI
+                      <Link href="/harga" onClick={() => setOpen(false)}>
+                        <Star className="mr-2 h-4 w-4 fill-current"/>
+                        Upgrade ke Pro
                       </Link>
                     </Button>
                   </div>

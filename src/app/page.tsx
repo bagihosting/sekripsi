@@ -133,15 +133,11 @@ const CtaSection = () => (
                    Waktu terus berjalan. Teman-temanmu sudah mulai wisuda. Giliranmu kapan? Semua alat untuk menaklukkan skripsi sudah di depan mata.
                 </p>
                 <Button size="lg" className="mt-8" asChild>
-                    <Link href="/alat-ai">
-                        Saya Mau Lulus Cepat! <ArrowRight className="ml-2 h-5 w-5" />
+                    <Link href="/harga">
+                        Lihat Paket & Upgrade Sekarang <ArrowRight className="ml-2 h-5 w-5" />
                     </Link>
                 </Button>
             </div>
         </div>
     </section>
 );
-
-
-
-
