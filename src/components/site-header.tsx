@@ -42,14 +42,14 @@ export const SiteHeader = () => {
   const { user, userProfile } = useAuth();
 
   return (
-    <header className="hidden md:flex sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 max-w-screen-xl items-center justify-between">
+    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      {/* Desktop Header */}
+      <div className="container hidden h-16 max-w-screen-xl items-center justify-between md:flex">
         <Link href="/" className="flex items-center gap-2" prefetch={false}>
           <SekripsiComIcon className="h-8 w-8 text-primary" />
           <span className="font-headline text-2xl font-bold text-foreground">sekripsi.com</span>
         </Link>
         
-        {/* Desktop Navigation */}
         <nav className="hidden items-center gap-6 text-sm font-medium md:flex">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -166,128 +166,15 @@ export const SiteHeader = () => {
                 </Link>
               </Button>
           )}
-
-
-          {/* Mobile Navigation */}
-          <Sheet open={open} onOpenChange={setOpen}>
-            <SheetTrigger asChild>
-              <Button variant="outline" size="icon" className="md:hidden">
-                <Menu className="h-5 w-5" />
-                <span className="sr-only">Buka Menu</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-full max-w-sm">
-                <SheetHeader className="text-left sr-only">
-                  <SheetTitle>Menu</SheetTitle>
-                  <SheetDescription>
-                    Navigasi utama untuk sekripsi.com.
-                  </SheetDescription>
-                </SheetHeader>
-               <div className="h-full overflow-y-auto">
-                  <div className="flex flex-col gap-1 pt-12">
-                    <Link href="/" className="mb-4 flex items-center gap-2" onClick={() => setOpen(false)}>
-                      <SekripsiComIcon className="h-8 w-8 text-primary" />
-                      <span className="font-headline text-xl font-bold text-foreground">sekripsi.com</span>
-                    </Link>
-
-                    {userProfile && userProfile.plan === 'free' && (
-                        <Button asChild className="w-full mb-4">
-                            <Link href="/harga" onClick={() => setOpen(false)}>
-                                <Star className="mr-2 h-4 w-4 fill-current" />
-                                Upgrade ke Pro
-                            </Link>
-                        </Button>
-                    )}
-
-                    <Link
-                        href="/alat-ai"
-                        onClick={() => setOpen(false)}
-                        className="px-2 py-1.5 text-lg font-medium transition-colors hover:text-primary"
-                    >
-                        Pusat AI
-                    </Link>
-                     <div className='flex flex-col gap-1 pl-6'>
-                        {aiToolsLinks.map(link => (
-                            <Link
-                                key={link.href}
-                                href={link.href}
-                                onClick={() => setOpen(false)}
-                                className={cn(
-                                    "text-sm transition-colors hover:text-primary",
-                                    pathname.startsWith(link.href) ? "text-primary" : "text-foreground/70"
-                                )}
-                            >
-                                {link.label}
-                            </Link>
-                        ))}
-                    </div>
-                    
-                    <Separator className='my-2' />
-
-                    {mainNavLinks.map(link => (
-                      <Link
-                        key={link.href}
-                        href={link.href}
-                        onClick={() => setOpen(false)}
-                        className={cn(
-                            "px-2 py-1.5 text-lg font-medium transition-colors hover:text-primary",
-                            pathname.startsWith(link.href) ? "text-primary" : "text-foreground/80"
-                        )}
-                      >
-                        {link.label}
-                      </Link>
-                    ))}
-                     <Link
-                        href="/harga"
-                        onClick={() => setOpen(false)}
-                        className={cn(
-                            "px-2 py-1.5 text-lg font-medium transition-colors hover:text-primary",
-                            pathname.startsWith('/harga') ? "text-primary" : "text-foreground/80"
-                        )}
-                      >
-                        Harga
-                      </Link>
-
-                    <Separator className='my-2' />
-
-                     {user ? (
-                        <div className="p-2">
-                           <div className="mb-4">
-                             <p className="font-medium">{userProfile?.displayName || userProfile?.email}</p>
-                             <p className="text-sm text-muted-foreground capitalize">{userProfile?.role} ({userProfile?.plan})</p>
-                           </div>
-                           <Button asChild className="w-full mb-2">
-                                <Link href="/dashboard" onClick={() => setOpen(false)}>
-                                    <LayoutDashboard className="mr-2 h-4 w-4" />
-                                    Buka Dasbor
-                                </Link>
-                           </Button>
-                            <Button asChild className="w-full mb-2" variant="outline">
-                                <Link href="/dashboard/profil" onClick={() => setOpen(false)}>
-                                    <UserCog className="mr-2 h-4 w-4" />
-                                    Profil Saya
-                                </Link>
-                           </Button>
-                           <Button onClick={() => { logout(); setOpen(false); }} className="w-full" variant="outline">
-                                <LogOut className="mr-2 h-4 w-4" />
-                                Logout
-                           </Button>
-                        </div>
-                     ) : (
-                         <div className="grid grid-cols-2 gap-2 p-2">
-                            <Button asChild variant="ghost" className="w-full">
-                                <Link href="/login" onClick={() => setOpen(false)}>Login</Link>
-                            </Button>
-                            <Button asChild className="w-full">
-                                <Link href="/register" onClick={() => setOpen(false)}>Daftar</Link>
-                            </Button>
-                         </div>
-                     )}
-                  </div>
-                </div>
-            </SheetContent>
-          </Sheet>
         </div>
+      </div>
+      
+      {/* Mobile Header */}
+      <div className="container flex h-16 items-center justify-center md:hidden">
+         <Link href="/" className="flex items-center gap-2" prefetch={false}>
+          <SekripsiComIcon className="h-8 w-8 text-primary" />
+          <span className="font-headline text-2xl font-bold text-foreground">sekripsi.com</span>
+        </Link>
       </div>
     </header>
   );
