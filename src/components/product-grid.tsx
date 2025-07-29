@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Label } from '@/components/ui/label';
 import { Badge } from './ui/badge';
+import { useAuth } from '@/hooks/use-auth';
 
 export default function ProductGrid({ products }: { products: AiTool[] }) {
   const [category, setCategory] = useState('all');
@@ -80,30 +81,46 @@ export default function ProductGrid({ products }: { products: AiTool[] }) {
   );
 }
 
-const ProductCard = ({ product }: { product: AiTool }) => (
-  <Card className="group flex flex-col overflow-hidden rounded-lg shadow-sm transition-all hover:shadow-lg hover:-translate-y-1">
-    <CardContent className="flex flex-1 flex-col p-4">
-        <div className="flex-1">
-            <div className="mb-4 aspect-video flex items-center justify-center rounded-md bg-secondary">
-                <product.icon className="h-16 w-16 text-primary" />
-            </div>
-            <div className="flex justify-between items-start">
-                <Badge variant="outline" className="mb-2">{product.category}</Badge>
-                {product.badge && <Badge>{product.badge}</Badge>}
-            </div>
-            <h3 className="font-headline text-xl font-semibold leading-snug">
-                <Link href={`/produk/${product.id}`} className="hover:text-primary transition-colors">{product.title}</Link>
-            </h3>
-            <p className="mt-2 text-sm text-muted-foreground h-12 line-clamp-2">{product.description}</p>
-        </div>
-        <div className="mt-4">
-            <div className="text-lg font-bold mb-2">
-                {product.price === 0 ? 'Gratis' : `Rp ${product.price?.toLocaleString('id-ID')}`}
-            </div>
-            <Button className="w-full" asChild>
-                <Link href={`/produk/${product.id}`}>Lihat Detail & Beli</Link>
-            </Button>
-        </div>
-    </CardContent>
-  </Card>
-);
+const ProductCard = ({ product }: { product: AiTool }) => {
+    const { userProfile } = useAuth();
+    const isPro = userProfile?.plan === 'pro';
+    const isFree = product.price === 0;
+    const displayPrice = isPro && !isFree ? product.price / 2 : product.price;
+
+    return (
+        <Card className="group flex flex-col overflow-hidden rounded-lg shadow-sm transition-all hover:shadow-lg hover:-translate-y-1">
+            <CardContent className="flex flex-1 flex-col p-4">
+                <div className="flex-1">
+                    <div className="mb-4 aspect-video flex items-center justify-center rounded-md bg-secondary">
+                        <product.icon className="h-16 w-16 text-primary" />
+                    </div>
+                    <div className="flex justify-between items-start">
+                        <Badge variant="outline" className="mb-2">{product.category}</Badge>
+                        {product.badge && <Badge>{product.badge}</Badge>}
+                    </div>
+                    <h3 className="font-headline text-xl font-semibold leading-snug">
+                        <Link href={`/produk/${product.id}`} className="hover:text-primary transition-colors">{product.title}</Link>
+                    </h3>
+                    <p className="mt-2 text-sm text-muted-foreground h-12 line-clamp-2">{product.description}</p>
+                </div>
+                <div className="mt-4">
+                    <div className="text-lg font-bold mb-2 h-7">
+                        {isFree ? (
+                             <span className="text-green-600">Gratis</span>
+                        ) : isPro ? (
+                            <div className="flex items-center gap-2">
+                                <span>Rp {displayPrice.toLocaleString('id-ID')}</span>
+                                <span className="text-sm font-normal text-muted-foreground line-through">Rp {product.price.toLocaleString('id-ID')}</span>
+                            </div>
+                        ) : (
+                            <span>Rp {displayPrice.toLocaleString('id-ID')}</span>
+                        )}
+                    </div>
+                    <Button className="w-full" asChild>
+                        <Link href={`/produk/${product.id}`}>Lihat Detail & Beli</Link>
+                    </Button>
+                </div>
+            </CardContent>
+        </Card>
+    );
+};

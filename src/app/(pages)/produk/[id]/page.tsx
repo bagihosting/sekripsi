@@ -6,7 +6,7 @@ import { notFound, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle, ChevronRight, Home, ShoppingCart, Star } from 'lucide-react';
+import { CheckCircle, ChevronRight, Home, ShoppingCart, Star, Percent } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { useTransition, useEffect, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
@@ -48,6 +48,8 @@ export default function ProductDetailPage({ params }: Props) {
   
   const hasTool = userProfile?.activatedTools?.includes(product.id);
   const isFree = product.price === 0;
+  const isPro = userProfile?.plan === 'pro';
+  const displayPrice = isPro && !isFree ? product.price / 2 : product.price;
 
   const handleAction = () => {
     if (!userProfile) {
@@ -68,7 +70,7 @@ export default function ProductDetailPage({ params }: Props) {
       if(hasTool) return { text: 'Sudah Dimiliki', disabled: true };
       if(isPending) return { text: 'Memproses...', disabled: true };
       if(isFree) return { text: 'Alat Gratis', disabled: true };
-      return { text: `Beli Alat Ini - Rp ${product.price?.toLocaleString('id-ID')}`, disabled: false };
+      return { text: `Beli Alat Ini - Rp ${displayPrice?.toLocaleString('id-ID')}`, disabled: false };
   }
 
   const { text: buttonText, disabled: isButtonDisabled } = getButtonState();
@@ -109,13 +111,26 @@ export default function ProductDetailPage({ params }: Props) {
                 </div>
 
                 <div className="mt-auto pt-8">
-                     <div className="text-2xl font-bold mb-4 flex items-center gap-2">
+                     <div className="mb-4">
                         {isFree ? (
-                            <span className="text-green-600">Gratis</span>
+                             <p className="text-2xl font-bold text-green-600">Gratis</p>
+                        ) : isPro ? (
+                            <div className="flex items-center gap-3">
+                                <p className="text-3xl font-bold text-primary">Rp {displayPrice.toLocaleString('id-ID')}</p>
+                                <p className="text-xl font-medium text-muted-foreground line-through">Rp {product.price.toLocaleString('id-ID')}</p>
+                                <Badge variant="destructive" className="flex gap-1">
+                                    <Percent className="h-4 w-4" /> 50% OFF
+                                </Badge>
+                            </div>
                         ) : (
-                            <span>Rp {product.price?.toLocaleString('id-ID')}</span>
+                            <p className="text-3xl font-bold">Rp {displayPrice.toLocaleString('id-ID')}</p>
                         )}
-                    </div>
+                        {!isFree && !isPro && userProfile && (
+                            <p className="text-sm text-muted-foreground mt-1">
+                                <Link href="/harga" className="text-primary font-semibold hover:underline">Upgrade ke Pro</Link> untuk diskon 50%!
+                            </p>
+                        )}
+                     </div>
                     <div className="flex flex-col sm:flex-row gap-4">
                         <Button size="lg" className="flex-1" onClick={handleAction} disabled={isButtonDisabled || authLoading}>
                             {isPending ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <ShoppingCart className="mr-2 h-5 w-5" />}

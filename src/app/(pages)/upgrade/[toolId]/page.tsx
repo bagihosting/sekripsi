@@ -4,14 +4,17 @@
 import { useEffect, useState } from 'react';
 import UpgradeForm from '@/components/upgrade-form';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Banknote, Package } from 'lucide-react';
+import { Banknote, Package, Percent } from 'lucide-react';
 import { getToolById } from '@/lib/plugins';
 import type { AiTool } from '@/lib/plugins';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useAuth } from '@/hooks/use-auth';
+import { Badge } from '@/components/ui/badge';
 
 export default function UpgradeToolPage({ params }: { params: { toolId: string } }) {
   const [tool, setTool] = useState<AiTool | null>(null);
   const [loading, setLoading] = useState(true);
+  const { userProfile, loading: authLoading } = useAuth();
 
   useEffect(() => {
     async function fetchTool() {
@@ -22,7 +25,11 @@ export default function UpgradeToolPage({ params }: { params: { toolId: string }
     fetchTool();
   }, [params.toolId]);
 
-  if (loading) {
+  const isPro = userProfile?.plan === 'pro';
+  const price = tool?.price || 0;
+  const displayPrice = isPro ? price / 2 : price;
+
+  if (loading || authLoading) {
     return <UpgradePageSkeleton />;
   }
 
@@ -42,15 +49,27 @@ export default function UpgradeToolPage({ params }: { params: { toolId: string }
             <CardHeader>
               <CardTitle>Detail Pembelian</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-2">
+            <CardContent className="space-y-4">
                 <div className="flex items-center gap-2">
                     <Package className="h-5 w-5 text-muted-foreground" />
                     <span className="font-medium">{tool?.title || 'Alat AI'}</span>
                 </div>
                 <div className="flex items-center gap-2">
                     <Banknote className="h-5 w-5 text-muted-foreground" />
-                    <span className="font-bold text-primary text-lg">Rp {tool?.price?.toLocaleString('id-ID') || '...'}</span>
+                    {isPro ? (
+                        <div className="flex items-center gap-3">
+                            <span className="font-bold text-primary text-lg">Rp {displayPrice.toLocaleString('id-ID')}</span>
+                            <span className="text-md text-muted-foreground line-through">Rp {price.toLocaleString('id-ID')}</span>
+                        </div>
+                    ) : (
+                        <span className="font-bold text-primary text-lg">Rp {displayPrice.toLocaleString('id-ID')}</span>
+                    )}
                 </div>
+                 {isPro && (
+                    <Badge variant="secondary" className="flex gap-1 w-fit">
+                        <Percent className="h-4 w-4" /> Anda hemat 50% sebagai anggota Pro!
+                    </Badge>
+                )}
             </CardContent>
           </Card>
           
@@ -58,7 +77,7 @@ export default function UpgradeToolPage({ params }: { params: { toolId: string }
             <CardHeader>
               <CardTitle>Langkah 1: Lakukan Pembayaran</CardTitle>
               <CardDescription>
-                Silakan transfer sejumlah <span className="font-bold text-primary">Rp {tool?.price?.toLocaleString('id-ID')}</span> ke rekening berikut:
+                Silakan transfer sejumlah <span className="font-bold text-primary">Rp {displayPrice.toLocaleString('id-ID')}</span> ke rekening berikut:
               </CardDescription>
             </CardHeader>
             <CardContent>
