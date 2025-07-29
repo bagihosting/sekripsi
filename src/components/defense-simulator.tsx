@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useFormStatus } from "react-dom";
+import { useFormState, useFormStatus } from "react-dom";
 import { simulateDefense, DefenseSimulatorOutput } from "@/ai/flows/defense-simulator";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,42 +9,42 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Loader2, ShieldQuestion, HelpCircle } from "lucide-react";
 import { Badge } from "./ui/badge";
 
-type SimulatorState = {
+const initialState: {
   result: DefenseSimulatorOutput | null;
   error: string | null;
+} = {
+  result: null,
+  error: null,
 };
 
-export default function DefenseSimulator() {
-  const [state, setState] = useState<SimulatorState>({
-    result: null,
-    error: null,
-  });
-
-  async function handleAction(formData: FormData) {
-    const summary = formData.get("summary") as string;
-    if (!summary) {
-      setState({ result: null, error: "Silakan masukkan abstrak atau ringkasan skripsi." });
-      return;
-    }
-
-    setState({ result: null, error: null });
-
-    try {
-      const result = await simulateDefense({ summary });
-      if (result.questions) {
-        setState({ result, error: null });
-      } else {
-        setState({ result: null, error: "Tidak dapat menghasilkan pertanyaan. Silakan coba lagi." });
-      }
-    } catch (e) {
-      console.error(e);
-      setState({ result: null, error: "Terjadi kesalahan yang tidak terduga. Mohon coba lagi." });
-    }
+async function simulateDefenseAction(
+  prevState: any,
+  formData: FormData
+): Promise<{ result: DefenseSimulatorOutput | null; error: string | null; }> {
+  const summary = formData.get("summary") as string;
+  if (!summary) {
+    return { result: null, error: "Silakan masukkan abstrak atau ringkasan skripsi." };
   }
+
+  try {
+    const result = await simulateDefense({ summary });
+    if (result.questions) {
+      return { result, error: null };
+    } else {
+      return { result: null, error: "Tidak dapat menghasilkan pertanyaan. Silakan coba lagi." };
+    }
+  } catch (e) {
+    console.error(e);
+    return { result: null, error: "Terjadi kesalahan yang tidak terduga. Mohon coba lagi." };
+  }
+}
+
+export default function DefenseSimulator() {
+  const [state, formAction] = useFormState(simulateDefenseAction, initialState);
 
   return (
     <div className="space-y-6">
-      <form action={handleAction} className="space-y-4">
+      <form action={formAction} className="space-y-4">
         <div>
           <Textarea
             name="summary"

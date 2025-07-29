@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useFormStatus } from "react-dom";
+import { useFormState, useFormStatus } from "react-dom";
 import { checkArgument, ArgumentCheckOutput } from "@/ai/flows/argument-checker";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,42 +9,43 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Loader2, BrainCircuit, Lightbulb, MessageSquareQuote, Pencil } from "lucide-react";
 import { Badge } from "./ui/badge";
 
-type ArgumentCheckerState = {
+const initialState: {
   result: ArgumentCheckOutput | null;
   error: string | null;
+} = {
+  result: null,
+  error: null,
 };
 
-export default function ArgumentChecker() {
-  const [state, setState] = useState<ArgumentCheckerState>({
-    result: null,
-    error: null,
-  });
-
-  async function handleAction(formData: FormData) {
-    const text = formData.get("text") as string;
-    if (!text) {
-      setState({ result: null, error: "Silakan masukkan teks argumen Anda." });
-      return;
-    }
-
-    setState({ result: null, error: null });
-
-    try {
-      const result = await checkArgument({ text });
-      if (result.weaknesses) {
-        setState({ result, error: null });
-      } else {
-        setState({ result: null, error: "Tidak dapat menganalisis teks. Silakan coba lagi." });
-      }
-    } catch (e) {
-      console.error(e);
-      setState({ result: null, error: "Terjadi kesalahan yang tidak terduga. Mohon coba lagi." });
-    }
+async function checkArgumentAction(
+  prevState: any,
+  formData: FormData
+): Promise<{ result: ArgumentCheckOutput | null; error: string | null; }> {
+  const text = formData.get("text") as string;
+  if (!text) {
+    return { result: null, error: "Silakan masukkan teks argumen Anda." };
   }
+
+  try {
+    const result = await checkArgument({ text });
+    if (result.weaknesses) {
+      return { result, error: null };
+    } else {
+      return { result: null, error: "Tidak dapat menganalisis teks. Silakan coba lagi." };
+    }
+  } catch (e) {
+    console.error(e);
+    return { result: null, error: "Terjadi kesalahan yang tidak terduga. Mohon coba lagi." };
+  }
+}
+
+
+export default function ArgumentChecker() {
+  const [state, formAction] = useFormState(checkArgumentAction, initialState);
 
   return (
     <div className="space-y-6">
-      <form action={handleAction} className="space-y-4">
+      <form action={formAction} className="space-y-4">
         <div>
           <Textarea
             name="text"
