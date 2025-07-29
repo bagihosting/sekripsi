@@ -34,13 +34,13 @@ export const BottomNavBar = () => {
             <Link
               key={link.href}
               href={link.href}
+              aria-label={link.label}
               className={cn(
-                "flex flex-col items-center justify-center gap-1 text-xs font-medium transition-colors",
+                "flex flex-col items-center justify-center text-xs font-medium transition-colors",
                 isActive ? "text-primary" : "text-muted-foreground hover:text-primary"
               )}
             >
-              <link.icon className="h-5 w-5" />
-              <span>{link.label}</span>
+              <link.icon className="h-6 w-6" />
             </Link>
           );
         })}
