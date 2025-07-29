@@ -16,6 +16,7 @@ export const SiteHeader = () => {
   const navLinks = [
     { href: '/produk', label: 'Produk' },
     { href: '/rekomendasi-ai', label: 'Rekomendasi AI' },
+    { href: '/blog', label: 'Blog' },
     { href: '/dukungan', label: 'Dukungan' },
   ];
 
