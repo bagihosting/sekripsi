@@ -66,7 +66,7 @@ export default function Home() {
 
 const HeroSection = () => (
   <section className="w-full">
-    <div className="container flex min-h-[calc(90dvh-4rem)] items-center text-center max-w-screen-xl">
+    <div className="container flex min-h-[calc(80dvh-4rem)] items-center text-center max-w-screen-xl">
       <div className="mx-auto max-w-4xl">
         <h1 className="font-headline text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
           Lulus 3.5 Tahun Bukan Mimpi! Taklukkan Skripsimu Sekarang.
@@ -134,7 +134,9 @@ const CtaSection = () => (
                 </p>
                 <Button size="lg" className="mt-8" asChild>
                     <Link href="/harga">
-                        Lihat Paket & Upgrade Sekarang <ArrowRight className="ml-2 h-5 w-5" />
+                        <span className="sm:hidden">Lihat Paket & Upgrade</span>
+                        <span className="hidden sm:inline">Lihat Paket & Upgrade Sekarang</span>
+                        <ArrowRight className="ml-2 h-5 w-5" />
                     </Link>
                 </Button>
             </div>

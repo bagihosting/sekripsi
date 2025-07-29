@@ -138,7 +138,10 @@ export const SiteHeader = () => {
                 <Link href="/login">Login</Link>
               </Button>
                <Button asChild>
-                <Link href="/register">Daftar Gratis</Link>
+                 <Link href="/register">
+                  <span className="sm:hidden">Daftar</span>
+                  <span className="hidden sm:inline">Daftar Gratis</span>
+                </Link>
               </Button>
             </>
           )}
@@ -147,7 +150,7 @@ export const SiteHeader = () => {
              <Button asChild size="sm" className="hidden sm:flex items-center gap-1">
                 <Link href="/harga">
                   <Star className="h-4 w-4 fill-current" />
-                  <span className="sm:hidden lg:inline-block">Upgrade ke Pro</span>
+                  <span className="hidden lg:inline-block">Upgrade ke Pro</span>
                 </Link>
               </Button>
           )}
