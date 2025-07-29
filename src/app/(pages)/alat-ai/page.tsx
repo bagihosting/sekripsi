@@ -1,34 +1,84 @@
 
+'use client';
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Lock, Star } from 'lucide-react';
 import Link from 'next/link';
 import type { LucideIcon } from 'lucide-react';
 import { aiToolGroups, AiTool } from '@/lib/plugins';
+import { useAuth } from '@/hooks/use-auth';
+import { useRouter } from 'next/navigation';
+import { Badge } from '@/components/ui/badge';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
-function ToolCard({ icon: Icon, title, description, href, badge }: AiTool) {
+function ToolCard({ tool }: { tool: AiTool }) {
+  const { userProfile } = useAuth();
+  const router = useRouter();
+  const isProFeature = tool.availability === 'pro';
+  const hasAccess = !isProFeature || userProfile?.plan === 'pro';
+
+  const handleClick = (e: React.MouseEvent) => {
+    if (!hasAccess) {
+      e.preventDefault();
+      router.push('/harga');
+    }
+  };
+
+  const buttonContent = (
+    <div className="flex items-center">
+      {hasAccess ? (
+        <>
+          Gunakan Alat <ArrowRight className="ml-2 h-4 w-4" />
+        </>
+      ) : (
+        <>
+          <Lock className="mr-2 h-4 w-4" /> Upgrade untuk Akses
+        </>
+      )}
+    </div>
+  );
+
   return (
     <Card className="flex flex-col justify-between transition-all hover:shadow-lg hover:-translate-y-1">
-      <CardHeader>
+       <CardHeader>
         <div className="flex items-center justify-between">
             <div className="bg-primary/10 text-primary p-3 rounded-lg">
-                 <Icon className="h-8 w-8" />
+                 <tool.icon className="h-8 w-8" />
             </div>
-            {badge && (
-                <div className="rounded-full bg-accent px-3 py-1 text-xs font-semibold text-accent-foreground">{badge}</div>
-            )}
+            <div className="flex gap-2">
+              {isProFeature && (
+                  <Badge variant="secondary" className="flex items-center gap-1 border-yellow-400/50">
+                      <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" /> PRO
+                  </Badge>
+              )}
+              {tool.badge && (
+                  <Badge variant="secondary">{tool.badge}</Badge>
+              )}
+            </div>
         </div>
-        <CardTitle className="pt-4 font-headline text-xl">{title}</CardTitle>
+        <CardTitle className="pt-4 font-headline text-xl">{tool.title}</CardTitle>
       </CardHeader>
       <CardContent className="flex-grow">
-        <p className="text-muted-foreground text-sm">{description}</p>
+        <p className="text-muted-foreground text-sm">{tool.description}</p>
       </CardContent>
       <div className="p-6 pt-0">
-        <Button asChild className="w-full">
-          <Link href={href}>
-            Gunakan Alat <ArrowRight className="ml-2 h-4 w-4" />
-          </Link>
-        </Button>
+         <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button asChild className="w-full" variant={hasAccess ? 'default' : 'secondary'}>
+                  <Link href={hasAccess ? tool.href : '/harga'} onClick={handleClick}>
+                     {buttonContent}
+                  </Link>
+              </Button>
+            </TooltipTrigger>
+            {!hasAccess && (
+              <TooltipContent>
+                <p>Fitur ini hanya tersedia untuk pengguna Pro.</p>
+              </TooltipContent>
+            )}
+          </Tooltip>
+        </TooltipProvider>
       </div>
     </Card>
   );
@@ -53,7 +103,7 @@ export default function AiToolsPage() {
             </div>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {group.tools.map((tool) => (
-                <ToolCard key={tool.href} {...tool} />
+                <ToolCard key={tool.href} tool={tool} />
               ))}
             </div>
           </div>
