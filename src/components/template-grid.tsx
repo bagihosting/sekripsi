@@ -1,8 +1,9 @@
 
+
 "use client";
 
 import { useState, useMemo } from 'react';
-import { Template } from '@/lib/data';
+import { DigitalProduct } from '@/lib/data';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
 import Image from 'next/image';
@@ -10,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Label } from '@/components/ui/label';
 
-export default function TemplateGrid({ templates }: { templates: Template[] }) {
+export default function TemplateGrid({ templates }: { templates: DigitalProduct[] }) {
   const [category, setCategory] = useState('all');
   const [sort, setSort] = useState('name-asc');
 
@@ -28,10 +29,6 @@ export default function TemplateGrid({ templates }: { templates: Template[] }) {
 
     return filtered.sort((a, b) => {
       switch (sort) {
-        case 'price-asc':
-          return a.price - b.price;
-        case 'price-desc':
-          return b.price - a.price;
         case 'name-asc':
           return a.name.localeCompare(b.name);
         case 'name-desc':
@@ -67,8 +64,6 @@ export default function TemplateGrid({ templates }: { templates: Template[] }) {
             <SelectContent>
               <SelectItem value="name-asc">Name (A-Z)</SelectItem>
               <SelectItem value="name-desc">Name (Z-A)</SelectItem>
-              <SelectItem value="price-asc">Price (Low to High)</SelectItem>
-              <SelectItem value="price-desc">Price (High to Low)</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -86,7 +81,7 @@ export default function TemplateGrid({ templates }: { templates: Template[] }) {
   );
 }
 
-const TemplateCard = ({ template }: { template: Template }) => (
+const TemplateCard = ({ template }: { template: DigitalProduct }) => (
   <Card className="group overflow-hidden rounded-lg shadow-sm transition-all hover:shadow-lg hover:-translate-y-1">
     <CardContent className="p-0">
       <Link href={`/produk/${template.id}`} className="focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-t-lg">

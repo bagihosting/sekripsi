@@ -1,12 +1,13 @@
 
+
 'use client';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowRight, Lock, Star } from 'lucide-react';
+import { ArrowRight, Lock, Star, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import type { LucideIcon } from 'lucide-react';
-import { aiToolGroups, AiTool } from '@/lib/plugins';
+import { aiToolGroups, allAiTools, AiTool } from '@/lib/plugins';
 import { useAuth } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
@@ -85,30 +86,92 @@ function ToolCard({ tool }: { tool: AiTool }) {
 }
 
 export default function AiToolsPage() {
+  const { userProfile } = useAuth();
+
+  const getVisibleTools = () => {
+    if (!userProfile) {
+      // Show only free tools for logged-out users
+      return allAiTools.filter(tool => tool.availability === 'free');
+    }
+    // Show tools that the user has activated
+    return allAiTools.filter(tool => userProfile.activatedTools?.includes(tool.id));
+  };
+
+  const visibleTools = getVisibleTools();
+  const visibleToolIds = new Set(visibleTools.map(t => t.id));
+
+  const filteredToolGroups = aiToolGroups
+    .map(group => ({
+      ...group,
+      tools: group.tools.filter(tool => visibleToolIds.has(tool.id)),
+    }))
+    .filter(group => group.tools.length > 0);
+  
+  if (!userProfile) {
+    return (
+       <div className="container max-w-screen-xl py-12 lg:py-16">
+        <div className="mx-auto mb-12 max-w-3xl text-center">
+          <h1 className="font-headline text-3xl font-bold md:text-4xl lg:text-5xl">Pusat Senjata AI sekripsi.com</h1>
+          <p className="mt-4 text-lg text-foreground/70">
+            Silakan <Link href="/login" className="text-primary font-bold hover:underline">login</Link> atau <Link href="/register" className="text-primary font-bold hover:underline">daftar</Link> untuk melihat semua alat yang tersedia dan mengaktifkan fitur-fitur canggih.
+          </p>
+        </div>
+         <div className="space-y-12">
+            {aiToolGroups.map((group, groupIndex) => (
+              <div key={groupIndex}>
+                <div className="mb-8">
+                  <h2 className="font-headline text-2xl font-bold md:text-3xl">{group.title}</h2>
+                  <p className="mt-2 text-md text-foreground/70">{group.description}</p>
+                </div>
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                  {group.tools.map((tool) => (
+                    <ToolCard key={tool.href} tool={tool} />
+                  ))}
+                </div>
+              </div>
+            ))}
+         </div>
+      </div>
+    )
+  }
+
   return (
     <div className="container max-w-screen-xl py-12 lg:py-16">
       <div className="mx-auto mb-12 max-w-3xl text-center">
-        <h1 className="font-headline text-3xl font-bold md:text-4xl lg:text-5xl">Pusat Senjata AI sekripsi.com</h1>
+        <h1 className="font-headline text-3xl font-bold md:text-4xl lg:text-5xl">Pusat Senjata AI-mu</h1>
         <p className="mt-4 text-lg text-foreground/70">
-          Semua yang kamu butuhkan untuk mempercepat kelulusan ada di sini. Pilih alat yang sesuai dengan tahap pengerjaan skripsimu, dari perencanaan hingga persiapan sidang.
+          Semua alat yang telah kamu aktifkan ada di sini. Butuh lebih banyak? <Link href="/produk" className="text-primary font-bold hover:underline">Kunjungi Toko Alat AI</Link> untuk menambah koleksimu.
         </p>
       </div>
 
-      <div className="space-y-12">
-        {aiToolGroups.map((group, groupIndex) => (
-          <div key={groupIndex}>
-            <div className="mb-8">
-              <h2 className="font-headline text-2xl font-bold md:text-3xl">{group.title}</h2>
-              <p className="mt-2 text-md text-foreground/70">{group.description}</p>
-            </div>
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {group.tools.map((tool) => (
-                <ToolCard key={tool.href} tool={tool} />
-              ))}
-            </div>
+       {filteredToolGroups.length > 0 ? (
+          <div className="space-y-12">
+            {filteredToolGroups.map((group, groupIndex) => (
+              <div key={groupIndex}>
+                <div className="mb-8">
+                  <h2 className="font-headline text-2xl font-bold md:text-3xl">{group.title}</h2>
+                  <p className="mt-2 text-md text-foreground/70">{group.description}</p>
+                </div>
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                  {group.tools.map((tool) => (
+                    <ToolCard key={tool.href} tool={tool} />
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+        ) : (
+          <div className="text-center py-16 border rounded-lg bg-card">
+              <Sparkles className="mx-auto h-12 w-12 text-muted-foreground" />
+              <h3 className="mt-4 text-lg font-medium">Koleksi Alat AI Anda Masih Kosong</h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Kunjungi toko untuk mulai menambahkan alat-alat canggih.
+              </p>
+              <Button asChild className="mt-6">
+                <Link href="/produk">Kunjungi Toko Alat AI</Link>
+              </Button>
+          </div>
+        )}
     </div>
   );
 }

@@ -6,7 +6,7 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, up
 import { auth, db } from '@/lib/firebase';
 import { createUserProfile } from './firestore';
 import { redirect } from 'next/navigation';
-import { collection, doc, setDoc, serverTimestamp, updateDoc, addDoc, deleteDoc, getDoc } from 'firebase/firestore';
+import { collection, doc, setDoc, serverTimestamp, updateDoc, addDoc, deleteDoc, getDoc, arrayUnion } from 'firebase/firestore';
 import { uploadToCloudinary } from './cloudinary';
 import { revalidatePath } from 'next/cache';
 
@@ -342,4 +342,38 @@ export async function deleteBlogPost(postId: string) {
     
     revalidatePath('/blog');
     revalidatePath('/dashboard');
+}
+
+const activateAiToolSchema = z.object({
+  toolId: z.string(),
+});
+
+export async function activateAiTool(values: z.infer<typeof activateAiToolSchema>) {
+    const user = auth.currentUser;
+    if (!user) {
+        return { error: 'You must be logged in to activate a tool.' };
+    }
+
+    const { toolId } = activateAiToolSchema.parse(values);
+
+    try {
+        const userRef = doc(db, 'users', user.uid);
+        const userDoc = await getDoc(userRef);
+        const userData = userDoc.data();
+
+        if (userData?.plan !== 'pro') {
+            return { error: 'This feature is only for Pro members.' };
+        }
+        
+        await updateDoc(userRef, {
+            activatedTools: arrayUnion(toolId),
+        });
+
+    } catch (error) {
+        console.error("Failed to activate AI tool:", error);
+        return { error: 'Could not activate the tool. Please try again.' };
+    }
+
+    revalidatePath('/alat-ai');
+    return { success: true };
 }
