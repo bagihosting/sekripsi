@@ -1,6 +1,7 @@
 "use client";
 
-import { useFormState, useFormStatus } from "react-dom";
+import { useActionState } from "react";
+import { useFormStatus } from "react-dom";
 import { generateDraft, DraftGeneratorOutput } from "@/ai/flows/draft-generator";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,7 +40,7 @@ async function generateDraftAction(
 }
 
 export default function DraftGenerator() {
-  const [state, formAction] = useFormState(generateDraftAction, initialState);
+  const [state, formAction] = useActionState(generateDraftAction, initialState);
 
   return (
     <div className="space-y-6">
