@@ -4,45 +4,37 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper function to check if a user is an admin
     function isAdmin() {
-      return exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
 
-    // Helper function to check if a user is authenticated
-    function isAuthenticated() {
-      return request.auth != null;
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
     }
 
-    // Users can read/update their own profile. Admins can do anything.
     match /users/{userId} {
-      allow read, update: if request.auth.uid == userId || isAdmin();
-      allow create: if isAuthenticated();
+      allow read, update: if isOwner(userId) || isAdmin();
+      allow create: if request.auth != null;
     }
 
-    // Anyone can read blog posts. Admins can write/delete.
     match /blogPosts/{postId} {
-      allow read: if true;
-      allow write, delete: if isAdmin();
+      allow read: if resource.data.status == 'published' || isAdmin();
+      allow create, update, delete: if isAdmin();
     }
-
-    // Anyone can read AI tools. Admins can write.
+    
     match /ai_tools/{toolId} {
-        allow read: if true;
-        allow write: if isAdmin();
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
     }
-
-    // Anyone can read pricing plans. Admins can write.
+    
     match /pricingPlans/{planId} {
-        allow read: if true;
-        allow write: if isAdmin();
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
     }
 
-    // Authenticated users can create payments. Admins can read/update them.
     match /payments/{paymentId} {
-        allow create: if isAuthenticated();
-        allow read, update: if isAdmin();
+      allow create: if request.auth != null;
+      allow read, update: if isAdmin();
     }
   }
 }
