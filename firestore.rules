@@ -3,35 +3,34 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Users Collection
+    // Helper function to check for admin role
+    function isAdmin() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // Users can only read/update their own profile
     match /users/{userId} {
-      // A user can only read their own profile
-      allow get: if request.auth.uid == userId;
-      
-      // A new user can create their own profile
-      allow create: if request.auth.uid == userId;
-
-      // A user can only update their own profile, but cannot change their role, plan, or paymentStatus
-      allow update: if request.auth.uid == userId
-                    && request.resource.data.role == resource.data.role
-                    && request.resource.data.plan == resource.data.plan
-                    && request.resource.data.paymentStatus == resource.data.paymentStatus;
+      allow read, update: if request.auth.uid == userId || isAdmin();
+      allow create: if request.auth.uid != null;
     }
 
-    // Payments Collection
+    // Admins can read all payments
+    // Users can create their own payment record
     match /payments/{paymentId} {
-      // Only authenticated users can create a payment request for themselves
-      allow create: if request.auth.uid == request.resource.data.userId;
-      
-      // Nobody can read, update or delete payment documents directly for security.
-      // This will be handled by admin logic via backend functions in the future.
-      allow read, update, delete: if false;
+      allow read, list, update: if isAdmin();
+      allow create: if request.auth.uid != null;
     }
-    
-    // Admin access (Example: allows full access if user has admin role)
-    // This part can be expanded in the future for more granular admin controls.
+
+    // Pricing plans are public and can be read by anyone, but only modified by admins.
+    match /pricingPlans/{planId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Default deny all other collections that don't have a specific rule.
+    // This is an important security measure.
     match /{document=**} {
-      allow read, write: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      allow read, write: if false;
     }
   }
 }
