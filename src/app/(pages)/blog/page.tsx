@@ -26,7 +26,7 @@ function processBlogPost(doc: FirebaseFirestore.DocumentSnapshot): BlogPost {
 async function getBlogPosts(): Promise<BlogPost[]> {
     if (!adminDb) return [];
     const postsCollection = adminDb.collection('blogPosts');
-    // Query only for published posts first to avoid needing a composite index during build.
+    // Query only for published posts to avoid needing a composite index during build.
     const q = postsCollection.where('status', '==', 'published');
     const querySnapshot = await q.get();
 
