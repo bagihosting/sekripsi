@@ -8,11 +8,11 @@ import { createUserProfile, UserProfile } from './firestore';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { uploadToCloudinary } from './cloudinary';
-import { getToolById } from './plugins';
 import { cookies } from 'next/headers';
 import { adminAuth, adminDb } from '@/lib/firebase-admin';
 import { FieldValue, Timestamp } from 'firebase-admin/firestore';
 import { RecentUpgrade } from '@/components/recent-upgrade-toast';
+import { AiTool } from './plugins';
 
 const registerSchema = z.object({
   email: z.string().email(),
@@ -478,5 +478,38 @@ export async function getRecentUpgrades(): Promise<RecentUpgrade[]> {
     } catch (error) {
         console.error("Error fetching recent upgrades:", error);
         return [];
+    }
+}
+
+export async function getToolById(id: string): Promise<AiTool | null> {
+    if (!adminDb) {
+        console.warn(`Admin DB not initialized. Cannot fetch tool ${id}.`);
+        return null;
+    }
+    try {
+        const toolRef = adminDb.collection('ai_tools').doc(id);
+        const toolSnap = await toolRef.get();
+
+        if (!toolSnap.exists) {
+            console.warn(`Tool with id ${id} not found in Firestore.`);
+            return null;
+        }
+
+        const data = toolSnap.data();
+        if (!data) return null;
+
+        return {
+            id: toolSnap.id,
+            icon: data.icon as string,
+            title: data.title,
+            description: data.description,
+            href: data.href,
+            category: data.category,
+            badge: data.badge,
+            price: data.price,
+        } as AiTool;
+    } catch (error) {
+        console.error(`Error fetching tool with id ${id} with Admin SDK:`, error);
+        return null;
     }
 }

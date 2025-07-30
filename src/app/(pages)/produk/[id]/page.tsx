@@ -1,5 +1,5 @@
 
-import { getToolById, AiTool, iconMap } from '@/lib/plugins';
+import { getAllTools, AiTool, iconMap } from '@/lib/plugins';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -14,7 +14,10 @@ type Props = {
 // This Server Component fetches the data.
 export default async function ProductDetailPage({ params }: Props) {
   const { id } = params;
-  const product = await getToolById(id);
+  // Fetching all tools is efficient here as they are likely cached.
+  // This avoids a dedicated DB call for a single item on a server component.
+  const products = await getAllTools();
+  const product = products.find(p => p.id === id);
 
   if (!product) {
     notFound();

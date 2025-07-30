@@ -5,11 +5,12 @@ import { useEffect, useState } from 'react';
 import UpgradeForm from '@/components/upgrade-form';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Banknote, Package, Percent } from 'lucide-react';
-import { getToolById } from '@/lib/plugins';
+import { getToolById } from '@/lib/actions';
 import type { AiTool } from '@/lib/plugins';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/hooks/use-auth';
 import { Badge } from '@/components/ui/badge';
+import { notFound } from 'next/navigation';
 
 export default function UpgradeToolPage({ params }: { params: { toolId: string } }) {
   const [tool, setTool] = useState<AiTool | null>(null);
@@ -19,6 +20,9 @@ export default function UpgradeToolPage({ params }: { params: { toolId: string }
   useEffect(() => {
     async function fetchTool() {
       const fetchedTool = await getToolById(params.toolId);
+      if (!fetchedTool) {
+        notFound();
+      }
       setTool(fetchedTool);
       setLoading(false);
     }

@@ -89,34 +89,6 @@ export async function getAllTools(): Promise<AiTool[]> {
   }
 }
 
-// Function to get a single tool by ID from Firestore, returning icon as a string
-export async function getToolById(id: string): Promise<AiTool | null> {
-    if (!adminDb) {
-        console.warn(`Admin DB not initialized. Cannot fetch tool ${id}.`);
-        const tool = initialTools.find(t => t.id === id) || null;
-        return tool;
-    }
-    try {
-        const toolRef = adminDb.collection('ai_tools').doc(id);
-        const toolSnap = await toolRef.get();
-
-        if (!toolSnap.exists) {
-            console.warn(`Tool with id ${id} not found in Firestore.`);
-            return null;
-        }
-
-        const data = toolSnap.data();
-        return {
-            ...data,
-            id: toolSnap.id,
-            icon: data.icon as string,
-        } as AiTool;
-    } catch (error) {
-        console.error(`Error fetching tool with id ${id} with Admin SDK:`, error);
-        return null;
-    }
-}
-
 export function groupTools(tools: AiTool[]): AiToolGroup[] {
   const groups: { [key: string]: AiTool[] } = {};
   
