@@ -1,4 +1,3 @@
-
 'use client';
 
 import { SiteFooter } from "@/components/site-footer";
@@ -10,7 +9,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import type { AiTool } from "@/lib/types";
 
-const specialLayoutRoutes = ['/login', '/register', '/upgrade'];
+const specialLayoutRoutes = ['/login', '/register'];
 const dashboardRoute = '/dashboard';
 
 interface MainLayoutProps {
@@ -22,8 +21,10 @@ export default function MainLayout({ children, aiToolsLinks }: MainLayoutProps) 
   const pathname = usePathname();
   const isMobile = useIsMobile();
   
+  const isSpecialRoute = specialLayoutRoutes.some(route => pathname.startsWith(route)) || pathname.startsWith('/upgrade');
+
   // Special layout for login, register, upgrade
-  if (specialLayoutRoutes.some(route => pathname.startsWith(route))) {
+  if (isSpecialRoute) {
     return (
       <>
         {children}
