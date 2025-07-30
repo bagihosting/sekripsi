@@ -9,7 +9,7 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import {z} from 'zod';
 
 const AbstractGeneratorInputSchema = z.object({
   background: z.string().describe('The background and objectives of the research.'),

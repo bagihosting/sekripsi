@@ -9,7 +9,7 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import {z} from 'zod';
 
 const SpssGuideInputSchema = z.object({
   problemDescription: z.string().describe('A description of the research problem or the data analysis needed.'),

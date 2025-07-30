@@ -9,7 +9,7 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import {z} from 'zod';
 
 const StoryGeneratorInputSchema = z.object({
   prompt: z.string().describe('The prompt or idea for the story.'),

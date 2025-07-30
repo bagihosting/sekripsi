@@ -9,7 +9,7 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import {z} from 'zod';
 
 const DefenseSimulatorInputSchema = z.object({
   summary: z.string().describe('The abstract or summary of the thesis.'),

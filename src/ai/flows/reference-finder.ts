@@ -9,7 +9,7 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import {z} from 'zod';
 
 const FindReferencesInputSchema = z.object({
   topic: z.string().describe('The research topic to find references for.'),

@@ -9,7 +9,7 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import {z} from 'zod';
 
 const GenerateOutlineInputSchema = z.object({
   topic: z.string().describe('The main topic or title of the thesis.'),
