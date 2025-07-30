@@ -1,3 +1,4 @@
+
 import type { AiTool } from './plugins';
 
 export const initialTools: AiTool[] = [
