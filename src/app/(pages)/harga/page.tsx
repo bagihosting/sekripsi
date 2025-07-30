@@ -1,9 +1,10 @@
 
-import { getPricingPlans } from '@/lib/plans';
-import PricingClientPage from '../harga-client-page';
+import { getPricingPlans } from '@/lib/actions';
+import PricingClientPage from '@/app/(pages)/harga-client-page';
+import type { PricingPlan } from '@/lib/types';
 
 export default async function HargaPage() {
-  const plans = await getPricingPlans();
+  const plans = await getPricingPlans() || [];
 
   return <PricingClientPage plans={plans} />;
 }

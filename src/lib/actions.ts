@@ -6,9 +6,9 @@ import { cookies } from 'next/headers';
 import { adminAuth, adminDb } from '@/lib/firebase-admin';
 import { FieldValue, Timestamp } from 'firebase-admin/firestore';
 import type { RecentUpgrade, AiTool, UserProfile, BlogPost, Payment, PricingPlan } from './types';
-import { initialTools } from './initial-data';
-import { getUserProfile } from './user-actions';
-import { uploadToCloudinary } from './cloudinary';
+import { initialTools, defaultPlans } from '@/lib/initial-data';
+import { getUserProfile } from '@/lib/user-actions';
+import { uploadToCloudinary } from '@/lib/cloudinary';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
@@ -36,6 +36,40 @@ const profileUpdateSchema = z.object({
     password: z.string().min(6, { message: 'Password baru harus minimal 6 karakter.' }).optional().or(z.literal('')),
     photo: fileSchema.optional(),
 });
+
+const pricingPlanSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  price: z.string(),
+  priceDescription: z.string(),
+  features: z.array(z.string()),
+  isRecommended: z.boolean(),
+});
+
+const blogPostSchema = z.object({
+  title: z.string().min(1, { message: 'Judul harus diisi.' }),
+  slug: z.string().min(1, { message: 'Slug harus diisi.' }),
+  content: z.string().min(1, { message: 'Konten harus diisi.' }),
+  category: z.string().min(1, { message: 'Kategori harus diisi.' }),
+  status: z.enum(['draft', 'published']),
+  image: fileSchema.optional(),
+  postId: z.string().optional(),
+  currentImageUrl: z.string().optional(),
+});
+
+const aiToolSchema = z.object({
+  id: z.string().min(1),
+  title: z.string().min(1),
+  description: z.string().min(1),
+  price: z.coerce.number().min(0),
+});
+
+const confirmPaymentSchema = z.object({
+  paymentId: z.string(),
+  userId: z.string(),
+  toolId: z.string().optional(),
+});
+
 
 // ========== Authentication Actions ==========
 
@@ -89,7 +123,8 @@ export async function login(values: z.infer<typeof loginSchema>) {
         return { error: 'Konfigurasi server Firebase tidak lengkap.' };
     }
     try {
-        const { email, password } = loginSchema.parse(values);
+        const validatedValues = loginSchema.parse(values);
+        const { email, password } = validatedValues;
         // This is a simplified login for demo. In a real app, you'd verify password.
         // For this app, we'll get the user and create a custom token, then session.
         // NOTE: This approach is NOT standard password verification. 
@@ -288,12 +323,6 @@ export async function updateUserProfile(formData: FormData) {
 
 // ========== Admin Actions ==========
 
-const confirmPaymentSchema = z.object({
-  paymentId: z.string(),
-  userId: z.string(),
-  toolId: z.string().optional(),
-});
-
 export async function confirmPayment(values: z.infer<typeof confirmPaymentSchema>) {
     if (!adminDb) {
       return { error: "Konfigurasi server Firebase tidak lengkap." };
@@ -348,15 +377,6 @@ export async function confirmPayment(values: z.infer<typeof confirmPaymentSchema
     return { success: true };
 }
 
-const pricingPlanSchema = z.object({
-  id: z.string().min(1),
-  name: z.string().min(1),
-  price: z.string(),
-  priceDescription: z.string(),
-  features: z.array(z.string()),
-  isRecommended: z.boolean(),
-});
-
 export async function updatePricingPlan(formData: FormData) {
     if (!adminDb) {
       return { error: "Konfigurasi server Firebase tidak lengkap." };
@@ -390,17 +410,6 @@ export async function updatePricingPlan(formData: FormData) {
     revalidatePath('/dashboard');
     return { success: true };
 }
-
-const blogPostSchema = z.object({
-  title: z.string().min(1, { message: 'Judul harus diisi.' }),
-  slug: z.string().min(1, { message: 'Slug harus diisi.' }),
-  content: z.string().min(1, { message: 'Konten harus diisi.' }),
-  category: z.string().min(1, { message: 'Kategori harus diisi.' }),
-  status: z.enum(['draft', 'published']),
-  image: fileSchema.optional(),
-  postId: z.string().optional(),
-  currentImageUrl: z.string().optional(),
-});
 
 export async function saveBlogPost(formData: FormData) {
     if (!adminDb) {
@@ -488,13 +497,6 @@ export async function deleteBlogPost(postId: string) {
     return { success: true, postId };
 }
 
-const aiToolSchema = z.object({
-  id: z.string().min(1),
-  title: z.string().min(1),
-  description: z.string().min(1),
-  price: z.coerce.number().min(0),
-});
-
 export async function updateAiTool(formData: FormData) {
     if (!adminDb) {
       return { error: "Konfigurasi server Firebase tidak lengkap." };
@@ -564,9 +566,11 @@ export async function getRecentUpgrades(): Promise<RecentUpgrade[]> {
 export async function getBlogPosts(): Promise<BlogPost[] | null> {
     if (!adminDb) return null;
     try {
-        const q = adminDb.collection('blogPosts').orderBy('createdAt', 'desc');
+        const postsCollection = adminDb.collection('blogPosts');
+        const q = postsCollection.where('status', '==', 'published');
         const querySnapshot = await q.get();
-        return querySnapshot.docs.map(doc => {
+
+        const posts = querySnapshot.docs.map(doc => {
             const data = doc.data();
             return {
                 id: doc.id,
@@ -575,6 +579,11 @@ export async function getBlogPosts(): Promise<BlogPost[] | null> {
                 updatedAt: (data.updatedAt as Timestamp).toDate().toISOString(),
             } as BlogPost;
         });
+        
+        posts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+        return posts;
+
     } catch (error) {
         console.error("Error getting blog posts:", error);
         return null;
@@ -601,7 +610,7 @@ export async function getPendingPayments(): Promise<Payment[] | null> {
 }
 
 
-export async function getAllTools(): Promise<AiTool[] | null> {
+export async function getAllTools(): Promise<AiTool[]> {
   if (!adminDb) {
      console.warn("Admin DB not initialized. Returning initial tools.");
      return initialTools;
@@ -611,14 +620,12 @@ export async function getAllTools(): Promise<AiTool[] | null> {
     let toolsSnapshot = await toolsCollection.get();
     
     if (toolsSnapshot.empty) {
-        console.warn("No AI tools found in Firestore. Seeding initial toolset...");
         const batch = adminDb.batch();
         initialTools.forEach(tool => {
             const docRef = toolsCollection.doc(tool.id);
             batch.set(docRef, tool);
         });
         await batch.commit();
-        console.log("Seeding complete. Refetching tools...");
         toolsSnapshot = await toolsCollection.get();
     }
     
@@ -633,22 +640,29 @@ export async function getAllTools(): Promise<AiTool[] | null> {
     return tools;
   } catch (error) {
     console.error("Error fetching tools from Firestore with Admin SDK:", error);
-    return null;
+    return [];
   }
 }
 
-export async function getPricingPlans(): Promise<PricingPlan[] | null> {
+export async function getPricingPlans(): Promise<PricingPlan[]> {
   if (!adminDb) {
     console.warn("Admin DB not initialized. Can't fetch plans.");
-    return null;
+    return [];
   }
   try {
     const plansCollection = adminDb.collection('pricingPlans');
-    const plansSnapshot = await plansCollection.orderBy('name').get();
+    let plansSnapshot = await plansCollection.get();
 
     if (plansSnapshot.empty) {
-        console.warn("No pricing plans found in Firestore.");
-        return [];
+        const batch = adminDb.batch();
+        defaultPlans.forEach(plan => {
+            const docRef = plansCollection.doc(plan.id);
+            // We remove the 'id' from the object before setting it in Firestore
+            const { id, ...planData } = plan;
+            batch.set(docRef, planData);
+        });
+        await batch.commit();
+        plansSnapshot = await plansCollection.get();
     }
     
     const plans: PricingPlan[] = [];
@@ -662,7 +676,7 @@ export async function getPricingPlans(): Promise<PricingPlan[] | null> {
     return plans;
   } catch (error) {
     console.error("Error fetching pricing plans with Admin SDK:", error);
-    return null;
+    return [];
   }
 }
 
