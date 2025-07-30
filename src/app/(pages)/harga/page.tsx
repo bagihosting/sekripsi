@@ -8,3 +8,5 @@ export default async function HargaPage() {
 
   return <PricingClientPage plans={plans} />;
 }
+
+    

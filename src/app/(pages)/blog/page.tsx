@@ -204,3 +204,5 @@ function HorizontalArticleCard({ post }: PostProps) {
         </Card>
     )
 }
+
+    

@@ -5,11 +5,9 @@ import { z } from 'zod';
 import { cookies } from 'next/headers';
 import { adminAuth, adminDb } from '@/lib/firebase-admin';
 import { FieldValue, Timestamp } from 'firebase-admin/firestore';
-import type { RecentUpgrade, AiTool, UserProfile, BlogPost, Payment, PricingPlan } from './types';
-import { initialTools } from './initial-data';
-import { defaultPlans } from './plans';
-import { getUserProfile } from './user-actions';
-import { uploadToCloudinary } from './cloudinary';
+import type { RecentUpgrade, AiTool, UserProfile, BlogPost, Payment, PricingPlan } from '@/lib/types';
+import { initialTools, defaultPlans } from '@/lib/initial-data';
+import { uploadToCloudinary } from '@/lib/cloudinary';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
@@ -18,11 +16,6 @@ import { redirect } from 'next/navigation';
 const registerSchema = z.object({
   email: z.string().email({ message: 'Email tidak valid.' }),
   password: z.string().min(6, { message: 'Password minimal harus 6 karakter.' }),
-});
-
-const loginSchema = z.object({
-  email: z.string().email({ message: 'Email tidak valid.' }),
-  password: z.string().min(1, { message: 'Password tidak boleh kosong.' }),
 });
 
 const fileSchema = z.instanceof(File)
@@ -119,38 +112,6 @@ export async function register(values: z.infer<typeof registerSchema>) {
   }
 }
 
-export async function login(values: z.infer<typeof loginSchema>) {
-    if (!adminAuth) {
-        return { error: 'Konfigurasi server Firebase tidak lengkap.' };
-    }
-    try {
-        const validatedValues = loginSchema.parse(values);
-        const { email, password } = validatedValues;
-        // This is a simplified login for demo. In a real app, you'd verify password.
-        // For this app, we'll get the user and create a custom token, then session.
-        // NOTE: This approach is NOT standard password verification. 
-        // It's a workaround for custom token flow without client SDK password check.
-        const userRecord = await adminAuth.getUserByEmail(email);
-        const customToken = await adminAuth.createCustomToken(userRecord.uid);
-        
-        // The client will need to sign in with this token, then send the ID token.
-        // This server action is now simplified to just return the token.
-        // The client will handle the rest.
-        return { customToken };
-        
-    } catch (error: any) {
-         if (error instanceof z.ZodError) {
-            return { error: error.errors.map((e) => e.message).join(', ') };
-        }
-        if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
-            return { error: 'Email atau password salah.' };
-        }
-        console.error("Login error:", error);
-        return { error: 'Terjadi kesalahan saat login.' };
-    }
-}
-
-
 export async function createSession(idToken: string) {
     if (!adminAuth) {
         console.error('Admin Auth not initialized');
@@ -178,7 +139,43 @@ export async function logout() {
     redirect('/login');
 }
 
-// ========== User Actions ==========
+// ========== User Profile Actions ==========
+
+function processUserProfileDoc(doc: FirebaseFirestore.DocumentSnapshot): UserProfile | null {
+    if (!doc.exists) {
+        return null;
+    }
+    const data = doc.data()!;
+    const processedData: any = {};
+    for (const key in data) {
+        if (data[key] && typeof data[key].toDate === 'function') {
+            processedData[key] = data[key].toDate().toISOString();
+        } else {
+            processedData[key] = data[key];
+        }
+    }
+
+    return {
+        uid: doc.id,
+        ...processedData,
+    } as UserProfile;
+}
+
+export async function getUserProfile(uid: string): Promise<UserProfile | null> {
+    if (!adminDb) {
+        console.error("Admin DB not initialized. Cannot get user profile.");
+        return null;
+    }
+    try {
+        const userRef = adminDb.collection('users').doc(uid);
+        const userSnap = await userRef.get();
+        return processUserProfileDoc(userSnap);
+    } catch (error) {
+        console.error("Error fetching user profile with Admin SDK:", error);
+        return null;
+    }
+}
+
 
 export async function requestUpgrade(formData: FormData): Promise<{ success: boolean; error?: string; }> {
     if (!adminAuth || !adminDb) {
@@ -567,9 +564,11 @@ export async function getRecentUpgrades(): Promise<RecentUpgrade[]> {
 export async function getBlogPosts(): Promise<BlogPost[] | null> {
     if (!adminDb) return null;
     try {
-        const q = adminDb.collection('blogPosts').orderBy('createdAt', 'desc');
+        const postsCollection = adminDb.collection('blogPosts');
+        const q = postsCollection.orderBy('createdAt', 'desc');
         const querySnapshot = await q.get();
-        return querySnapshot.docs.map(doc => {
+
+        const posts = querySnapshot.docs.map(doc => {
             const data = doc.data();
             return {
                 id: doc.id,
@@ -578,6 +577,9 @@ export async function getBlogPosts(): Promise<BlogPost[] | null> {
                 updatedAt: (data.updatedAt as Timestamp).toDate().toISOString(),
             } as BlogPost;
         });
+
+        return posts;
+
     } catch (error) {
         console.error("Error getting blog posts:", error);
         return null;
@@ -614,14 +616,12 @@ export async function getAllTools(): Promise<AiTool[]> {
     let toolsSnapshot = await toolsCollection.get();
     
     if (toolsSnapshot.empty) {
-        console.warn("No AI tools found in Firestore. Seeding initial toolset...");
         const batch = adminDb.batch();
         initialTools.forEach(tool => {
             const docRef = toolsCollection.doc(tool.id);
             batch.set(docRef, tool);
         });
         await batch.commit();
-        console.log("Seeding complete. Refetching tools...");
         toolsSnapshot = await toolsCollection.get();
     }
     
@@ -650,16 +650,13 @@ export async function getPricingPlans(): Promise<PricingPlan[]> {
     let plansSnapshot = await plansCollection.get();
 
     if (plansSnapshot.empty) {
-        console.warn("No pricing plans found in Firestore. Seeding default plans...");
         const batch = adminDb.batch();
         defaultPlans.forEach(plan => {
             const docRef = plansCollection.doc(plan.id);
-            // We remove the 'id' from the object before setting it in Firestore
             const { id, ...planData } = plan;
             batch.set(docRef, planData);
         });
         await batch.commit();
-        console.log("Seeding complete. Refetching plans...");
         plansSnapshot = await plansCollection.get();
     }
     
@@ -725,3 +722,5 @@ export async function getSession(): Promise<{ userProfile: UserProfile | null }>
     return { userProfile: null };
   }
 }
+
+    

@@ -150,8 +150,8 @@ export const defaultPlans: PricingPlan[] = [
       price: "Rp 0",
       priceDescription: "selamanya",
       features: [
-        "Akses ke semua 12+ alat AI",
-        "Penggunaan terbatas harian",
+        "Akses ke alat AI gratis",
+        "Beli alat premium secara individual",
         "Dukungan komunitas",
       ],
       actionType: 'current',
@@ -163,10 +163,9 @@ export const defaultPlans: PricingPlan[] = [
       price: "Rp 79.000",
       priceDescription: "/bulan",
       features: [
-        "Semua yang ada di paket Gratis",
-        "Penggunaan tanpa batas",
+        "Akses ke semua 12+ alat AI tanpa batas",
+        "Diskon 50% untuk semua pembelian alat baru",
         "Prioritas pemrosesan AI",
-        "Akses ke fitur & alat beta",
         "Dukungan prioritas via email",
       ],
       actionType: 'auth_action',
@@ -183,7 +182,6 @@ export const defaultPlans: PricingPlan[] = [
         "Manajemen multi-akun untuk tim",
         "Analitik penggunaan",
         "Dukungan khusus",
-        "Kustomisasi model AI (add-on)",
       ],
       actionType: 'link',
       actionLink: '/dukungan',
@@ -191,3 +189,5 @@ export const defaultPlans: PricingPlan[] = [
       isRecommended: false,
     },
 ];
+
+    
