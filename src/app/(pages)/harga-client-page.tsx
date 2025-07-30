@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useAuth } from "@/hooks/use-auth";
 import { Check, Star } from "lucide-react";
 import { useRouter } from "next/navigation";
-import type { PricingPlan } from "@/lib/firestore";
+import type { PricingPlan } from "@/lib/types";
 
 interface PricingClientPageProps {
   plans: PricingPlan[];
