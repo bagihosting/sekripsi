@@ -81,6 +81,17 @@ Nilai ini **sangat rahasia** dan hanya boleh ada di server Anda. Kunci ini membe
 4.  **Salin seluruh konten file JSON tersebut**, mulai dari `{` hingga `}`.
 5.  Tempelkan konten tersebut sebagai nilai untuk `FIREBASE_SERVICE_ACCOUNT_KEY` di file `.env` Anda. **PENTING:** Pastikan seluruh konten JSON berada di dalam tanda kutip tunggal (`'...'`) agar dapat dibaca sebagai satu baris string oleh sistem.
 
+#### C. Kredensial Google AI (Gemini API Key) - RAHASIA
+
+Nilai ini diperlukan agar semua fitur berbasis AI di aplikasi ini dapat berfungsi. Kunci ini digunakan untuk mengakses model bahasa Gemini dari Google.
+
+1.  Buka [Google AI Studio](https://aistudio.google.com/).
+2.  Login dengan akun Google Anda.
+3.  Klik tombol **"Get API key"** di pojok kiri atas.
+4.  Klik **"Create API key in new project"**.
+5.  Salin kunci API yang muncul.
+6.  Tempelkan kunci tersebut sebagai nilai untuk `GEMINI_API_KEY` di file `.env` Anda.
+
 #### Contoh Isi File `.env`
 
 ```
@@ -93,6 +104,9 @@ NEXT_PUBLIC_FIREBASE_PROJECT_ID=...
 # Kredensial Firebase Admin (Sisi Server) - RAHASIA!
 # Salin seluruh isi file JSON service account ke sini di dalam tanda kutip tunggal.
 FIREBASE_SERVICE_ACCOUNT_KEY='{"type": "service_account", "project_id": "...", ...}'
+
+# Kredensial Google AI (Gemini) - RAHASIA!
+GEMINI_API_KEY=...
 
 # Kredensial Cloudinary (Opsional, jika menggunakan)
 CLOUDINARY_CLOUD_NAME=...
