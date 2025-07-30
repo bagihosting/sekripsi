@@ -1,4 +1,3 @@
-
 // This is a CLIENT-SAFE version of the admin SDK initialization.
 // It allows read-only operations like onSnapshot from the client
 // for admin-like views, but ONLY if the user is authenticated as an admin.
@@ -20,7 +19,8 @@ const firebaseConfig = {
 };
 
 let app;
-if (!getApps().length) {
+// Check if the "admin-client" app has already been initialized
+if (!getApps().some(app => app.name === 'admin-client')) {
     app = initializeApp(firebaseConfig, "admin-client");
 } else {
     app = getApp("admin-client");
