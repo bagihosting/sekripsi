@@ -125,10 +125,9 @@ export default async function BlogPostPage({ params }: Props) {
                     </div>
                 )}
                 
-                <div
-                    className="prose prose-lg dark:prose-invert max-w-none"
-                    dangerouslySetInnerHTML={{ __html: post.content.replace(/\n/g, '<br />') }} 
-                />
+                <div className="prose prose-lg dark:prose-invert max-w-none">
+                    <p className="whitespace-pre-wrap">{post.content}</p>
+                </div>
             </article>
         </div>
     );
