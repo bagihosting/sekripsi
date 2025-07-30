@@ -3,7 +3,7 @@
 
 import { useTransition } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { login, register, createSession } from '@/lib/actions';
+import { register, createSession } from '@/lib/actions';
 import { signInWithEmailAndPassword, signInWithCustomToken, getIdToken } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
@@ -22,30 +22,41 @@ export default function AuthFormContainer({ mode }: AuthFormContainerProps) {
 
   const handleLogin = (values: LoginFormValues) => {
     startTransition(async () => {
-      // First, sign in with email and password on the client to verify credentials
+      if (!auth) {
+        toast({ title: 'Login Gagal', description: 'Layanan autentikasi tidak tersedia.', variant: 'destructive' });
+        return;
+      }
+      // First, sign in with email and password on the client to get an ID token
       try {
-        await signInWithEmailAndPassword(auth, values.email, values.password);
+        const userCredential = await signInWithEmailAndPassword(auth, values.email, values.password);
+        const idToken = await getIdToken(userCredential.user);
+        
+        // Then, pass the ID token to the server to create a session cookie
+        const sessionResult = await createSession(idToken);
+        
+        if (sessionResult?.error) {
+          throw new Error(sessionResult.error);
+        }
+
+        router.push('/dashboard');
+        toast({ title: 'Login Berhasil!', description: 'Selamat datang kembali.' });
       } catch (error: any) {
         if (error.code === 'auth/invalid-credential') {
           toast({ title: 'Login Gagal', description: 'Email atau password salah.', variant: 'destructive' });
         } else {
+          console.error("Login error:", error);
           toast({ title: 'Login Gagal', description: 'Terjadi kesalahan. Silakan coba lagi.', variant: 'destructive' });
         }
-        return;
-      }
-      
-      // If successful, get the ID token
-      if (auth.currentUser) {
-        const idToken = await getIdToken(auth.currentUser);
-        await createSession(idToken); // Create server session
-        router.push('/dashboard');
-        toast({ title: 'Login Berhasil!', description: 'Selamat datang kembali.' });
       }
     });
   };
 
   const handleRegister = (values: RegisterFormValues) => {
     startTransition(async () => {
+       if (!auth) {
+        toast({ title: 'Registrasi Gagal', description: 'Layanan autentikasi tidak tersedia.', variant: 'destructive' });
+        return;
+      }
       // Create user via server action
       const result = await register(values);
       if (result?.error) {
@@ -77,3 +88,5 @@ export default function AuthFormContainer({ mode }: AuthFormContainerProps) {
 
   return <RegisterForm onSubmit={handleRegister} isPending={isPending} />;
 }
+
+    

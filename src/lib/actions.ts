@@ -29,6 +29,7 @@ export async function register(values: z.infer<typeof registerSchema>) {
     const userRecord = await adminAuth.createUser({
       email,
       password,
+      displayName: email.split('@')[0] || 'User',
     });
     
     // Create user profile in Firestore
@@ -54,55 +55,27 @@ export async function register(values: z.infer<typeof registerSchema>) {
     if (error.code === 'auth/email-already-exists') {
       return { error: 'Email ini sudah terdaftar.' };
     }
+    console.error("Registration error:", error);
     return {
       error: 'Terjadi kesalahan saat mendaftar. Silakan coba lagi.',
     };
   }
 }
 
-const loginSchema = z.object({
-  email: z.string().email(),
-});
-
-// This action doesn't validate password, it just gets the UID for a given email.
-// The actual login happens on the client with the password.
-// This is a simplified approach to avoid complex server-side password validation logic for this use case.
-export async function login(values: z.infer<typeof loginSchema>) {
-    if (!adminAuth) {
-      return { error: 'Konfigurasi server Firebase tidak lengkap.' };
-    }
-    try {
-        const validatedValues = loginSchema.parse(values);
-        const { email } = validatedValues;
-        
-        // Get user record by email
-        const userRecord = await adminAuth.getUserByEmail(email);
-
-        // Generate custom token for client-side sign-in
-        const customToken = await adminAuth.createCustomToken(userRecord.uid);
-        return { customToken };
-
-    } catch (error: any) {
-        if (error.code === 'auth/user-not-found') {
-             return { error: 'Email atau password salah.' };
-        }
-        return {
-            error: 'Terjadi kesalahan saat login. Silakan coba lagi.',
-        };
-    }
-}
 
 export async function createSession(idToken: string) {
     if (!adminAuth) {
         console.error('Admin Auth not initialized');
-        return;
+        return { error: 'Authentication service not configured.' };
     }
     const expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 days
     try {
         const sessionCookie = await adminAuth.createSessionCookie(idToken, { expiresIn });
         cookies().set('session', sessionCookie, { maxAge: expiresIn, httpOnly: true, secure: true });
+        return { success: true };
     } catch (error) {
         console.error('Failed to create session:', error);
+        return { error: 'Failed to create session.' };
     }
 }
 
@@ -601,3 +574,5 @@ export async function getSession(): Promise<{ userProfile: UserProfile | null }>
     return { userProfile: null };
   }
 }
+
+    
