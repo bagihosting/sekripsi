@@ -608,11 +608,18 @@ export async function getAllTools(): Promise<AiTool[] | null> {
   }
   try {
     const toolsCollection = adminDb.collection('ai_tools');
-    const toolsSnapshot = await toolsCollection.get();
+    let toolsSnapshot = await toolsCollection.get();
     
     if (toolsSnapshot.empty) {
-        console.warn("No AI tools found in Firestore. Returning initial toolset.");
-        return initialTools;
+        console.warn("No AI tools found in Firestore. Seeding initial toolset...");
+        const batch = adminDb.batch();
+        initialTools.forEach(tool => {
+            const docRef = toolsCollection.doc(tool.id);
+            batch.set(docRef, tool);
+        });
+        await batch.commit();
+        console.log("Seeding complete. Refetching tools...");
+        toolsSnapshot = await toolsCollection.get();
     }
     
     const tools = toolsSnapshot.docs.map(doc => {
