@@ -82,7 +82,9 @@ export async function register(values: z.infer<typeof registerSchema>) {
     });
     
     const freeTools = initialTools.filter(tool => tool.price === 0).map(tool => tool.id);
-    const newUserProfile: Omit<UserProfile, 'uid' | 'createdAt' | 'upgradedAt'> & { createdAt: FieldValue } = {
+    
+    const newUserProfile: Omit<UserProfile, 'createdAt' | 'upgradedAt'> & { createdAt: FieldValue } = {
+      uid: userRecord.uid,
       email,
       displayName: email.split('@')[0] || 'User',
       photoURL: '',
@@ -565,7 +567,8 @@ export async function getBlogPosts(): Promise<BlogPost[] | null> {
     if (!adminDb) return null;
     try {
         const postsCollection = adminDb.collection('blogPosts');
-        const q = postsCollection.orderBy('createdAt', 'desc');
+        // Query only for published posts to avoid needing a composite index during build.
+        const q = postsCollection.where('status', '==', 'published');
         const querySnapshot = await q.get();
 
         const posts = querySnapshot.docs.map(doc => {
@@ -577,6 +580,9 @@ export async function getBlogPosts(): Promise<BlogPost[] | null> {
                 updatedAt: (data.updatedAt as Timestamp).toDate().toISOString(),
             } as BlogPost;
         });
+        
+        // Sort the posts by date in the code.
+        posts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
         return posts;
 
@@ -722,5 +728,3 @@ export async function getSession(): Promise<{ userProfile: UserProfile | null }>
     return { userProfile: null };
   }
 }
-
-    
