@@ -122,7 +122,7 @@ pm2 startup
 pm2 save
 ```
 
-Aplikasi Anda sekarang berjalan, tetapi hanya dapat diakses melalui `localhost:3000`. Langkah selanjutnya adalah membuatnya dapat diakses dari luar.
+Aplikasi Anda sekarang berjalan, tetapi hanya dapat diakses melalui `localhost:3003`. Langkah selanjutnya adalah membuatnya dapat diakses dari luar.
 
 ## 5. Konfigurasi Nginx sebagai Reverse Proxy
 
@@ -145,7 +145,7 @@ server {
 
     location / {
         # Port di mana aplikasi Next.js berjalan
-        proxy_pass http://localhost:3000;
+        proxy_pass http://localhost:3003;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
