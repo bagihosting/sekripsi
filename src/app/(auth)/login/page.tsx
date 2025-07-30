@@ -1,4 +1,5 @@
-import LoginForm from '@/components/login-form';
+
+import AuthFormContainer from '@/components/auth-form-container';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { SekripsiComIcon } from '@/components/icons';
 import Link from 'next/link';
@@ -16,7 +17,7 @@ export default function LoginPage() {
         <CardDescription>Masukkan email dan password Anda untuk melanjutkan.</CardDescription>
       </CardHeader>
       <CardContent>
-        <LoginForm />
+        <AuthFormContainer mode="login" />
         <p className="mt-4 text-center text-sm text-muted-foreground">
           Belum punya akun?{' '}
           <Link href="/register" className="font-semibold text-primary hover:underline">

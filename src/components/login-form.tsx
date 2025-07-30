@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm } from 'react-hook-form';
@@ -13,9 +14,6 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { useToast } from '@/hooks/use-toast';
-import { login } from '@/lib/actions';
-import { useState, useTransition } from 'react';
 import { Loader2 } from 'lucide-react';
 
 const formSchema = z.object({
@@ -23,30 +21,21 @@ const formSchema = z.object({
   password: z.string().min(1, { message: 'Password tidak boleh kosong.' }),
 });
 
-export default function LoginForm() {
-  const { toast } = useToast();
-  const [isPending, startTransition] = useTransition();
+export type LoginFormValues = z.infer<typeof formSchema>;
 
-  const form = useForm<z.infer<typeof formSchema>>({
+interface LoginFormProps {
+  onSubmit: (values: LoginFormValues) => void;
+  isPending: boolean;
+}
+
+export default function LoginForm({ onSubmit, isPending }: LoginFormProps) {
+  const form = useForm<LoginFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: '',
       password: '',
     },
   });
-
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    startTransition(async () => {
-      const result = await login(values);
-      if (result?.error) {
-        toast({
-          title: 'Login Gagal',
-          description: result.error,
-          variant: 'destructive',
-        });
-      }
-    });
-  }
 
   return (
     <Form {...form}>

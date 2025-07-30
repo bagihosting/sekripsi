@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm } from 'react-hook-form';
@@ -13,9 +14,6 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { useToast } from '@/hooks/use-toast';
-import { register } from '@/lib/actions';
-import { useTransition } from 'react';
 import { Loader2 } from 'lucide-react';
 
 const formSchema = z.object({
@@ -23,35 +21,21 @@ const formSchema = z.object({
   password: z.string().min(6, { message: 'Password minimal harus 6 karakter.' }),
 });
 
-export default function RegisterForm() {
-  const { toast } = useToast();
-  const [isPending, startTransition] = useTransition();
+export type RegisterFormValues = z.infer<typeof formSchema>;
 
-  const form = useForm<z.infer<typeof formSchema>>({
+interface RegisterFormProps {
+    onSubmit: (values: RegisterFormValues) => void;
+    isPending: boolean;
+}
+
+export default function RegisterForm({ onSubmit, isPending }: RegisterFormProps) {
+  const form = useForm<RegisterFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: '',
       password: '',
     },
   });
-
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    startTransition(async () => {
-      const result = await register(values);
-      if (result?.error) {
-        toast({
-          title: 'Registrasi Gagal',
-          description: result.error,
-          variant: 'destructive',
-        });
-      } else {
-        toast({
-          title: 'Registrasi Berhasil!',
-          description: 'Anda akan dialihkan ke halaman utama.',
-        });
-      }
-    });
-  }
 
   return (
     <Form {...form}>
