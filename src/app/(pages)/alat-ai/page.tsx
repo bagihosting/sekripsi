@@ -23,14 +23,15 @@ async function getUserProfile(uid: string): Promise<UserProfile | null> {
 
 async function getSession() {
   const sessionCookie = cookies().get('session')?.value;
-  if (!sessionCookie) {
+  if (!sessionCookie || !adminAuth) {
     return null;
   }
   try {
     const decodedIdToken = await adminAuth.verifySessionCookie(sessionCookie, true);
     return decodedIdToken;
   } catch (error) {
-    console.error('Error verifying session cookie:', error);
+    // Session cookie is invalid or expired.
+    // This is an expected error and can be ignored.
     return null;
   }
 }

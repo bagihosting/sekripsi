@@ -19,6 +19,9 @@ const registerSchema = z.object({
 });
 
 export async function register(values: z.infer<typeof registerSchema>) {
+  if (!adminAuth) {
+    throw new Error('Firebase Admin SDK not initialized.');
+  }
   try {
     const validatedValues = registerSchema.parse(values);
     const { email, password } = validatedValues;
@@ -52,6 +55,9 @@ const loginSchema = z.object({
 
 
 export async function login(values: z.infer<typeof loginSchema>) {
+    if (!adminAuth) {
+      throw new Error('Firebase Admin SDK not initialized.');
+    }
     try {
         const validatedValues = loginSchema.parse(values);
         const { email, password } = validatedValues;
@@ -86,6 +92,9 @@ export async function logout() {
 
 
 export async function requestUpgrade(formData: FormData) {
+    if (!adminAuth) {
+      throw new Error('Firebase Admin SDK not initialized.');
+    }
     const sessionCookie = cookies().get('session')?.value;
     if (!sessionCookie) return { error: "Anda harus login untuk melakukan ini." };
     const decodedToken = await adminAuth.verifySessionCookie(sessionCookie, true);
@@ -152,6 +161,9 @@ export async function requestUpgrade(formData: FormData) {
 }
 
 export async function updateUserProfile(formData: FormData) {
+    if (!adminAuth) {
+      throw new Error('Firebase Admin SDK not initialized.');
+    }
     const sessionCookie = cookies().get('session')?.value;
     if (!sessionCookie) return { error: "Anda harus login untuk melakukan ini." };
     const decodedToken = await adminAuth.verifySessionCookie(sessionCookie, true);
@@ -195,7 +207,11 @@ export async function updateUserProfile(formData: FormData) {
         }
 
         if (password) {
-            await updatePassword(clientAuth.currentUser!, password); // Needs client-side auth instance
+            if (clientAuth.currentUser) {
+              await updatePassword(clientAuth.currentUser, password);
+            } else {
+              return { error: 'Sesi Anda telah berakhir. Silakan logout dan login kembali untuk mengubah kata sandi.' };
+            }
         }
 
     } catch (error: any) {

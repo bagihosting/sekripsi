@@ -1,3 +1,4 @@
+
 import { initializeApp, getApps, getApp, cert } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 
@@ -11,6 +12,6 @@ if (serviceAccount && getApps().length === 0) {
   });
 }
 
-const adminAuth = getAuth(getApp());
+const adminAuth = serviceAccount ? getAuth(getApp()) : null;
 
 export { adminAuth };
