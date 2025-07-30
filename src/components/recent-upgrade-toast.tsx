@@ -2,18 +2,15 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { collection, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
-import { db } from '@/lib/firebase'; // Use client SDK for live updates
-import { UserProfile } from '@/lib/firestore';
 import { Toast, ToastDescription, ToastTitle } from '@/components/ui/toast';
 import { Star } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { AnimatePresence, motion } from "framer-motion";
-import { Timestamp } from 'firebase/firestore';
+import { getRecentUpgrades } from '@/lib/actions';
+import { UserProfile } from '@/lib/firestore';
 
-
-type RecentUpgrade = Pick<UserProfile, 'displayName' | 'photoURL'> & {
-    upgradedAt: Date;
+export type RecentUpgrade = Pick<UserProfile, 'displayName' | 'photoURL'> & {
+    upgradedAt: string; // ISO string
 };
 
 export default function RecentUpgradeToast() {
@@ -21,29 +18,15 @@ export default function RecentUpgradeToast() {
   const [currentUpgradeIndex, setCurrentUpgradeIndex] = useState(0);
 
   useEffect(() => {
-    // Query the public 'recent_upgrades' collection instead of 'users'
-    const q = query(
-      collection(db, 'recent_upgrades'),
-      orderBy('upgradedAt', 'desc'),
-      limit(5)
-    );
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const fetchedUpgrades: RecentUpgrade[] = [];
-      snapshot.forEach((doc) => {
-        const data = doc.data();
-        if (data.upgradedAt instanceof Timestamp) {
-            fetchedUpgrades.push({
-                displayName: data.displayName,
-                photoURL: data.photoURL,
-                upgradedAt: data.upgradedAt.toDate(),
-            });
-        }
-      });
+    const fetchUpgrades = async () => {
+      const fetchedUpgrades = await getRecentUpgrades();
       setUpgrades(fetchedUpgrades);
-    });
+    };
 
-    return () => unsubscribe();
+    fetchUpgrades(); // Initial fetch
+    const fetchInterval = setInterval(fetchUpgrades, 30000); // Refetch every 30 seconds
+
+    return () => clearInterval(fetchInterval);
   }, []);
 
   useEffect(() => {
@@ -54,7 +37,7 @@ export default function RecentUpgradeToast() {
 
       return () => clearInterval(interval);
     }
-  }, [upgrades.length]);
+  }, [upgrades]);
 
   const currentUpgrade = upgrades[currentUpgradeIndex];
   
@@ -62,8 +45,9 @@ export default function RecentUpgradeToast() {
     return null;
   }
   
-  const timeAgo = (date: Date | undefined) => {
-    if (!date) return '';
+  const timeAgo = (dateString: string | undefined) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
     const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
     let interval = seconds / 31536000;
     if (interval > 1) return Math.floor(interval) + " tahun lalu";

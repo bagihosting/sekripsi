@@ -1,5 +1,5 @@
 
-import { doc, setDoc, serverTimestamp, Timestamp, collection } from 'firebase/firestore';
+import { doc, setDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
 import { db } from './firebase';
 import { initialTools } from './plugins';
 

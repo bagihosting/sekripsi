@@ -11,7 +11,8 @@ import { uploadToCloudinary } from './cloudinary';
 import { getToolById } from './plugins';
 import { cookies } from 'next/headers';
 import { adminAuth, adminDb } from '@/lib/firebase-admin';
-import { FieldValue } from 'firebase-admin/firestore';
+import { FieldValue, Timestamp } from 'firebase-admin/firestore';
+import { RecentUpgrade } from '@/components/recent-upgrade-toast';
 
 const registerSchema = z.object({
   email: z.string().email(),
@@ -447,4 +448,35 @@ export async function updateAiTool(formData: FormData) {
     revalidatePath(`/produk/${id}`);
     revalidatePath('/dashboard');
     return { success: true };
+}
+
+export async function getRecentUpgrades(): Promise<RecentUpgrade[]> {
+    if (!adminDb) {
+      console.warn('Admin DB not available for getRecentUpgrades');
+      return [];
+    }
+    try {
+        const snapshot = await adminDb.collection('recent_upgrades')
+            .orderBy('upgradedAt', 'desc')
+            .limit(5)
+            .get();
+
+        if (snapshot.empty) {
+            return [];
+        }
+
+        return snapshot.docs.map(doc => {
+            const data = doc.data();
+            const upgradedAt = data.upgradedAt as Timestamp;
+            return {
+                displayName: data.displayName,
+                photoURL: data.photoURL,
+                upgradedAt: upgradedAt.toDate().toISOString(),
+            };
+        });
+
+    } catch (error) {
+        console.error("Error fetching recent upgrades:", error);
+        return [];
+    }
 }
