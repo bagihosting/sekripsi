@@ -26,10 +26,16 @@ function processBlogPost(doc: FirebaseFirestore.DocumentSnapshot): BlogPost {
 async function getBlogPosts(): Promise<BlogPost[]> {
     if (!adminDb) return [];
     const postsCollection = adminDb.collection('blogPosts');
-    const q = postsCollection.where('status', '==', 'published').orderBy('createdAt', 'desc');
+    // Query only for published posts first to avoid needing a composite index during build.
+    const q = postsCollection.where('status', '==', 'published');
     const querySnapshot = await q.get();
 
-    return querySnapshot.docs.map(processBlogPost);
+    const posts = querySnapshot.docs.map(processBlogPost);
+    
+    // Sort the posts by date in the code.
+    posts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+    return posts;
 }
 
 export default async function BlogPage() {
