@@ -2,7 +2,7 @@
 'use server';
 
 import { z } from 'zod';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updatePassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { auth as clientAuth } from '@/lib/firebase';
 import { createUserProfile } from './firestore';
 import { redirect } from 'next/navigation';
@@ -11,8 +11,9 @@ import { uploadToCloudinary } from './cloudinary';
 import { cookies } from 'next/headers';
 import { adminAuth, adminDb } from '@/lib/firebase-admin';
 import { FieldValue, Timestamp } from 'firebase-admin/firestore';
-import type { RecentUpgrade, AiTool } from './types';
+import type { RecentUpgrade, AiTool, UserProfile } from './types';
 import { initialTools } from './initial-data';
+import { getUserProfile } from './user-actions';
 
 const registerSchema = z.object({
   email: z.string().email(),
@@ -543,4 +544,20 @@ export async function getToolById(id: string): Promise<AiTool | null> {
         console.error(`Error fetching tool with id ${id} with Admin SDK:`, error);
         return null;
     }
+}
+
+export async function getSession(): Promise<{ userProfile: UserProfile | null }> {
+  const sessionCookie = cookies().get('session')?.value;
+  if (!sessionCookie || !adminAuth) {
+    return { userProfile: null };
+  }
+  try {
+    const decodedIdToken = await adminAuth.verifySessionCookie(sessionCookie, true);
+    const userProfile = await getUserProfile(decodedIdToken.uid);
+    return { userProfile };
+  } catch (error) {
+    // Session cookie is invalid or expired.
+    // This is an expected error and can be ignored.
+    return { userProfile: null };
+  }
 }

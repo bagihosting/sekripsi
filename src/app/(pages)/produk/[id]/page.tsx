@@ -1,14 +1,13 @@
 
 'use server';
 
-import { getToolById } from '@/lib/actions';
+import { getToolById, getSession } from '@/lib/actions';
 import { iconMap } from '@/lib/plugins';
 import type { AiTool } from '@/lib/types';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle, ChevronRight, Home, Percent, Wand } from 'lucide-react';
+import { CheckCircle, ChevronRight, Home, Wand } from 'lucide-react';
 import ProductPurchaseButton from '@/components/product-purchase-button';
 
 type Props = {
@@ -18,7 +17,11 @@ type Props = {
 // This Server Component fetches the data.
 export default async function ProductDetailPage({ params }: Props) {
   const { id } = params;
-  const product = await getToolById(id);
+  
+  const productPromise = getToolById(id);
+  const sessionPromise = getSession();
+
+  const [product, session] = await Promise.all([productPromise, sessionPromise]);
 
   if (!product) {
     notFound();
@@ -62,7 +65,7 @@ export default async function ProductDetailPage({ params }: Props) {
                 </div>
                 
                 {/* Client component for handling purchase logic */}
-                <ProductPurchaseButton product={product} />
+                <ProductPurchaseButton product={product} userProfile={session?.userProfile} />
             </div>
         </div>
     </div>

@@ -1,25 +1,28 @@
 
 'use client';
 
-import { useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
-import type { AiTool } from '@/lib/types';
+import type { AiTool, UserProfile } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Percent, ShoppingCart } from 'lucide-react';
+import { Percent, ShoppingCart } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface ProductPurchaseButtonProps {
     product: AiTool;
+    userProfile: UserProfile | null | undefined; // Passed from server component
 }
 
-export default function ProductPurchaseButton({ product }: ProductPurchaseButtonProps) {
-    const { userProfile, loading: authLoading } = useAuth();
-    const [isPending, startTransition] = useTransition();
+export default function ProductPurchaseButton({ product, userProfile: serverUserProfile }: ProductPurchaseButtonProps) {
+    const { userProfile: clientUserProfile, loading: authLoading } = useAuth();
     const { toast } = useToast();
     const router = useRouter();
+
+    // Prioritize client-side profile once it's loaded to ensure UI is up-to-date
+    const userProfile = authLoading ? serverUserProfile : clientUserProfile;
 
     const hasTool = userProfile?.activatedTools?.includes(product.id);
     const isFree = product.price === 0;
@@ -40,9 +43,8 @@ export default function ProductPurchaseButton({ product }: ProductPurchaseButton
     };
 
     const getButtonState = () => {
-        if (authLoading) return { text: 'Memuat...', disabled: true };
+        if (authLoading && !serverUserProfile) return { text: 'Memuat...', disabled: true };
         if (hasTool) return { text: 'Sudah Dimiliki', disabled: true };
-        if (isPending) return { text: 'Memproses...', disabled: true };
         if (isFree) return { text: 'Alat Gratis', disabled: true };
         return { text: `Beli Alat Ini - Rp ${displayPrice?.toLocaleString('id-ID')}`, disabled: false };
     };
@@ -73,7 +75,7 @@ export default function ProductPurchaseButton({ product }: ProductPurchaseButton
             </div>
             <div className="flex flex-col sm:flex-row gap-4">
                 <Button size="lg" className="flex-1" onClick={handleAction} disabled={isButtonDisabled}>
-                    {isPending ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <ShoppingCart className="mr-2 h-5 w-5" />}
+                    <ShoppingCart className="mr-2 h-5 w-5" />
                     {buttonText}
                 </Button>
             </div>
