@@ -2,61 +2,9 @@
 import { doc, setDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
 import { db } from './firebase';
 import { initialTools } from './initial-data';
+import type { UserProfile } from './types';
 
-export interface UserProfile {
-  uid: string;
-  email: string | null;
-  displayName?: string;
-  photoURL?: string;
-  role: 'user' | 'admin';
-  plan: 'free' | 'pro';
-  paymentStatus: 'none' | 'pending' | 'pro';
-  createdAt: Timestamp;
-  upgradedAt?: Timestamp;
-  activatedTools: string[];
-  purchasedTools: string[];
-}
-
-export interface Payment {
-  id: string; // Document ID
-  userId: string;
-  userEmail: string;
-  proofUrl: string;
-  status: 'pending' | 'confirmed' | 'rejected';
-  type: 'subscription' | 'tool_purchase';
-  toolId?: string;
-  toolName?: string;
-  amount?: number;
-  createdAt: Timestamp;
-  processedAt?: Timestamp;
-}
-
-export interface PricingPlan {
-    id: string; // e.g., 'free', 'pro', 'team'
-    name: string;
-    price: string;
-    priceDescription: string;
-    features: string[];
-    isRecommended: boolean;
-    buttonText?: string;
-    actionType: 'link' | 'auth_action' | 'current';
-    actionLink?: string;
-}
-
-export interface BlogPost {
-  id?: string;
-  slug: string;
-  title: string;
-  description: string;
-  content: string;
-  category: string;
-  author: string;
-  imageUrl: string;
-  aiHint: string;
-  status: 'published' | 'draft';
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
-}
+export type { UserProfile };
 
 
 /**

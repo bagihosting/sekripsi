@@ -11,7 +11,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { useAuth } from '@/hooks/use-auth';
 import { logout } from '@/lib/actions';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import type { AiTool } from '@/lib/plugins';
+import type { AiTool } from '@/lib/types';
 
 interface SiteHeaderProps {
     aiToolsLinks: AiTool[];

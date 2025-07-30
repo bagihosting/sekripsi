@@ -2,7 +2,9 @@
 "use client";
 
 import { useEffect, useState, useTransition } from 'react';
-import { AiTool, getAllTools, iconMap } from '@/lib/plugins';
+import { getAllTools } from '@/lib/actions';
+import type { AiTool } from '@/lib/types';
+import { iconMap } from '@/lib/plugins';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from './ui/card';
 import { Skeleton } from './ui/skeleton';
 import { Label } from './ui/label';
@@ -19,6 +21,7 @@ export default function ProductManagement() {
 
   useEffect(() => {
     async function fetchTools() {
+      // This is now a server action and safe to call from a client component
       const fetchedTools = await getAllTools();
       setTools(fetchedTools);
       setLoading(false);

@@ -8,8 +8,9 @@ import Link from 'next/link';
 import { useAuth } from '@/hooks/use-auth';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { AiTool, AiToolGroup, groupTools, iconMap } from '@/lib/plugins';
-import { UserProfile } from '@/lib/firestore';
+import { iconMap, groupTools } from '@/lib/plugins';
+import type { AiTool, AiToolGroup } from '@/lib/types';
+import type { UserProfile } from '@/lib/firestore';
 import { useEffect, useState } from 'react';
 
 interface AiToolsClientProps {

@@ -1,6 +1,6 @@
 
 import { adminDb } from './firebase-admin';
-import type { PricingPlan } from './firestore';
+import type { PricingPlan } from './types';
 
 const defaultPlans: PricingPlan[] = [
     {

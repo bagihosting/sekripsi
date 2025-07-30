@@ -1,7 +1,7 @@
 
 import ProductGrid from '@/components/product-grid';
-import { getAllTools } from '@/lib/plugins';
-import type { AiTool } from '@/lib/plugins';
+import { getAllTools } from '@/lib/actions';
+import type { AiTool } from '@/lib/types';
 
 export default async function ProdukPage() {
   const allProducts: AiTool[] = await getAllTools();

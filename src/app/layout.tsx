@@ -3,8 +3,9 @@ import type {Metadata} from 'next';
 import { Toaster } from "@/components/ui/toaster"
 import './globals.css';
 import { AuthProvider } from '@/components/auth-provider';
-import { getAllTools } from '@/lib/plugins';
+import { getAllTools } from '@/lib/actions';
 import MainLayout from '@/components/main-layout';
+import type { AiTool } from '@/lib/types';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://sekripsi.com';
 
@@ -54,7 +55,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const tools = await getAllTools();
+  const tools: AiTool[] = await getAllTools();
   
   return (
     <html lang="id" className="scroll-smooth">

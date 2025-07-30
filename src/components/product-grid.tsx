@@ -2,7 +2,8 @@
 "use client";
 
 import { useState, useMemo } from 'react';
-import { AiTool, iconMap } from '@/lib/plugins';
+import { iconMap } from '@/lib/plugins';
+import type { AiTool } from '@/lib/types';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';

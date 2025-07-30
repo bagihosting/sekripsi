@@ -8,7 +8,7 @@ import RecentUpgradeToast from "@/components/recent-upgrade-toast";
 import { usePathname } from "next/navigation";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
-import type { AiTool } from "@/lib/plugins";
+import type { AiTool } from "@/lib/types";
 
 const specialLayoutRoutes = ['/login', '/register', '/upgrade'];
 const dashboardRoute = '/dashboard';

@@ -4,15 +4,15 @@
 import { z } from 'zod';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updatePassword } from 'firebase/auth';
 import { auth as clientAuth } from '@/lib/firebase';
-import { createUserProfile, UserProfile } from './firestore';
+import { createUserProfile } from './firestore';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { uploadToCloudinary } from './cloudinary';
 import { cookies } from 'next/headers';
 import { adminAuth, adminDb } from '@/lib/firebase-admin';
 import { FieldValue, Timestamp } from 'firebase-admin/firestore';
-import { RecentUpgrade } from '@/components/recent-upgrade-toast';
-import { AiTool } from './plugins';
+import type { RecentUpgrade, AiTool } from './types';
+import { initialTools } from './initial-data';
 
 const registerSchema = z.object({
   email: z.string().email(),
@@ -248,18 +248,18 @@ export async function confirmPayment(values: z.infer<typeof confirmPaymentSchema
     try {
         const userRef = adminDb.collection('users').doc(userId);
         const paymentRef = adminDb.collection('payments').doc(paymentId);
+        const userSnap = await userRef.get();
+        if (!userSnap.exists) throw new Error("User not found");
+        const userData = userSnap.data();
+        if (!userData) throw new Error("User data not found");
 
         if (toolId) {
             await userRef.update({
                 purchasedTools: FieldValue.arrayUnion(toolId),
                 activatedTools: FieldValue.arrayUnion(toolId),
-                paymentStatus: 'pro', // Or could be kept same if they are not subbed
+                paymentStatus: userData.plan === 'pro' ? 'pro' : 'none', 
             });
         } else {
-            const userSnap = await userRef.get();
-            if (!userSnap.exists) throw new Error("User not found");
-            const userData = userSnap.data() as UserProfile;
-
             await userRef.update({
                 plan: 'pro',
                 paymentStatus: 'pro',
@@ -480,6 +480,37 @@ export async function getRecentUpgrades(): Promise<RecentUpgrade[]> {
         return [];
     }
 }
+
+// Function to get all tools from Firestore, returning icon as a string
+export async function getAllTools(): Promise<AiTool[]> {
+  if (!adminDb) {
+     console.warn("Admin DB not initialized. Returning initial tools.");
+     return initialTools;
+  }
+  try {
+    const toolsCollection = adminDb.collection('ai_tools');
+    const toolsSnapshot = await toolsCollection.get();
+    
+    if (toolsSnapshot.empty) {
+        console.warn("No AI tools found in Firestore. Returning initial toolset.");
+        return initialTools;
+    }
+    
+    const tools = toolsSnapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        ...data,
+        id: doc.id,
+        icon: data.icon as string, // Keep icon as string
+      } as AiTool;
+    });
+    return tools;
+  } catch (error) {
+    console.error("Error fetching tools from Firestore with Admin SDK:", error);
+    return initialTools; // Fallback
+  }
+}
+
 
 export async function getToolById(id: string): Promise<AiTool | null> {
     if (!adminDb) {
