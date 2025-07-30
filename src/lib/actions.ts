@@ -567,7 +567,6 @@ export async function getBlogPosts(): Promise<BlogPost[] | null> {
     if (!adminDb) return null;
     try {
         const postsCollection = adminDb.collection('blogPosts');
-        // Query only for published posts to avoid needing a composite index during build.
         const q = postsCollection.where('status', '==', 'published');
         const querySnapshot = await q.get();
 
@@ -581,7 +580,6 @@ export async function getBlogPosts(): Promise<BlogPost[] | null> {
             } as BlogPost;
         });
         
-        // Sort the posts by date in the code.
         posts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
         return posts;
