@@ -1,3 +1,4 @@
+
 'use client';
 
 import { SiteFooter } from "@/components/site-footer";
@@ -10,7 +11,6 @@ import { cn } from "@/lib/utils";
 import type { AiTool } from "@/lib/types";
 
 const specialLayoutRoutes = ['/login', '/register'];
-const dashboardRoute = '/dashboard';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -26,17 +26,6 @@ export default function MainLayout({ children, aiToolsLinks }: MainLayoutProps) 
   // Special layout for login, register, upgrade
   if (isSpecialRoute) {
     return (
-      <>
-        {children}
-        <RecentUpgradeToast />
-        {isMobile && <BottomNavBar />}
-      </>
-    );
-  }
-
-  // Special layout for dashboard
-  if (pathname.startsWith(dashboardRoute)) {
-     return (
       <>
         {children}
         <RecentUpgradeToast />
