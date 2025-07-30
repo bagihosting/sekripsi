@@ -59,22 +59,49 @@ cp .env.example .env
 nano .env
 ```
 
-Isi file `.env` dengan semua nilai yang diperlukan, seperti:
+Isi file `.env` dengan semua nilai yang diperlukan.
+
+#### A. Kredensial Klien (NEXT_PUBLIC_)
+
+Nilai-nilai ini aman untuk diekspos ke browser dan digunakan oleh Firebase Client SDK.
+
+1.  Buka [Firebase Console](https://console.firebase.google.com/).
+2.  Pilih proyek Anda.
+3.  Klik ikon gerigi (⚙️) di pojok kiri atas, lalu pilih **Project settings**.
+4.  Di tab **General**, scroll ke bawah ke bagian **Your apps**.
+5.  Pilih aplikasi web Anda.
+6.  Pilih **Config** untuk melihat objek konfigurasi `firebaseConfig`.
+7.  Salin nilai-nilai ini ke dalam file `.env` Anda.
+
+#### B. Kredensial Firebase Admin SDK (Server-side)
+
+Nilai ini **sangat rahasia** dan hanya boleh ada di server Anda. Kunci ini memberikan akses penuh ke backend Firebase Anda.
+
+1.  Di **Project settings**, buka tab **Service accounts**.
+2.  Klik tombol **Generate new private key**. Sebuah file JSON akan terunduh ke komputer Anda.
+3.  Buka file JSON tersebut dengan editor teks.
+4.  **Salin seluruh konten file JSON tersebut**, mulai dari `{` hingga `}`.
+5.  Tempelkan konten tersebut sebagai nilai untuk `FIREBASE_SERVICE_ACCOUNT_KEY` di file `.env` Anda. **PENTING:** Pastikan seluruh konten JSON berada di dalam tanda kutip tunggal (`'...'`) agar dapat dibaca sebagai satu baris oleh sistem.
+
+#### Contoh Isi File `.env`
+
 ```
-# Kredensial Firebase Client
+# Kredensial Firebase Client (Sisi Browser)
 NEXT_PUBLIC_FIREBASE_API_KEY=...
 NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=...
 NEXT_PUBLIC_FIREBASE_PROJECT_ID=...
 # ... (dan variabel NEXT_PUBLIC lainnya)
 
-# Kredensial Firebase Admin (Server-side)
-FIREBASE_SERVICE_ACCOUNT_KEY='{...}'
+# Kredensial Firebase Admin (Sisi Server) - RAHASIA!
+# Salin seluruh isi file JSON service account ke sini di dalam tanda kutip tunggal.
+FIREBASE_SERVICE_ACCOUNT_KEY='{"type": "service_account", "project_id": "...", ...}'
 
-# Kredensial Cloudinary
+# Kredensial Cloudinary (Opsional, jika menggunakan)
 CLOUDINARY_CLOUD_NAME=...
 CLOUDINARY_API_KEY=...
 CLOUDINARY_API_SECRET=...
 ```
+
 
 ## 4. Membangun dan Menjalankan Aplikasi dengan PM2
 
