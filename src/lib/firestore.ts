@@ -1,7 +1,7 @@
 
 import { doc, setDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
 import { db } from './firebase';
-import { initialTools } from './plugins';
+import { initialTools } from './initial-data';
 
 export interface UserProfile {
   uid: string;
