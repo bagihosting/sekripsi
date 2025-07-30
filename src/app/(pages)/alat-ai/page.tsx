@@ -5,7 +5,7 @@ import { getDoc, doc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { UserProfile } from '@/lib/firestore';
 import { cookies } from 'next/headers';
-import { auth } from 'firebase-admin';
+import { adminAuth } from '@/lib/firebase-admin';
 
 async function getUserProfile(uid: string): Promise<UserProfile | null> {
     try {
@@ -27,7 +27,7 @@ async function getSession() {
     return null;
   }
   try {
-    const decodedIdToken = await auth().verifySessionCookie(sessionCookie, true);
+    const decodedIdToken = await adminAuth.verifySessionCookie(sessionCookie, true);
     return decodedIdToken;
   } catch (error) {
     console.error('Error verifying session cookie:', error);

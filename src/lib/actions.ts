@@ -11,7 +11,7 @@ import { uploadToCloudinary } from './cloudinary';
 import { revalidatePath } from 'next/cache';
 import { getToolById } from './plugins';
 import { cookies } from 'next/headers';
-import { auth as adminAuth } from 'firebase-admin';
+import { adminAuth } from '@/lib/firebase-admin';
 
 const registerSchema = z.object({
   email: z.string().email(),
@@ -30,7 +30,7 @@ export async function register(values: z.infer<typeof registerSchema>) {
 
     const idToken = await user.getIdToken();
     const expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 days
-    const sessionCookie = await adminAuth().createSessionCookie(idToken, { expiresIn });
+    const sessionCookie = await adminAuth.createSessionCookie(idToken, { expiresIn });
     cookies().set('session', sessionCookie, { maxAge: expiresIn, httpOnly: true, secure: true });
     
   } catch (error: any) {
@@ -59,7 +59,7 @@ export async function login(values: z.infer<typeof loginSchema>) {
         const userCredential = await signInWithEmailAndPassword(clientAuth, email, password);
         const idToken = await userCredential.user.getIdToken();
         const expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 days
-        const sessionCookie = await adminAuth().createSessionCookie(idToken, { expiresIn });
+        const sessionCookie = await adminAuth.createSessionCookie(idToken, { expiresIn });
         cookies().set('session', sessionCookie, { maxAge: expiresIn, httpOnly: true, secure: true });
 
     } catch (error: any) {
@@ -88,7 +88,7 @@ export async function logout() {
 export async function requestUpgrade(formData: FormData) {
     const sessionCookie = cookies().get('session')?.value;
     if (!sessionCookie) return { error: "Anda harus login untuk melakukan ini." };
-    const decodedToken = await adminAuth().verifySessionCookie(sessionCookie, true);
+    const decodedToken = await adminAuth.verifySessionCookie(sessionCookie, true);
     const user = { uid: decodedToken.uid, email: decodedToken.email };
     
     if (!user) {
@@ -154,7 +154,7 @@ export async function requestUpgrade(formData: FormData) {
 export async function updateUserProfile(formData: FormData) {
     const sessionCookie = cookies().get('session')?.value;
     if (!sessionCookie) return { error: "Anda harus login untuk melakukan ini." };
-    const decodedToken = await adminAuth().verifySessionCookie(sessionCookie, true);
+    const decodedToken = await adminAuth.verifySessionCookie(sessionCookie, true);
     const user = { uid: decodedToken.uid, email: decodedToken.email };
 
     if (!user) {

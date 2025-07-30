@@ -1,22 +1,8 @@
 // Import the functions you need from the SDKs you need
-import { initializeApp, getApps, getApp, cert } from "firebase-admin/app";
-import { getAuth as getAdminAuth } from "firebase-admin/auth";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 import { initializeApp as initializeClientApp, getApps as getClientApps, getApp as getClientApp } from 'firebase/app';
-
-// Admin SDK setup (for server-side operations)
-const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT_KEY
-  ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY)
-  : null;
-
-if (serviceAccount && getApps().length === 0) {
-  initializeApp({
-    credential: cert(serviceAccount),
-  });
-}
-const adminAuth = getAdminAuth(getApp());
 
 // Client SDK setup (for client-side operations)
 const firebaseConfig = {
@@ -35,4 +21,4 @@ const db = getFirestore(clientApp);
 const auth = getAuth(clientApp);
 const storage = getStorage(clientApp);
 
-export { clientApp as app, db, auth, storage, adminAuth };
+export { clientApp as app, db, auth, storage };
