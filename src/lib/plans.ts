@@ -2,6 +2,7 @@
 import { adminDb } from './firebase-admin';
 import type { PricingPlan } from './types';
 
+// This data is now primarily for fallback purposes if Firestore is unavailable.
 const defaultPlans: PricingPlan[] = [
     {
       id: "free",
@@ -51,8 +52,12 @@ const defaultPlans: PricingPlan[] = [
     },
 ];
 
-
+// This function is now OBSOLETE as its logic has been moved to a server action in `actions.ts`.
+// It is kept here to avoid breaking any potential (though unlikely) remaining imports,
+// but it should be considered deprecated and removed in a future refactor.
+// The server action `getPricingPlans` in `actions.ts` is the single source of truth.
 export async function getPricingPlans(): Promise<PricingPlan[]> {
+  console.warn("DEPRECATED: getPricingPlans from /lib/plans.ts is called. Use the server action instead.");
   if (!adminDb) {
     console.warn("Admin DB not initialized. Returning default plans.");
     return defaultPlans;

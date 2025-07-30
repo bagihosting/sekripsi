@@ -2,8 +2,8 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { getPricingPlans } from '@/lib/plans';
-import type { PricingPlan } from '@/lib/firestore';
+import { getPricingPlans } from '@/lib/actions';
+import type { PricingPlan } from '@/lib/types';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from './ui/card';
 import { Skeleton } from './ui/skeleton';
 import { Label } from './ui/label';
@@ -18,15 +18,20 @@ import { Loader2, Trash2 } from 'lucide-react';
 export default function PricingManagement() {
   const [plans, setPlans] = useState<PricingPlan[]>([]);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
     async function fetchPlans() {
       const fetchedPlans = await getPricingPlans();
-      setPlans(fetchedPlans);
+      if(fetchedPlans) {
+        setPlans(fetchedPlans);
+      } else {
+        toast({ title: "Gagal Memuat Paket Harga", variant: "destructive" });
+      }
       setLoading(false);
     }
     fetchPlans();
-  }, []);
+  }, [toast]);
   
   const handlePlanChange = (planId: string, field: keyof PricingPlan, value: any) => {
     setPlans(prevPlans => 

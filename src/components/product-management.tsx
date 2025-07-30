@@ -18,16 +18,20 @@ import { Textarea } from './ui/textarea';
 export default function ProductManagement() {
   const [tools, setTools] = useState<AiTool[]>([]);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
     async function fetchTools() {
-      // This is now a server action and safe to call from a client component
       const fetchedTools = await getAllTools();
-      setTools(fetchedTools);
+      if(fetchedTools) {
+        setTools(fetchedTools);
+      } else {
+        toast({ title: "Gagal Memuat Alat AI", variant: "destructive" });
+      }
       setLoading(false);
     }
     fetchTools();
-  }, []);
+  }, [toast]);
   
   const handleToolChange = (toolId: string, field: keyof AiTool, value: any) => {
     setTools(prevTools => 

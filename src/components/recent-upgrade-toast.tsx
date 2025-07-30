@@ -7,11 +7,7 @@ import { Star } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { AnimatePresence, motion } from "framer-motion";
 import { getRecentUpgrades } from '@/lib/actions';
-import { UserProfile } from '@/lib/firestore';
-
-export type RecentUpgrade = Pick<UserProfile, 'displayName' | 'photoURL'> & {
-    upgradedAt: string; // ISO string
-};
+import type { RecentUpgrade } from '@/lib/types';
 
 export default function RecentUpgradeToast() {
   const [upgrades, setUpgrades] = useState<RecentUpgrade[]>([]);
