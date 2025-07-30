@@ -6,41 +6,30 @@ import { ArrowRight, Calendar, User } from "lucide-react";
 import Link from 'next/link';
 import Image from "next/image";
 import { adminDb } from "@/lib/firebase-admin";
-import { BlogPost } from "@/lib/firestore";
+import type { BlogPost } from "@/lib/types";
 import { Timestamp } from "firebase-admin/firestore";
 
+function processBlogPost(doc: FirebaseFirestore.DocumentSnapshot): BlogPost {
+    const data = doc.data()!;
+    const createdAt = data.createdAt instanceof Timestamp ? data.createdAt.toDate() : new Date();
+    const updatedAt = data.updatedAt instanceof Timestamp ? data.updatedAt.toDate() : new Date();
 
-interface SerializableBlogPost extends Omit<BlogPost, 'createdAt' | 'updatedAt'> {
-    id: string;
-    createdAt: string;
-    updatedAt: string;
-    date: string;
+    return {
+        ...data,
+        id: doc.id,
+        createdAt: createdAt.toISOString(),
+        updatedAt: updatedAt.toISOString(),
+    } as BlogPost;
 }
 
 
-async function getBlogPosts(): Promise<SerializableBlogPost[]> {
+async function getBlogPosts(): Promise<BlogPost[]> {
     if (!adminDb) return [];
     const postsCollection = adminDb.collection('blogPosts');
     const q = postsCollection.where('status', '==', 'published').orderBy('createdAt', 'desc');
     const querySnapshot = await q.get();
 
-    const posts = querySnapshot.docs.map(doc => {
-        const data = doc.data();
-        const createdAt = data.createdAt instanceof Timestamp ? data.createdAt.toDate() : new Date();
-        const updatedAt = data.updatedAt instanceof Timestamp ? data.updatedAt.toDate() : new Date();
-
-        return {
-            ...data,
-            id: doc.id,
-            createdAt: createdAt.toISOString(),
-            updatedAt: updatedAt.toISOString(),
-            date: createdAt.toLocaleDateString('id-ID', {
-                year: 'numeric', month: 'long', day: 'numeric'
-            }),
-        } as SerializableBlogPost;
-    });
-
-    return posts;
+    return querySnapshot.docs.map(processBlogPost);
 }
 
 export default async function BlogPage() {
@@ -89,8 +78,14 @@ export default async function BlogPage() {
 }
 
 type PostProps = {
-    post: SerializableBlogPost;
+    post: BlogPost;
 }
+
+const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('id-ID', {
+        year: 'numeric', month: 'long', day: 'numeric'
+    });
+};
 
 function FeaturedPost({ post }: PostProps) {
     return (
@@ -117,7 +112,7 @@ function FeaturedPost({ post }: PostProps) {
                     </div>
                     <div className="flex items-center gap-2">
                         <Calendar className="h-4 w-4" />
-                        <span>{post.date}</span>
+                        <span>{formatDate(post.createdAt)}</span>
                     </div>
                 </div>
                 <Button size="lg" className="mt-6" asChild>
@@ -159,7 +154,7 @@ function ArticleCard({ post }: PostProps) {
             </div>
             <div className="flex items-center gap-1.5">
                 <Calendar className="h-3 w-3" />
-                <span>{post.date}</span>
+                <span>{formatDate(post.createdAt)}</span>
             </div>
         </div>
       </CardContent>
@@ -196,7 +191,7 @@ function HorizontalArticleCard({ post }: PostProps) {
                     </div>
                     <div className="flex items-center gap-1.5">
                         <Calendar className="h-3 w-3" />
-                        <span>{post.date}</span>
+                        <span>{formatDate(post.createdAt)}</span>
                     </div>
                 </div>
             </CardContent>
