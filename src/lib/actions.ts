@@ -20,7 +20,7 @@ const registerSchema = z.object({
 
 export async function register(values: z.infer<typeof registerSchema>) {
   if (!adminAuth) {
-    throw new Error('Firebase Admin SDK not initialized.');
+    return { error: 'Konfigurasi server Firebase tidak lengkap.' };
   }
   try {
     const validatedValues = registerSchema.parse(values);
@@ -56,7 +56,7 @@ const loginSchema = z.object({
 
 export async function login(values: z.infer<typeof loginSchema>) {
     if (!adminAuth) {
-      throw new Error('Firebase Admin SDK not initialized.');
+      return { error: 'Konfigurasi server Firebase tidak lengkap.' };
     }
     try {
         const validatedValues = loginSchema.parse(values);
@@ -91,24 +91,27 @@ export async function logout() {
 }
 
 
-export async function requestUpgrade(formData: FormData) {
+export async function requestUpgrade(formData: FormData): Promise<{ success: boolean; error?: string; }> {
     if (!adminAuth) {
-      throw new Error('Firebase Admin SDK not initialized.');
+      return { success: false, error: "Konfigurasi server Firebase tidak lengkap." };
     }
     const sessionCookie = cookies().get('session')?.value;
-    if (!sessionCookie) return { error: "Anda harus login untuk melakukan ini." };
-    const decodedToken = await adminAuth.verifySessionCookie(sessionCookie, true);
+    if (!sessionCookie) return { success: false, error: "Anda harus login untuk melakukan ini." };
+    
+    let decodedToken;
+    try {
+        decodedToken = await adminAuth.verifySessionCookie(sessionCookie, true);
+    } catch (error) {
+        return { success: false, error: "Sesi tidak valid. Silakan login kembali." };
+    }
+    
     const user = { uid: decodedToken.uid, email: decodedToken.email };
     
-    if (!user) {
-        return { error: "Anda harus login untuk melakukan ini." };
-    }
-
     const proof = formData.get('proof') as File;
     const toolId = formData.get('toolId') as string | null;
 
     if (!proof) {
-        return { error: "File bukti transfer tidak ditemukan." };
+        return { success: false, error: "File bukti transfer tidak ditemukan." };
     }
     
     try {
@@ -154,7 +157,7 @@ export async function requestUpgrade(formData: FormData) {
 
     } catch (error: any) {
         console.error("Upgrade request failed:", error);
-        return { error: "Gagal memproses permintaan Anda. Silakan coba lagi." };
+        return { success: false, error: "Gagal memproses permintaan Anda. Silakan coba lagi." };
     }
 
     return { success: true };
@@ -162,17 +165,20 @@ export async function requestUpgrade(formData: FormData) {
 
 export async function updateUserProfile(formData: FormData) {
     if (!adminAuth) {
-      throw new Error('Firebase Admin SDK not initialized.');
+      return { error: "Konfigurasi server Firebase tidak lengkap." };
     }
     const sessionCookie = cookies().get('session')?.value;
     if (!sessionCookie) return { error: "Anda harus login untuk melakukan ini." };
-    const decodedToken = await adminAuth.verifySessionCookie(sessionCookie, true);
-    const user = { uid: decodedToken.uid, email: decodedToken.email };
-
-    if (!user) {
-        return { error: "Anda harus login untuk melakukan ini." };
+    
+    let decodedToken;
+    try {
+        decodedToken = await adminAuth.verifySessionCookie(sessionCookie, true);
+    } catch (error) {
+        return { error: "Sesi tidak valid. Silakan login kembali." };
     }
 
+    const user = { uid: decodedToken.uid, email: decodedToken.email };
+    
     const displayName = formData.get('displayName') as string;
     const password = formData.get('password') as string | null;
     const photo = formData.get('photo') as File | null;
