@@ -1,6 +1,6 @@
 
 import { adminDb } from "@/lib/firebase-admin";
-import { BlogPost } from "@/lib/firestore";
+import { BlogPost } from "@/lib/types";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
@@ -24,6 +24,18 @@ export async function generateStaticParams() {
     }));
 }
 
+function processBlogPost(doc: FirebaseFirestore.DocumentSnapshot): BlogPost | null {
+    if (!doc.exists) return null;
+    const data = doc.data()!;
+    return {
+        id: doc.id,
+        ...data,
+        createdAt: (data.createdAt as Timestamp).toDate().toISOString(),
+        updatedAt: (data.updatedAt as Timestamp).toDate().toISOString(),
+    } as BlogPost;
+}
+
+
 async function getPostBySlug(slug: string): Promise<BlogPost | null> {
     if (!adminDb) return null;
     const postsCollection = adminDb.collection('blogPosts');
@@ -35,14 +47,7 @@ async function getPostBySlug(slug: string): Promise<BlogPost | null> {
     }
 
     const doc = querySnapshot.docs[0];
-    const data = doc.data();
-
-    return {
-        id: doc.id,
-        ...data,
-        createdAt: data.createdAt,
-        updatedAt: data.updatedAt,
-    } as BlogPost;
+    return processBlogPost(doc);
 }
 
 
@@ -55,8 +60,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         }
     }
     
-    const publishedAt = post.createdAt instanceof Timestamp ? post.createdAt.toDate().toISOString() : new Date().toISOString();
-
     return {
         title: `${post.title} | sekripsi.com`,
         description: post.description,
@@ -64,7 +67,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
             title: post.title,
             description: post.description,
             type: 'article',
-            publishedTime: publishedAt,
+            publishedTime: post.createdAt,
             authors: [post.author],
             images: [
                 {
@@ -86,9 +89,7 @@ export default async function BlogPostPage({ params }: Props) {
         notFound();
     }
     
-    const createdAtDate = post.createdAt instanceof Timestamp ? post.createdAt.toDate() : new Date();
-
-    const publishedDate = createdAtDate.toLocaleDateString('id-ID', {
+    const publishedDate = new Date(post.createdAt).toLocaleDateString('id-ID', {
         year: 'numeric', month: 'long', day: 'numeric'
     });
 

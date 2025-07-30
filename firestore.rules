@@ -1,29 +1,45 @@
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-
+  
     // Helper function to check for admin role
     function isAdmin() {
       return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
 
-    // Users can only read/update their own profile. Admins can do anything.
+    // Users can only read and update their own profile.
+    // Admins can read/write any profile.
     match /users/{userId} {
       allow read, update: if request.auth.uid == userId || isAdmin();
-      allow create, delete: if isAdmin();
+      allow create: if request.auth.uid == userId;
     }
 
-    // Public collections are readable by anyone, but only writable by admins.
-    match /(blogPosts|ai_tools|pricingPlans|recent_upgrades)/{docId} {
-        allow read: if true;
-        allow write: if isAdmin();
-    }
-
-    // Payments can be created by any authenticated user.
-    // Only admins can read all payments and update them.
+    // Payments: Users can create their own payment records. Only admins can read/update.
     match /payments/{paymentId} {
-      allow create: if request.auth != null;
-      allow read, update, delete: if isAdmin();
+      allow create: if request.auth.uid == request.resource.data.userId;
+      allow read, update: if isAdmin();
+    }
+    
+    // Publicly readable, admin-only writable collections
+    match /pricingPlans/{planId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    match /ai_tools/{toolId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    match /blogPosts/{postId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    match /recent_upgrades/{upgradeId} {
+      allow read: if true;
+      allow write: if isAdmin();
     }
   }
 }

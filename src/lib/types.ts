@@ -50,8 +50,8 @@ export interface BlogPost {
   imageUrl: string;
   aiHint: string;
   status: 'published' | 'draft';
-  createdAt: Date; // Date object on client
-  updatedAt: Date; // Date object on client
+  createdAt: string; // ISO string on client
+  updatedAt: string; // ISO string on client
 }
 
 export interface AiTool {

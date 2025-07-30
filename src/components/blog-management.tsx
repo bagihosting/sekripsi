@@ -4,7 +4,7 @@
 import { useEffect, useState, useTransition } from 'react';
 import { adminDb } from '@/lib/firebase-admin-client';
 import { collection, onSnapshot, query, orderBy, Timestamp } from 'firebase/firestore';
-import { BlogPost } from '@/lib/firestore';
+import { BlogPost } from '@/lib/types';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
@@ -28,8 +28,8 @@ function convertToClientBlogPost(doc: any): BlogPost {
         imageUrl: data.imageUrl,
         aiHint: data.aiHint,
         status: data.status,
-        createdAt: data.createdAt.toDate(),
-        updatedAt: data.updatedAt.toDate(),
+        createdAt: data.createdAt.toDate().toISOString(),
+        updatedAt: data.updatedAt.toDate().toISOString(),
     } as BlogPost;
 }
 
