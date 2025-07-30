@@ -17,7 +17,7 @@ export async function uploadToCloudinary(fileUri: string, folder: string) {
     return result;
   } catch (error) {
     console.error('Error uploading to Cloudinary:', error);
-    throw new Error('Gagal mengunggah file ke Cloudinary.');
+    throw new Error('Gagal mengunggah file ke Cloudinary. Periksa konfigurasi Anda.');
   }
 }
 

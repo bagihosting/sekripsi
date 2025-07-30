@@ -197,7 +197,7 @@ export async function updateUserProfile(formData: FormData) {
             updates.displayName = displayName;
         }
 
-        if (photo) {
+        if (photo && photo.size > 0) {
             const fileBuffer = await photo.arrayBuffer();
             const mime = photo.type;
             const encoding = 'base64';
@@ -367,18 +367,22 @@ export async function saveBlogPost(formData: FormData) {
             imageUrl = result.secure_url;
         }
 
-        const postData = {
+        const postData: { [key: string]: any } = {
             title,
             slug,
             content,
             category,
             status,
-            imageUrl,
             description: content.substring(0, 150),
             author: "Tim sekripsi.com",
             aiHint: `${category.toLowerCase()} blog`,
             updatedAt: FieldValue.serverTimestamp(),
         };
+        
+        if (imageUrl) {
+            postData.imageUrl = imageUrl;
+        }
+
 
         if (postId) {
             const postRef = adminDb.collection('blogPosts').doc(postId);
