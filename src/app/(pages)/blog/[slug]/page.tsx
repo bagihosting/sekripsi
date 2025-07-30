@@ -39,7 +39,7 @@ function processBlogPost(doc: FirebaseFirestore.DocumentSnapshot): BlogPost | nu
 async function getPostBySlug(slug: string): Promise<BlogPost | null> {
     if (!adminDb) return null;
     const postsCollection = adminDb.collection('blogPosts');
-    const q = postsCollection.where('slug', '==', slug).limit(1);
+    const q = postsCollection.where('slug', '==', slug).where('status', '==', 'published').limit(1);
     const querySnapshot = await q.get();
 
     if (querySnapshot.empty) {

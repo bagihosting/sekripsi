@@ -1,45 +1,16 @@
-rules_version = '2';
 
+rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
   
-    // Helper function to check for admin role
-    function isAdmin() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
-    }
+    // Recommended index for blog post queries:
+    // Collection: blogPosts
+    // Fields:
+    // 1. slug (Ascending)
+    // 2. status (Ascending)
 
-    // Users can only read and update their own profile.
-    // Admins can read/write any profile.
-    match /users/{userId} {
-      allow read, update: if request.auth.uid == userId || isAdmin();
-      allow create: if request.auth.uid == userId;
-    }
-
-    // Payments: Users can create their own payment records. Only admins can read/update.
-    match /payments/{paymentId} {
-      allow create: if request.auth.uid == request.resource.data.userId;
-      allow read, update: if isAdmin();
-    }
-    
-    // Publicly readable, admin-only writable collections
-    match /pricingPlans/{planId} {
-      allow read: if true;
-      allow write: if isAdmin();
-    }
-    
-    match /ai_tools/{toolId} {
-      allow read: if true;
-      allow write: if isAdmin();
-    }
-    
-    match /blogPosts/{postId} {
-      allow read: if true;
-      allow write: if isAdmin();
-    }
-    
-    match /recent_upgrades/{upgradeId} {
-      allow read: if true;
-      allow write: if isAdmin();
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }
