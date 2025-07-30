@@ -22,9 +22,10 @@ Menggunakan Node Version Manager (NVM) adalah cara terbaik untuk mengelola versi
 # Unduh dan jalankan skrip instalasi NVM
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 
-# Muat NVM agar dapat digunakan di sesi terminal saat ini
+# Muat NVM agar dapat digunakan di sesi terminal saat ini dan untuk masa mendatang
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
 # Instal Node.js versi LTS (Long-Term Support) terbaru
 nvm install --lts
@@ -52,10 +53,7 @@ npm install
 Buat file `.env` untuk menyimpan semua kredensial dan kunci API.
 
 ```bash
-# Salin dari file .env.example jika ada, atau buat file baru
-cp .env.example .env
-
-# Buka file .env dengan editor teks (contoh: nano)
+# Buat file .env baru dari awal
 nano .env
 ```
 
@@ -102,7 +100,6 @@ CLOUDINARY_API_KEY=...
 CLOUDINARY_API_SECRET=...
 ```
 
-
 ## 4. Membangun dan Menjalankan Aplikasi dengan PM2
 
 PM2 adalah *process manager* untuk aplikasi Node.js yang akan menjaga aplikasi tetap berjalan.
@@ -114,12 +111,12 @@ sudo npm install -g pm2
 # Bangun aplikasi Next.js untuk produksi
 npm run build
 
-# Jalankan aplikasi menggunakan PM2
-pm2 start npm --name "sekripsi-app" -- start
+# Jalankan aplikasi menggunakan PM2 (ganti "nextjs-app" dengan nama pilihanmu)
+pm2 start npm --name "nextjs-app" -- start
 
 # Atur PM2 agar otomatis berjalan saat server startup
 pm2 startup
-# (Ikuti instruksi yang ditampilkan oleh perintah di atas)
+# (Ikuti instruksi yang ditampilkan oleh perintah di atas untuk menjalankannya)
 
 # Simpan konfigurasi PM2 saat ini
 pm2 save
@@ -147,7 +144,8 @@ server {
     server_name subdomain.yourdomain.com;
 
     location / {
-        proxy_pass http://localhost:3000; # Port di mana aplikasi Next.js berjalan
+        # Port di mana aplikasi Next.js berjalan
+        proxy_pass http://localhost:3000;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
