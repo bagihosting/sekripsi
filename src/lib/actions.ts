@@ -3,13 +3,15 @@
 
 import { z } from 'zod';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updatePassword } from 'firebase/auth';
-import { auth, db } from '@/lib/firebase';
+import { auth as clientAuth, db } from '@/lib/firebase';
 import { createUserProfile } from './firestore';
 import { redirect } from 'next/navigation';
 import { collection, doc, setDoc, serverTimestamp, updateDoc, addDoc, deleteDoc, getDoc, arrayUnion } from 'firebase/firestore';
 import { uploadToCloudinary } from './cloudinary';
 import { revalidatePath } from 'next/cache';
 import { getToolById } from './plugins';
+import { cookies } from 'next/headers';
+import { auth as adminAuth } from 'firebase-admin';
 
 const registerSchema = z.object({
   email: z.string().email(),
@@ -21,10 +23,15 @@ export async function register(values: z.infer<typeof registerSchema>) {
     const validatedValues = registerSchema.parse(values);
     const { email, password } = validatedValues;
 
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const userCredential = await createUserWithEmailAndPassword(clientAuth, email, password);
     const user = userCredential.user;
 
     await createUserProfile(user.uid, user.email);
+
+    const idToken = await user.getIdToken();
+    const expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 days
+    const sessionCookie = await adminAuth().createSessionCookie(idToken, { expiresIn });
+    cookies().set('session', sessionCookie, { maxAge: expiresIn, httpOnly: true, secure: true });
     
   } catch (error: any) {
     if (error.code === 'auth/email-already-in-use') {
@@ -49,7 +56,11 @@ export async function login(values: z.infer<typeof loginSchema>) {
         const validatedValues = loginSchema.parse(values);
         const { email, password } = validatedValues;
         
-        await signInWithEmailAndPassword(auth, email, password);
+        const userCredential = await signInWithEmailAndPassword(clientAuth, email, password);
+        const idToken = await userCredential.user.getIdToken();
+        const expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 days
+        const sessionCookie = await adminAuth().createSessionCookie(idToken, { expiresIn });
+        cookies().set('session', sessionCookie, { maxAge: expiresIn, httpOnly: true, secure: true });
 
     } catch (error: any) {
         if (error.code === 'auth/invalid-credential') {
@@ -65,7 +76,8 @@ export async function login(values: z.infer<typeof loginSchema>) {
 
 export async function logout() {
     try {
-        await signOut(auth);
+        await signOut(clientAuth);
+        cookies().delete('session');
     } catch (error) {
         console.error('Error signing out:', error);
     }
@@ -74,7 +86,11 @@ export async function logout() {
 
 
 export async function requestUpgrade(formData: FormData) {
-    const user = auth.currentUser;
+    const sessionCookie = cookies().get('session')?.value;
+    if (!sessionCookie) return { error: "Anda harus login untuk melakukan ini." };
+    const decodedToken = await adminAuth().verifySessionCookie(sessionCookie, true);
+    const user = { uid: decodedToken.uid, email: decodedToken.email };
+    
     if (!user) {
         return { error: "Anda harus login untuk melakukan ini." };
     }
@@ -136,7 +152,11 @@ export async function requestUpgrade(formData: FormData) {
 }
 
 export async function updateUserProfile(formData: FormData) {
-    const user = auth.currentUser;
+    const sessionCookie = cookies().get('session')?.value;
+    if (!sessionCookie) return { error: "Anda harus login untuk melakukan ini." };
+    const decodedToken = await adminAuth().verifySessionCookie(sessionCookie, true);
+    const user = { uid: decodedToken.uid, email: decodedToken.email };
+
     if (!user) {
         return { error: "Anda harus login untuk melakukan ini." };
     }
@@ -175,7 +195,7 @@ export async function updateUserProfile(formData: FormData) {
         }
 
         if (password) {
-            await updatePassword(user, password);
+            await updatePassword(clientAuth.currentUser!, password); // Needs client-side auth instance
         }
 
     } catch (error: any) {
