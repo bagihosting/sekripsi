@@ -158,7 +158,6 @@ function processUserProfileDoc(doc: FirebaseFirestore.DocumentSnapshot): UserPro
     }
 
     return {
-        uid: doc.id,
         ...processedData,
     } as UserProfile;
 }
@@ -567,7 +566,7 @@ export async function getBlogPosts(): Promise<BlogPost[] | null> {
     if (!adminDb) return null;
     try {
         const postsCollection = adminDb.collection('blogPosts');
-        const q = postsCollection.where('status', '==', 'published');
+        const q = postsCollection.orderBy('createdAt', 'desc');
         const querySnapshot = await q.get();
 
         const posts = querySnapshot.docs.map(doc => {
@@ -579,8 +578,6 @@ export async function getBlogPosts(): Promise<BlogPost[] | null> {
                 updatedAt: (data.updatedAt as Timestamp).toDate().toISOString(),
             } as BlogPost;
         });
-        
-        posts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
         return posts;
 
@@ -726,5 +723,3 @@ export async function getSession(): Promise<{ userProfile: UserProfile | null }>
     return { userProfile: null };
   }
 }
-
-    

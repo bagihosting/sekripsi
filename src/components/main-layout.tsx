@@ -21,9 +21,9 @@ export default function MainLayout({ children, aiToolsLinks }: MainLayoutProps) 
   const pathname = usePathname();
   const isMobile = useIsMobile();
   
-  const isSpecialRoute = specialLayoutRoutes.some(route => pathname.startsWith(route)) || pathname.startsWith('/upgrade');
+  const isSpecialRoute = specialLayoutRoutes.some(route => pathname.startsWith(route));
 
-  // Special layout for login, register, upgrade
+  // Special layout for login, register
   if (isSpecialRoute) {
     return (
       <>
