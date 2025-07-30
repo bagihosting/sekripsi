@@ -565,7 +565,7 @@ export async function getBlogPosts(): Promise<BlogPost[] | null> {
     if (!adminDb) return null;
     try {
         const postsCollection = adminDb.collection('blogPosts');
-        const q = postsCollection.where('status', '==', 'published').orderBy('createdAt', 'desc');
+        const q = postsCollection.orderBy('createdAt', 'desc');
         const querySnapshot = await q.get();
 
         const posts = querySnapshot.docs.map(doc => {
