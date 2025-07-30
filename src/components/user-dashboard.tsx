@@ -1,5 +1,5 @@
 
-import type { UserProfile } from '@/lib/firestore';
+import type { UserProfile } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import Link from 'next/link';
 import { Button } from './ui/button';
@@ -13,7 +13,7 @@ export default function UserDashboard({ userProfile }: UserDashboardProps) {
   return (
     <div className="container max-w-screen-xl py-12 lg:py-16">
       <div className="space-y-4">
-        <h1 className="font-headline text-3xl font-bold md:text-4xl">Selamat Datang, Pejuang Skripsi!</h1>
+        <h1 className="font-headline text-3xl font-bold md:text-4xl">Selamat Datang, {userProfile.displayName || 'Pejuang Skripsi'}!</h1>
         <p className="text-lg text-foreground/70">
           Ini adalah pusat kendalimu. Semua alat dan progresmu ada di sini. Mari kita lanjutkan perjuangan!
         </p>

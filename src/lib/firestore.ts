@@ -14,6 +14,9 @@ export type { UserProfile };
  * @param email - The user's email.
  */
 export const createUserProfile = async (uid: string, email: string | null): Promise<void> => {
+  if (!db) {
+    throw new Error('Firestore is not initialized.');
+  }
   const userRef = doc(db, 'users', uid);
   // New users automatically get all free tools.
   const freeTools = initialTools.filter(tool => tool.price === 0).map(tool => tool.id);

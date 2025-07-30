@@ -1,5 +1,5 @@
 
-import type { UserProfile } from '@/lib/firestore';
+import type { UserProfile } from '@/lib/types';
 import { Card, CardHeader, CardTitle, CardContent } from './ui/card';
 import { Users, BarChart, Settings, LayoutGrid, Wand2, UserCog, Banknote, Tag, Rss, Store } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -32,7 +32,7 @@ export default function AdminDashboard({ userProfile }: AdminDashboardProps) {
       <div className="space-y-2 mb-12">
         <h1 className="font-headline text-3xl font-bold md:text-4xl">Dasbor Admin</h1>
         <p className="text-lg text-foreground/70">
-          Selamat datang, {userProfile.email}. Kelola pengguna, halaman, dan fitur dari sini.
+          Selamat datang, {userProfile.displayName || userProfile.email}. Kelola pengguna, halaman, dan fitur dari sini.
         </p>
       </div>
 
