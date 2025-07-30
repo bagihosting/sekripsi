@@ -73,7 +73,7 @@ Nilai-nilai ini aman untuk diekspos ke browser dan digunakan oleh Firebase Clien
 6.  Pilih **Config** untuk melihat objek konfigurasi `firebaseConfig`.
 7.  Salin nilai-nilai ini ke dalam file `.env` Anda.
 
-#### B. Kredensial Firebase Admin SDK (Server-side)
+#### B. Kredensial Firebase Admin SDK (Server-side) - SANGAT RAHASIA
 
 Nilai ini **sangat rahasia** dan hanya boleh ada di server Anda. Kunci ini memberikan akses penuh ke backend Firebase Anda.
 
@@ -81,7 +81,7 @@ Nilai ini **sangat rahasia** dan hanya boleh ada di server Anda. Kunci ini membe
 2.  Klik tombol **Generate new private key**. Sebuah file JSON akan terunduh ke komputer Anda.
 3.  Buka file JSON tersebut dengan editor teks.
 4.  **Salin seluruh konten file JSON tersebut**, mulai dari `{` hingga `}`.
-5.  Tempelkan konten tersebut sebagai nilai untuk `FIREBASE_SERVICE_ACCOUNT_KEY` di file `.env` Anda. **PENTING:** Pastikan seluruh konten JSON berada di dalam tanda kutip tunggal (`'...'`) agar dapat dibaca sebagai satu baris oleh sistem.
+5.  Tempelkan konten tersebut sebagai nilai untuk `FIREBASE_SERVICE_ACCOUNT_KEY` di file `.env` Anda. **PENTING:** Pastikan seluruh konten JSON berada di dalam tanda kutip tunggal (`'...'`) agar dapat dibaca sebagai satu baris string oleh sistem.
 
 #### Contoh Isi File `.env`
 
