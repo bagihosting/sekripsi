@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { cookies } from 'next/headers';
 import { adminAuth, adminDb } from '@/lib/firebase-admin';
 import { FieldValue, Timestamp } from 'firebase-admin/firestore';
-import type { RecentUpgrade, AiTool, UserProfile, BlogPost, Payment, PricingPlan } from './types';
+import type { RecentUpgrade, AiTool, UserProfile, BlogPost, Payment, PricingPlan } from '@/lib/types';
 import { initialTools, defaultPlans } from '@/lib/initial-data';
 import { uploadToCloudinary } from '@/lib/cloudinary';
 import { revalidatePath } from 'next/cache';
