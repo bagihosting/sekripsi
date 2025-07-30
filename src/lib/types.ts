@@ -74,3 +74,5 @@ export interface AiToolGroup {
 export type RecentUpgrade = Pick<UserProfile, 'displayName' | 'photoURL'> & {
     upgradedAt: string; // ISO string
 };
+
+    
