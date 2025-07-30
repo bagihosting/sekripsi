@@ -12,10 +12,32 @@ import { uploadToCloudinary } from './cloudinary';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
+// ========== Validation Schemas ==========
+
 const registerSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6),
+  email: z.string().email({ message: 'Email tidak valid.' }),
+  password: z.string().min(6, { message: 'Password minimal harus 6 karakter.' }),
 });
+
+const loginSchema = z.object({
+  email: z.string().email({ message: 'Email tidak valid.' }),
+  password: z.string().min(1, { message: 'Password tidak boleh kosong.' }),
+});
+
+const fileSchema = z.instanceof(File)
+  .refine((file) => file.size <= 5 * 1024 * 1024, `Ukuran file maksimal 5MB.`)
+  .refine(
+    (file) => ["image/jpeg", "image/jpg", "image/png", "image/webp"].includes(file.type),
+    "Hanya format .jpg, .jpeg, .png, dan .webp yang didukung."
+  );
+
+const profileUpdateSchema = z.object({
+    displayName: z.string().min(1, { message: 'Nama lengkap tidak boleh kosong.' }),
+    password: z.string().min(6, { message: 'Password baru harus minimal 6 karakter.' }).optional().or(z.literal('')),
+    photo: fileSchema.optional(),
+});
+
+// ========== Authentication Actions ==========
 
 export async function register(values: z.infer<typeof registerSchema>) {
   if (!adminAuth || !adminDb) {
@@ -25,14 +47,12 @@ export async function register(values: z.infer<typeof registerSchema>) {
     const validatedValues = registerSchema.parse(values);
     const { email, password } = validatedValues;
 
-    // Create user with Firebase Admin SDK
     const userRecord = await adminAuth.createUser({
       email,
       password,
       displayName: email.split('@')[0] || 'User',
     });
     
-    // Create user profile in Firestore
     const freeTools = initialTools.filter(tool => tool.price === 0).map(tool => tool.id);
     const newUserProfile = {
       email,
@@ -47,11 +67,13 @@ export async function register(values: z.infer<typeof registerSchema>) {
     };
     await adminDb.collection('users').doc(userRecord.uid).set(newUserProfile);
 
-    // Generate a custom token for client-side login
     const customToken = await adminAuth.createCustomToken(userRecord.uid);
     return { customToken };
 
   } catch (error: any) {
+    if (error instanceof z.ZodError) {
+      return { error: error.errors.map((e) => e.message).join(', ') };
+    }
     if (error.code === 'auth/email-already-exists') {
       return { error: 'Email ini sudah terdaftar.' };
     }
@@ -61,7 +83,6 @@ export async function register(values: z.infer<typeof registerSchema>) {
     };
   }
 }
-
 
 export async function createSession(idToken: string) {
     if (!adminAuth) {
@@ -85,13 +106,7 @@ export async function logout() {
     redirect('/login');
 }
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
-
-const fileSchema = z.instanceof(File)
-  .refine((file) => file.size <= MAX_FILE_SIZE, `Ukuran file maksimal 5MB.`)
-  .refine((file) => ACCEPTED_IMAGE_TYPES.includes(file.type), "Hanya format .jpg, .jpeg, .png, dan .webp yang didukung.");
-
+// ========== User Actions ==========
 
 export async function requestUpgrade(formData: FormData): Promise<{ success: boolean; error?: string; }> {
     if (!adminAuth || !adminDb) {
@@ -185,26 +200,27 @@ export async function updateUserProfile(formData: FormData) {
 
     const user = { uid: decodedToken.uid, email: decodedToken.email };
     
-    const displayName = formData.get('displayName') as string;
-    const password = formData.get('password') as string | null;
     const photo = formData.get('photo') as File | null;
+    const values = {
+        displayName: formData.get('displayName') as string,
+        password: formData.get('password') as string | null,
+        photo: photo && photo.size > 0 ? photo : undefined,
+    };
     
+    const validationResult = profileUpdateSchema.safeParse(values);
+    if (!validationResult.success) {
+      return { error: validationResult.error.errors.map((e) => e.message).join(', ') };
+    }
+    
+    const { displayName, password } = validationResult.data;
     const userRef = adminDb.collection('users').doc(user.uid);
-    const updates: { [key: string]: any } = {};
+    const updates: { [key: string]: any } = { displayName };
+    const authUpdates: { [key: string]: any } = { displayName };
 
     try {
-        if (displayName) {
-            updates.displayName = displayName;
-        }
-
-        if (photo && photo.size > 0) {
-            const validationResult = fileSchema.safeParse(photo);
-            if (!validationResult.success) {
-                return { error: validationResult.error.errors[0].message };
-            }
-            
-            const fileBuffer = await photo.arrayBuffer();
-            const mime = photo.type;
+        if (validationResult.data.photo) {
+            const fileBuffer = await validationResult.data.photo.arrayBuffer();
+            const mime = validationResult.data.photo.type;
             const encoding = 'base64';
             const base64Data = Buffer.from(fileBuffer).toString('base64');
             const fileUri = `data:${mime};${encoding},${base64Data}`;
@@ -214,20 +230,18 @@ export async function updateUserProfile(formData: FormData) {
 
             if (downloadURL) {
                 updates.photoURL = downloadURL;
+                authUpdates.photoURL = downloadURL;
             } else {
                  throw new Error("Gagal mengunggah foto profil.");
             }
         }
         
-        // Update both Auth and Firestore
-        if (Object.keys(updates).length > 0) {
-            await adminAuth.updateUser(user.uid, updates);
-            await userRef.update(updates);
-        }
-
         if (password) {
-            await adminAuth.updateUser(user.uid, { password: password });
+            authUpdates.password = password;
         }
+        
+        await adminAuth.updateUser(user.uid, authUpdates);
+        await userRef.update(updates);
 
     } catch (error: any) {
         console.error("Profile update failed:", error);
@@ -237,6 +251,8 @@ export async function updateUserProfile(formData: FormData) {
     revalidatePath('/dashboard/profil');
     return { success: true };
 }
+
+// ========== Admin Actions ==========
 
 const confirmPaymentSchema = z.object({
   paymentId: z.string(),
@@ -248,8 +264,12 @@ export async function confirmPayment(values: z.infer<typeof confirmPaymentSchema
     if (!adminDb) {
       return { error: "Konfigurasi server Firebase tidak lengkap." };
     }
-    const validatedValues = confirmPaymentSchema.parse(values);
-    const { paymentId, userId, toolId } = validatedValues;
+    const validatedValues = confirmPaymentSchema.safeParse(values);
+     if (!validatedValues.success) {
+      return { error: "Data konfirmasi tidak valid." };
+    }
+
+    const { paymentId, userId, toolId } = validatedValues.data;
 
     try {
         const userRef = adminDb.collection('users').doc(userId);
@@ -277,7 +297,6 @@ export async function confirmPayment(values: z.infer<typeof confirmPaymentSchema
                 photoURL: userData.photoURL,
                 upgradedAt: FieldValue.serverTimestamp(),
             };
-            // Add to the public recent_upgrades collection for the toast notification
             await adminDb.collection('recent_upgrades').add(upgradeData);
         }
 
@@ -295,30 +314,39 @@ export async function confirmPayment(values: z.infer<typeof confirmPaymentSchema
     return { success: true };
 }
 
+const pricingPlanSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  price: z.string(),
+  priceDescription: z.string(),
+  features: z.array(z.string()),
+  isRecommended: z.boolean(),
+});
+
 export async function updatePricingPlan(formData: FormData) {
     if (!adminDb) {
       return { error: "Konfigurasi server Firebase tidak lengkap." };
     }
-    const planId = formData.get('id') as string;
-    const name = formData.get('name') as string;
-    const price = formData.get('price') as string;
-    const priceDescription = formData.get('priceDescription') as string;
-    const features = formData.getAll('features') as string[];
-    const isRecommended = formData.get('isRecommended') === 'on';
+    
+    const data = {
+        id: formData.get('id') as string,
+        name: formData.get('name') as string,
+        price: formData.get('price') as string,
+        priceDescription: formData.get('priceDescription') as string,
+        features: formData.getAll('features') as string[],
+        isRecommended: formData.get('isRecommended') === 'on',
+    };
 
-    if (!planId) {
-        return { error: "Plan ID is missing." };
+    const validationResult = pricingPlanSchema.safeParse(data);
+    if (!validationResult.success) {
+        return { error: "Data paket harga tidak valid." };
     }
+    
+    const { id, ...planData } = validationResult.data;
 
     try {
-        const planRef = adminDb.collection('pricingPlans').doc(planId);
-        await planRef.update({
-            name,
-            price,
-            priceDescription,
-            features,
-            isRecommended
-        });
+        const planRef = adminDb.collection('pricingPlans').doc(id);
+        await planRef.update(planData);
     } catch(error) {
         console.error("Error updating plan:", error);
         return { error: "Gagal memperbarui paket harga." };
@@ -329,88 +357,78 @@ export async function updatePricingPlan(formData: FormData) {
     return { success: true };
 }
 
-const generateSlug = (title: string) => {
-    return title
-        .toLowerCase()
-        .replace(/[^a-z0-9\s-]/g, '')
-        .replace(/\s+/g, '-')
-        .replace(/-+/g, '-');
-};
+const blogPostSchema = z.object({
+  title: z.string().min(1, { message: 'Judul harus diisi.' }),
+  slug: z.string().min(1, { message: 'Slug harus diisi.' }),
+  content: z.string().min(1, { message: 'Konten harus diisi.' }),
+  category: z.string().min(1, { message: 'Kategori harus diisi.' }),
+  status: z.enum(['draft', 'published']),
+  image: fileSchema.optional(),
+  postId: z.string().optional(),
+  currentImageUrl: z.string().optional(),
+});
 
 export async function saveBlogPost(formData: FormData) {
     if (!adminDb) {
       return { error: "Konfigurasi server Firebase tidak lengkap." };
     }
-    const postId = formData.get('postId') as string | null;
-    const title = formData.get('title') as string;
-    let slug = formData.get('slug') as string;
-    const content = formData.get('content') as string;
-    const category = formData.get('category') as string;
-    const status = formData.get('status') as 'draft' | 'published';
+    
     const image = formData.get('image') as File | null;
+    const data = {
+        title: formData.get('title') as string,
+        slug: formData.get('slug') as string,
+        content: formData.get('content') as string,
+        category: formData.get('category') as string,
+        status: formData.get('status') as 'draft' | 'published',
+        image: image && image.size > 0 ? image : undefined,
+        postId: formData.get('postId') as string || undefined,
+        currentImageUrl: formData.get('currentImageUrl') as string || undefined,
+    };
+    
+    const validationResult = blogPostSchema.safeParse(data);
+    if (!validationResult.success) {
+        return { error: validationResult.error.errors.map(e => e.message).join(', ') };
+    }
 
-    if (!title || !content || !category || !status) {
-        return { error: 'Please fill all required fields.' };
-    }
-    
-    if (!slug) {
-        slug = generateSlug(title);
-    } else {
-        slug = generateSlug(slug);
-    }
-    
-    let imageUrl = formData.get('currentImageUrl') as string || '';
+    const { postId, currentImageUrl, ...postContent } = validationResult.data;
+    let imageUrl = currentImageUrl || '';
 
     try {
-        if (image && image.size > 0) {
-            const validationResult = fileSchema.safeParse(image);
-            if (!validationResult.success) {
-                return { error: validationResult.error.errors[0].message };
-            }
-            const fileBuffer = await image.arrayBuffer();
-            const mime = image.type;
-            const encoding = 'base64';
-            const base64Data = Buffer.from(fileBuffer).toString('base64');
-            const fileUri = `data:${mime};${encoding},${base64Data}`;
-            const result = await uploadToCloudinary(fileUri, `blog_images/${slug}`);
+        if (postContent.image) {
+            const fileBuffer = await postContent.image.arrayBuffer();
+            const mime = postContent.image.type;
+            const fileUri = `data:${mime};base64,${Buffer.from(fileBuffer).toString('base64')}`;
+            const result = await uploadToCloudinary(fileUri, `blog_images/${postContent.slug}`);
             imageUrl = result.secure_url;
         }
 
-        const postData: { [key: string]: any } = {
-            title,
-            slug,
-            content,
-            category,
-            status,
-            description: content.substring(0, 150),
+        const finalPostData: { [key: string]: any } = {
+            ...postContent,
+            description: postContent.content.substring(0, 150),
             author: "Tim sekripsi.com",
-            aiHint: `${category.toLowerCase()} blog`,
+            aiHint: `${postContent.category.toLowerCase()} blog`,
             updatedAt: FieldValue.serverTimestamp(),
+            imageUrl: imageUrl
         };
-        
-        if (imageUrl) {
-            postData.imageUrl = imageUrl;
-        }
+        delete finalPostData.image; // remove file object before saving to firestore
 
 
         if (postId) {
-            const postRef = adminDb.collection('blogPosts').doc(postId);
-            await postRef.update(postData);
+            await adminDb.collection('blogPosts').doc(postId).update(finalPostData);
         } else {
-            const collectionRef = adminDb.collection('blogPosts');
-            await collectionRef.add({
-                ...postData,
+            await adminDb.collection('blogPosts').add({
+                ...finalPostData,
                 createdAt: FieldValue.serverTimestamp(),
             });
         }
     } catch (e: any) {
         console.error(e);
-        return { error: 'Failed to save blog post.' };
+        return { error: 'Gagal menyimpan artikel blog.' };
     }
 
     revalidatePath('/blog');
     if (status === 'published') {
-        revalidatePath(`/blog/${slug}`);
+        revalidatePath(`/blog/${postContent.slug}`);
     }
     revalidatePath('/dashboard');
     return { success: true };
@@ -435,27 +453,38 @@ export async function deleteBlogPost(postId: string) {
     revalidatePath('/dashboard');
 }
 
+const aiToolSchema = z.object({
+  id: z.string().min(1),
+  title: z.string().min(1),
+  description: z.string().min(1),
+  price: z.coerce.number().min(0),
+});
+
 export async function updateAiTool(formData: FormData) {
     if (!adminDb) {
       return { error: "Konfigurasi server Firebase tidak lengkap." };
     }
-    const id = formData.get('id') as string;
-    const title = formData.get('title') as string;
-    const description = formData.get('description') as string;
-    const price = formData.get('price') as string;
-
-    if (!id) return { error: 'Tool ID is required' };
+    
+    const data = {
+        id: formData.get('id') as string,
+        title: formData.get('title') as string,
+        description: formData.get('description') as string,
+        price: formData.get('price') as string,
+    };
+    
+    const validationResult = aiToolSchema.safeParse(data);
+    if (!validationResult.success) {
+        return { error: 'Data alat AI tidak valid.' };
+    }
+    
+    const { id, ...toolData } = validationResult.data;
 
     try {
         const toolRef = adminDb.collection('ai_tools').doc(id);
-        await toolRef.update({
-            title,
-            description,
-            price: Number(price) || 0,
-        });
+        await toolRef.update(toolData);
     } catch (e: any) {
         console.error("Error updating AI tool:", e);
-        return { error: 'Failed to update AI tool.' };
+        return { error: 'Gagal memperbarui alat AI.' };
     }
     
     revalidatePath('/produk');
@@ -463,6 +492,8 @@ export async function updateAiTool(formData: FormData) {
     revalidatePath('/dashboard');
     return { success: true };
 }
+
+// ========== Data Fetching Actions ==========
 
 export async function getRecentUpgrades(): Promise<RecentUpgrade[]> {
     if (!adminDb) {
@@ -495,7 +526,6 @@ export async function getRecentUpgrades(): Promise<RecentUpgrade[]> {
     }
 }
 
-// Function to get all tools from Firestore, returning icon as a string
 export async function getAllTools(): Promise<AiTool[]> {
   if (!adminDb) {
      console.warn("Admin DB not initialized. Returning initial tools.");
@@ -515,13 +545,13 @@ export async function getAllTools(): Promise<AiTool[]> {
       return {
         ...data,
         id: doc.id,
-        icon: data.icon as string, // Keep icon as string
+        icon: data.icon as string,
       } as AiTool;
     });
     return tools;
   } catch (error) {
     console.error("Error fetching tools from Firestore with Admin SDK:", error);
-    return initialTools; // Fallback
+    return initialTools;
   }
 }
 
@@ -569,8 +599,6 @@ export async function getSession(): Promise<{ userProfile: UserProfile | null }>
     const userProfile = await getUserProfile(decodedIdToken.uid);
     return { userProfile };
   } catch (error) {
-    // Session cookie is invalid or expired.
-    // This is an expected error and can be ignored.
     return { userProfile: null };
   }
 }

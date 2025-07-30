@@ -26,20 +26,18 @@ export default function AuthFormContainer({ mode }: AuthFormContainerProps) {
         toast({ title: 'Login Gagal', description: 'Layanan autentikasi tidak tersedia.', variant: 'destructive' });
         return;
       }
-      // First, sign in with email and password on the client to get an ID token
       try {
         const userCredential = await signInWithEmailAndPassword(auth, values.email, values.password);
         const idToken = await getIdToken(userCredential.user);
         
-        // Then, pass the ID token to the server to create a session cookie
         const sessionResult = await createSession(idToken);
         
         if (sessionResult?.error) {
           throw new Error(sessionResult.error);
         }
 
-        router.push('/dashboard');
         toast({ title: 'Login Berhasil!', description: 'Selamat datang kembali.' });
+        router.push('/dashboard');
       } catch (error: any) {
         if (error.code === 'auth/invalid-credential') {
           toast({ title: 'Login Gagal', description: 'Email atau password salah.', variant: 'destructive' });
@@ -57,22 +55,20 @@ export default function AuthFormContainer({ mode }: AuthFormContainerProps) {
         toast({ title: 'Registrasi Gagal', description: 'Layanan autentikasi tidak tersedia.', variant: 'destructive' });
         return;
       }
-      // Create user via server action
       const result = await register(values);
       if (result?.error) {
         toast({ title: 'Registrasi Gagal', description: result.error, variant: 'destructive' });
         return;
       }
 
-      // If server-side creation is successful, sign in on the client with the custom token
       if (result.customToken) {
         try {
           await signInWithCustomToken(auth, result.customToken);
           if (auth.currentUser) {
               const idToken = await getIdToken(auth.currentUser);
-              await createSession(idToken); // Create server session
-              router.push('/dashboard');
+              await createSession(idToken);
               toast({ title: 'Registrasi Berhasil!', description: 'Selamat datang di sekripsi.com.' });
+              router.push('/dashboard');
           }
         } catch (clientError) {
             console.error("Client sign-in error:", clientError);

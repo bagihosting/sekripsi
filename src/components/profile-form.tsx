@@ -20,7 +20,7 @@ const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/web
 
 const formSchema = z.object({
   displayName: z.string().min(1, { message: 'Nama lengkap tidak boleh kosong.' }),
-  password: z.string().optional(),
+  password: z.string().min(6, { message: 'Password baru harus minimal 6 karakter.' }).optional().or(z.literal('')),
   photo: z
     .custom<FileList>()
     .refine((files) => !files || files.length === 0 || files?.[0]?.size <= MAX_FILE_SIZE, `Ukuran file maksimal 5MB.`)
@@ -75,7 +75,7 @@ export default function ProfileForm({ userProfile }: ProfileFormProps) {
           title: 'Update Berhasil!',
           description: 'Profil Anda telah berhasil diperbarui.',
         });
-        reloadProfile(); // Reload profile data from server
+        reloadProfile();
         form.reset({ ...form.getValues(), password: '' });
       }
     });
@@ -147,3 +147,5 @@ export default function ProfileForm({ userProfile }: ProfileFormProps) {
     </Form>
   );
 }
+
+    
