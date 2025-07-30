@@ -15,12 +15,11 @@ import {
   FileText,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
-import { collection, doc, getDoc, getDocs, setDoc } from 'firebase/firestore';
-import { db } from './firebase';
+import { adminDb } from './firebase-admin';
 
 export interface AiTool {
   id: string;
-  icon: LucideIcon | string; // Allow string for icon name
+  icon: string; 
   title: string;
   description: string;
   href: string;
@@ -35,7 +34,7 @@ export interface AiToolGroup {
     tools: AiTool[];
 }
 
-export const initialTools: Omit<AiTool, 'icon'> & { icon: string }[] = [
+export const initialTools: AiTool[] = [
     // Ideation Tools
     {
       id: 'draft-generator',
@@ -164,22 +163,22 @@ export const initialTools: Omit<AiTool, 'icon'> & { icon: string }[] = [
     },
 ];
 
-
-// Map icon names to actual components
 export const iconMap: { [key: string]: LucideIcon } = {
     FileText, Wand2, Target, TestTubeDiagonal, BookMarked, Library, PenSquare, SpellCheck, BrainCircuit, ShieldQuestion, Wand, Database, BookText
 };
 
 async function populateInitialTools() {
-    const toolsCollection = collection(db, 'ai_tools');
-    const snapshot = await getDocs(toolsCollection);
+    if (!adminDb) return;
+    const toolsCollection = adminDb.collection('ai_tools');
+    const snapshot = await toolsCollection.get();
     if (snapshot.empty) {
         console.log("Populating initial AI tools into Firestore...");
-        const batch = [];
+        const batch = adminDb.batch();
         for (const tool of initialTools) {
-            batch.push(setDoc(doc(db, 'ai_tools', tool.id), tool));
+            const docRef = toolsCollection.doc(tool.id);
+            batch.set(docRef, tool);
         }
-        await Promise.all(batch);
+        await batch.commit();
         console.log("Initial tools populated.");
     }
 }
@@ -188,13 +187,17 @@ populateInitialTools();
 
 // Function to get all tools from Firestore, returning icon as a string
 export async function getAllTools(): Promise<AiTool[]> {
+  if (!adminDb) {
+     console.warn("Admin DB not initialized. Returning initial tools.");
+     return initialTools;
+  }
   try {
-    const toolsCollection = collection(db, 'ai_tools');
-    const toolsSnapshot = await getDocs(toolsCollection);
+    const toolsCollection = adminDb.collection('ai_tools');
+    const toolsSnapshot = await toolsCollection.get();
     
     if (toolsSnapshot.empty) {
         console.warn("No AI tools found in Firestore. Returning initial toolset.");
-        return initialTools.map(t => ({...t, icon: t.icon}));
+        return initialTools;
     }
     
     const tools = toolsSnapshot.docs.map(doc => {
@@ -207,18 +210,23 @@ export async function getAllTools(): Promise<AiTool[]> {
     });
     return tools;
   } catch (error) {
-    console.error("Error fetching tools from Firestore:", error);
-    return initialTools.map(t => ({...t, icon: t.icon})); // Fallback
+    console.error("Error fetching tools from Firestore with Admin SDK:", error);
+    return initialTools; // Fallback
   }
 }
 
 // Function to get a single tool by ID from Firestore, returning icon as a string
 export async function getToolById(id: string): Promise<AiTool | null> {
+    if (!adminDb) {
+        console.warn(`Admin DB not initialized. Cannot fetch tool ${id}.`);
+        const tool = initialTools.find(t => t.id === id) || null;
+        return tool;
+    }
     try {
-        const toolRef = doc(db, 'ai_tools', id);
-        const toolSnap = await getDoc(toolRef);
+        const toolRef = adminDb.collection('ai_tools').doc(id);
+        const toolSnap = await toolRef.get();
 
-        if (!toolSnap.exists()) {
+        if (!toolSnap.exists) {
             console.warn(`Tool with id ${id} not found in Firestore.`);
             return null;
         }
@@ -227,10 +235,10 @@ export async function getToolById(id: string): Promise<AiTool | null> {
         return {
             ...data,
             id: toolSnap.id,
-            icon: data.icon as string, // Keep icon as string
+            icon: data.icon as string,
         } as AiTool;
     } catch (error) {
-        console.error(`Error fetching tool with id ${id}:`, error);
+        console.error(`Error fetching tool with id ${id} with Admin SDK:`, error);
         return null;
     }
 }

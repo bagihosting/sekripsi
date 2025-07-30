@@ -1,6 +1,5 @@
 
-import { collection, query, where, getDocs, limit, Timestamp } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { adminDb } from "@/lib/firebase-admin";
 import { BlogPost } from "@/lib/firestore";
 import { notFound } from "next/navigation";
 import Image from "next/image";
@@ -8,27 +7,28 @@ import { Badge } from "@/components/ui/badge";
 import { Calendar, User, Home, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { Metadata } from "next";
+import { Timestamp } from "firebase-admin/firestore";
 
 type Props = {
     params: { slug: string };
 };
 
-// Function to fetch all published blog posts for static generation
 export async function generateStaticParams() {
-    const postsCollection = collection(db, 'blogPosts');
-    const q = query(postsCollection, where('status', '==', 'published'));
-    const postsSnapshot = await getDocs(q);
+    if (!adminDb) return [];
+    const postsCollection = adminDb.collection('blogPosts');
+    const q = postsCollection.where('status', '==', 'published');
+    const postsSnapshot = await q.get();
 
     return postsSnapshot.docs.map(doc => ({
         slug: doc.data().slug,
     }));
 }
 
-// Function to get a single post by slug
 async function getPostBySlug(slug: string): Promise<BlogPost | null> {
-    const postsCollection = collection(db, 'blogPosts');
-    const q = query(postsCollection, where('slug', '==', slug), limit(1));
-    const querySnapshot = await getDocs(q);
+    if (!adminDb) return null;
+    const postsCollection = adminDb.collection('blogPosts');
+    const q = postsCollection.where('slug', '==', slug).limit(1);
+    const querySnapshot = await q.get();
 
     if (querySnapshot.empty) {
         return null;

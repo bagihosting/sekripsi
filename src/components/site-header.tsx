@@ -1,37 +1,26 @@
 
 "use client";
 
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger } from '@/components/ui/sheet';
 import { SekripsiComIcon } from '@/components/icons';
-import { ArrowRight, Menu, Sparkles, ChevronDown, Star, User, LogOut, LayoutDashboard, UserCog } from 'lucide-react';
+import { ChevronDown, LayoutDashboard, LogOut, Sparkles, Star, UserCog } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from './ui/dropdown-menu';
-import { Separator } from './ui/separator';
 import { useAuth } from '@/hooks/use-auth';
 import { logout } from '@/lib/actions';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { getAllTools, AiTool } from '@/lib/plugins';
+import type { AiTool } from '@/lib/plugins';
 
-export const SiteHeader = () => {
-  const [open, setOpen] = useState(false);
+interface SiteHeaderProps {
+    aiToolsLinks: AiTool[];
+}
+
+export const SiteHeader = ({ aiToolsLinks }: SiteHeaderProps) => {
   const pathname = usePathname();
   const { user, userProfile } = useAuth();
-  const [aiToolsLinks, setAiToolsLinks] = useState<AiTool[]>([]);
-  const [loadingTools, setLoadingTools] = useState(true);
-
-  useEffect(() => {
-    const fetchTools = async () => {
-      const tools = await getAllTools();
-      setAiToolsLinks(tools);
-      setLoadingTools(false);
-    }
-    fetchTools();
-  }, []);
-
+  
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       {/* Desktop Header */}
@@ -59,7 +48,7 @@ export const SiteHeader = () => {
                     </Link>
                 </DropdownMenuItem>
                  <DropdownMenuSeparator />
-                 {!loadingTools && aiToolsLinks.map(link => (
+                 {aiToolsLinks.map(link => (
                     <DropdownMenuItem key={link.href} asChild>
                         <Link href={link.href}>{link.title}</Link>
                     </DropdownMenuItem>

@@ -2,8 +2,8 @@
 "use client";
 
 import { useEffect, useState, useTransition } from 'react';
+import { adminDb } from '@/lib/firebase-admin-client'; // Using a client-safe admin instance
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
@@ -23,18 +23,32 @@ export default function PaymentConfirmation() {
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
 
   useEffect(() => {
-    const q = query(collection(db, 'payments'), where('status', '==', 'pending'));
+    if (!adminDb) {
+      setLoading(false);
+      return;
+    };
+    const q = query(collection(adminDb, 'payments'), where('status', '==', 'pending'));
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const pendingPayments: Payment[] = [];
       querySnapshot.forEach((doc) => {
-        pendingPayments.push({ id: doc.id, ...doc.data() } as Payment);
+        const data = doc.data();
+        pendingPayments.push({
+             id: doc.id,
+             ...data,
+             // Ensure Timestamps are converted if they exist
+             createdAt: data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : new Date().toISOString(),
+        } as Payment);
       });
       setPayments(pendingPayments);
+      setLoading(false);
+    }, (error) => {
+      console.error("Error fetching payments:", error);
+      toast({ title: "Gagal Memuat Pembayaran", description: "Tidak dapat mengambil data pembayaran. Anda mungkin tidak memiliki izin.", variant: 'destructive' });
       setLoading(false);
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [toast]);
 
   const handleConfirm = (paymentId: string, userId: string, toolId?: string) => {
     setConfirmingId(paymentId);
@@ -70,6 +84,20 @@ export default function PaymentConfirmation() {
       </Card>
     );
   }
+  
+   if (!adminDb) {
+     return (
+        <Card>
+        <CardHeader>
+          <CardTitle>Konfigurasi Admin Diperlukan</CardTitle>
+          <CardDescription>Manajemen pembayaran memerlukan konfigurasi Firebase Admin SDK di server.</CardDescription>
+        </CardHeader>
+        <CardContent>
+            <p className="text-sm text-muted-foreground">Silakan atur variabel lingkungan FIREBASE_SERVICE_ACCOUNT_KEY untuk mengaktifkan fitur ini.</p>
+        </CardContent>
+      </Card>
+     )
+   }
 
   return (
     <Card>
@@ -94,7 +122,7 @@ export default function PaymentConfirmation() {
                   </span>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Tanggal Pengajuan: {new Date(payment.createdAt.seconds * 1000).toLocaleString('id-ID')}
+                  Tanggal Pengajuan: {new Date(payment.createdAt).toLocaleString('id-ID')}
                 </p>
                  <Badge variant="secondary">{payment.status}</Badge>
               </div>

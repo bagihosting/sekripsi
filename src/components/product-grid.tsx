@@ -87,7 +87,7 @@ const ProductCard = ({ product }: { product: AiTool }) => {
     const isPro = userProfile?.plan === 'pro';
     const isFree = product.price === 0;
     const displayPrice = isPro && !isFree ? product.price / 2 : product.price;
-    const IconComponent = typeof product.icon === 'string' ? iconMap[product.icon] || Wand : product.icon;
+    const IconComponent = typeof product.icon === 'string' ? iconMap[product.icon] || Wand : Wand;
 
 
     return (

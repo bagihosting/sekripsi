@@ -17,8 +17,11 @@ const firebaseConfig = {
 
 const clientApp = !getClientApps().length ? initializeClientApp(firebaseConfig) : getClientApp();
 
-const db = getFirestore(clientApp);
+// These are for CLIENT-SIDE operations ONLY.
+// For server-side, use the firebase-admin SDK.
 const auth = getAuth(clientApp);
 const storage = getStorage(clientApp);
+const db = getFirestore(clientApp);
+
 
 export { clientApp as app, db, auth, storage };

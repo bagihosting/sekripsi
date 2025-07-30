@@ -3,15 +3,15 @@
 
 import { z } from 'zod';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updatePassword } from 'firebase/auth';
-import { auth as clientAuth, db } from '@/lib/firebase';
-import { createUserProfile } from './firestore';
+import { auth as clientAuth } from '@/lib/firebase';
+import { createUserProfile, UserProfile } from './firestore';
 import { redirect } from 'next/navigation';
-import { collection, doc, setDoc, serverTimestamp, updateDoc, addDoc, deleteDoc, getDoc, arrayUnion } from 'firebase/firestore';
-import { uploadToCloudinary } from './cloudinary';
 import { revalidatePath } from 'next/cache';
+import { uploadToCloudinary } from './cloudinary';
 import { getToolById } from './plugins';
 import { cookies } from 'next/headers';
-import { adminAuth } from '@/lib/firebase-admin';
+import { adminAuth, adminDb } from '@/lib/firebase-admin';
+import { FieldValue } from 'firebase-admin/firestore';
 
 const registerSchema = z.object({
   email: z.string().email(),
@@ -26,6 +26,7 @@ export async function register(values: z.infer<typeof registerSchema>) {
     const validatedValues = registerSchema.parse(values);
     const { email, password } = validatedValues;
 
+    // Use client SDK for user creation to get them logged in immediately
     const userCredential = await createUserWithEmailAndPassword(clientAuth, email, password);
     const user = userCredential.user;
 
@@ -62,8 +63,11 @@ export async function login(values: z.infer<typeof loginSchema>) {
         const validatedValues = loginSchema.parse(values);
         const { email, password } = validatedValues;
         
+        // Use client SDK to sign in
         const userCredential = await signInWithEmailAndPassword(clientAuth, email, password);
         const idToken = await userCredential.user.getIdToken();
+
+        // Create session cookie with Admin SDK
         const expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 days
         const sessionCookie = await adminAuth.createSessionCookie(idToken, { expiresIn });
         cookies().set('session', sessionCookie, { maxAge: expiresIn, httpOnly: true, secure: true });
@@ -82,6 +86,7 @@ export async function login(values: z.infer<typeof loginSchema>) {
 
 export async function logout() {
     try {
+        // Use client SDK to sign out
         await signOut(clientAuth);
         cookies().delete('session');
     } catch (error) {
@@ -92,7 +97,7 @@ export async function logout() {
 
 
 export async function requestUpgrade(formData: FormData): Promise<{ success: boolean; error?: string; }> {
-    if (!adminAuth) {
+    if (!adminAuth || !adminDb) {
       return { success: false, error: "Konfigurasi server Firebase tidak lengkap." };
     }
     const sessionCookie = cookies().get('session')?.value;
@@ -133,7 +138,7 @@ export async function requestUpgrade(formData: FormData): Promise<{ success: boo
             userEmail: user.email,
             proofUrl: downloadURL,
             status: 'pending',
-            createdAt: serverTimestamp(),
+            createdAt: FieldValue.serverTimestamp(),
             type: toolId ? 'tool_purchase' : 'subscription',
         };
 
@@ -147,11 +152,10 @@ export async function requestUpgrade(formData: FormData): Promise<{ success: boo
             paymentData.amount = 79000;
         }
 
-        const paymentRef = doc(collection(db, 'payments'));
-        await setDoc(paymentRef, paymentData);
+        await adminDb.collection('payments').add(paymentData);
         
-        const userRef = doc(db, 'users', user.uid);
-        await updateDoc(userRef, {
+        const userRef = adminDb.collection('users').doc(user.uid);
+        await userRef.update({
             paymentStatus: 'pending'
         });
 
@@ -164,7 +168,7 @@ export async function requestUpgrade(formData: FormData): Promise<{ success: boo
 }
 
 export async function updateUserProfile(formData: FormData) {
-    if (!adminAuth) {
+    if (!adminAuth || !adminDb) {
       return { error: "Konfigurasi server Firebase tidak lengkap." };
     }
     const sessionCookie = cookies().get('session')?.value;
@@ -183,7 +187,7 @@ export async function updateUserProfile(formData: FormData) {
     const password = formData.get('password') as string | null;
     const photo = formData.get('photo') as File | null;
     
-    const userRef = doc(db, 'users', user.uid);
+    const userRef = adminDb.collection('users').doc(user.uid);
     const updates: { [key: string]: any } = {};
 
     try {
@@ -208,23 +212,18 @@ export async function updateUserProfile(formData: FormData) {
             }
         }
         
+        // Update both Auth and Firestore
         if (Object.keys(updates).length > 0) {
-            await updateDoc(userRef, updates);
+            await adminAuth.updateUser(user.uid, updates);
+            await userRef.update(updates);
         }
 
         if (password) {
-            if (clientAuth.currentUser) {
-              await updatePassword(clientAuth.currentUser, password);
-            } else {
-              return { error: 'Sesi Anda telah berakhir. Silakan logout dan login kembali untuk mengubah kata sandi.' };
-            }
+            await adminAuth.updateUser(user.uid, { password: password });
         }
 
     } catch (error: any) {
         console.error("Profile update failed:", error);
-        if (error.code === 'auth/requires-recent-login') {
-            return { error: 'Sesi Anda telah berakhir. Silakan logout dan login kembali untuk mengubah kata sandi.' };
-        }
         return { error: "Gagal memperbarui profil Anda. Silakan coba lagi." };
     }
     
@@ -239,44 +238,45 @@ const confirmPaymentSchema = z.object({
 });
 
 export async function confirmPayment(values: z.infer<typeof confirmPaymentSchema>) {
+    if (!adminDb) {
+      return { error: "Konfigurasi server Firebase tidak lengkap." };
+    }
     const validatedValues = confirmPaymentSchema.parse(values);
     const { paymentId, userId, toolId } = validatedValues;
 
     try {
-        const userRef = doc(db, 'users', userId);
-        const paymentRef = doc(db, 'payments', paymentId);
+        const userRef = adminDb.collection('users').doc(userId);
+        const paymentRef = adminDb.collection('payments').doc(paymentId);
 
         if (toolId) {
-             // It's a tool purchase
-            await updateDoc(userRef, {
-                purchasedTools: arrayUnion(toolId),
-                activatedTools: arrayUnion(toolId),
-                paymentStatus: 'pro', // or some other logic
+            await userRef.update({
+                purchasedTools: FieldValue.arrayUnion(toolId),
+                activatedTools: FieldValue.arrayUnion(toolId),
+                paymentStatus: 'pro', // Or could be kept same if they are not subbed
             });
         } else {
-            // It's a subscription upgrade
-            const userSnap = await getDoc(userRef);
-            if (!userSnap.exists()) throw new Error("User not found");
-            const userData = userSnap.data();
+            const userSnap = await userRef.get();
+            if (!userSnap.exists) throw new Error("User not found");
+            const userData = userSnap.data() as UserProfile;
 
-            await updateDoc(userRef, {
+            await userRef.update({
                 plan: 'pro',
                 paymentStatus: 'pro',
-                upgradedAt: serverTimestamp(),
+                upgradedAt: FieldValue.serverTimestamp(),
             });
 
-            // Add to the public recent_upgrades collection for the toast notification
-            const upgradeRef = doc(collection(db, 'recent_upgrades'));
-            await setDoc(upgradeRef, {
+            const upgradeData = {
                 displayName: userData.displayName,
                 photoURL: userData.photoURL,
-                upgradedAt: serverTimestamp(),
-            });
+                upgradedAt: FieldValue.serverTimestamp(),
+            };
+            // Add to the public recent_upgrades collection for the toast notification
+            await adminDb.collection('recent_upgrades').add(upgradeData);
         }
 
-        await updateDoc(paymentRef, {
+        await paymentRef.update({
             status: 'confirmed',
-            processedAt: serverTimestamp(),
+            processedAt: FieldValue.serverTimestamp(),
         });
 
     } catch (error: any) {
@@ -289,6 +289,9 @@ export async function confirmPayment(values: z.infer<typeof confirmPaymentSchema
 }
 
 export async function updatePricingPlan(formData: FormData) {
+    if (!adminDb) {
+      return { error: "Konfigurasi server Firebase tidak lengkap." };
+    }
     const planId = formData.get('id') as string;
     const name = formData.get('name') as string;
     const price = formData.get('price') as string;
@@ -301,8 +304,8 @@ export async function updatePricingPlan(formData: FormData) {
     }
 
     try {
-        const planRef = doc(db, 'pricingPlans', planId);
-        await updateDoc(planRef, {
+        const planRef = adminDb.collection('pricingPlans').doc(planId);
+        await planRef.update({
             name,
             price,
             priceDescription,
@@ -328,6 +331,9 @@ const generateSlug = (title: string) => {
 };
 
 export async function saveBlogPost(formData: FormData) {
+    if (!adminDb) {
+      return { error: "Konfigurasi server Firebase tidak lengkap." };
+    }
     const postId = formData.get('postId') as string | null;
     const title = formData.get('title') as string;
     let slug = formData.get('slug') as string;
@@ -369,17 +375,17 @@ export async function saveBlogPost(formData: FormData) {
             description: content.substring(0, 150),
             author: "Tim sekripsi.com",
             aiHint: `${category.toLowerCase()} blog`,
-            updatedAt: serverTimestamp(),
+            updatedAt: FieldValue.serverTimestamp(),
         };
 
         if (postId) {
-            const postRef = doc(db, 'blogPosts', postId);
-            await updateDoc(postRef, postData);
+            const postRef = adminDb.collection('blogPosts').doc(postId);
+            await postRef.update(postData);
         } else {
-            const collectionRef = collection(db, 'blogPosts');
-            await addDoc(collectionRef, {
+            const collectionRef = adminDb.collection('blogPosts');
+            await collectionRef.add({
                 ...postData,
-                createdAt: serverTimestamp(),
+                createdAt: FieldValue.serverTimestamp(),
             });
         }
     } catch (e: any) {
@@ -396,12 +402,15 @@ export async function saveBlogPost(formData: FormData) {
 }
 
 export async function deleteBlogPost(postId: string) {
+    if (!adminDb) {
+      return { error: "Konfigurasi server Firebase tidak lengkap." };
+    }
     if (!postId) {
         return { error: "Post ID is required." };
     }
     try {
-        const postRef = doc(db, 'blogPosts', postId);
-        await deleteDoc(postRef);
+        const postRef = adminDb.collection('blogPosts').doc(postId);
+        await postRef.delete();
     } catch(e) {
         console.error(e);
         return { error: "Failed to delete post." };
@@ -412,6 +421,9 @@ export async function deleteBlogPost(postId: string) {
 }
 
 export async function updateAiTool(formData: FormData) {
+    if (!adminDb) {
+      return { error: "Konfigurasi server Firebase tidak lengkap." };
+    }
     const id = formData.get('id') as string;
     const title = formData.get('title') as string;
     const description = formData.get('description') as string;
@@ -420,8 +432,8 @@ export async function updateAiTool(formData: FormData) {
     if (!id) return { error: 'Tool ID is required' };
 
     try {
-        const toolRef = doc(db, 'ai_tools', id);
-        await updateDoc(toolRef, {
+        const toolRef = adminDb.collection('ai_tools').doc(id);
+        await toolRef.update({
             title,
             description,
             price: Number(price) || 0,

@@ -2,16 +2,18 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { collection, query, orderBy, limit, onSnapshot, Timestamp } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { collection, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
+import { db } from '@/lib/firebase'; // Use client SDK for live updates
 import { UserProfile } from '@/lib/firestore';
 import { Toast, ToastDescription, ToastTitle } from '@/components/ui/toast';
 import { Star } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { AnimatePresence, motion } from "framer-motion";
+import { Timestamp } from 'firebase/firestore';
+
 
 type RecentUpgrade = Pick<UserProfile, 'displayName' | 'photoURL'> & {
-    upgradedAt: Timestamp;
+    upgradedAt: Date;
 };
 
 export default function RecentUpgradeToast() {
@@ -30,11 +32,11 @@ export default function RecentUpgradeToast() {
       const fetchedUpgrades: RecentUpgrade[] = [];
       snapshot.forEach((doc) => {
         const data = doc.data();
-        if (data.upgradedAt) {
+        if (data.upgradedAt instanceof Timestamp) {
             fetchedUpgrades.push({
                 displayName: data.displayName,
                 photoURL: data.photoURL,
-                upgradedAt: data.upgradedAt,
+                upgradedAt: data.upgradedAt.toDate(),
             });
         }
       });
@@ -109,7 +111,7 @@ export default function RecentUpgradeToast() {
                                         <span className="font-semibold">{currentUpgrade.displayName}</span> baru saja menjadi Pejuang Skripsi Pro.
                                     </ToastDescription>
                                     <p className="text-xs text-muted-foreground mt-1">
-                                        {timeAgo(currentUpgrade.upgradedAt?.toDate())}
+                                        {timeAgo(currentUpgrade.upgradedAt)}
                                     </p>
                                 </div>
                             </div>

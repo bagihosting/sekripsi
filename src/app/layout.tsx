@@ -3,6 +3,8 @@ import type {Metadata} from 'next';
 import { Toaster } from "@/components/ui/toaster"
 import './globals.css';
 import { AuthProvider } from '@/components/auth-provider';
+import { getAllTools } from '@/lib/plugins';
+import MainLayout from '@/components/main-layout';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://sekripsi.com';
 
@@ -47,11 +49,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const tools = await getAllTools();
+  
   return (
     <html lang="id" className="scroll-smooth">
       <head>
@@ -61,7 +65,9 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased">
         <AuthProvider>
-          {children}
+          <MainLayout aiToolsLinks={tools}>
+            {children}
+          </MainLayout>
         </AuthProvider>
         <Toaster />
       </body>

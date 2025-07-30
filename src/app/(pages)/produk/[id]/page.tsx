@@ -20,7 +20,7 @@ export default async function ProductDetailPage({ params }: Props) {
     notFound();
   }
   
-  const IconComponent = typeof product.icon === 'string' ? iconMap[product.icon] || Wand : product.icon;
+  const IconComponent = typeof product.icon === 'string' ? iconMap[product.icon] || Wand : Wand;
   
   const productFeatures = [
       `Membantu dalam tahap ${product.category}`,

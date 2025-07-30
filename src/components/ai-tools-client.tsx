@@ -18,7 +18,7 @@ interface AiToolsClientProps {
 }
 
 function ToolCard({ tool }: { tool: AiTool }) {
-  const IconComponent = typeof tool.icon === 'string' ? iconMap[tool.icon] || Wand : tool.icon;
+  const IconComponent = typeof tool.icon === 'string' ? iconMap[tool.icon] || Wand : Wand;
   return (
     <Card className="flex flex-col justify-between transition-all hover:shadow-lg hover:-translate-y-1">
        <CardHeader>

@@ -1,22 +1,28 @@
 
 import { getAllTools } from '@/lib/plugins';
 import AiToolsClient from '@/components/ai-tools-client';
-import { getDoc, doc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
 import { UserProfile } from '@/lib/firestore';
 import { cookies } from 'next/headers';
-import { adminAuth } from '@/lib/firebase-admin';
+import { adminAuth, adminDb } from '@/lib/firebase-admin';
 
 async function getUserProfile(uid: string): Promise<UserProfile | null> {
+    if (!adminDb) return null;
     try {
-        const userRef = doc(db, 'users', uid);
-        const userSnap = await getDoc(userRef);
-        if (userSnap.exists()) {
-            return { uid, ...userSnap.data() } as UserProfile;
+        const userRef = adminDb.collection('users').doc(uid);
+        const userSnap = await userRef.get();
+        if (userSnap.exists) {
+            const data = userSnap.data();
+            // Firestore Admin SDK returns Timestamps, convert them for serialization
+            return {
+                ...data,
+                uid,
+                createdAt: data?.createdAt?.toDate().toISOString(),
+                upgradedAt: data?.upgradedAt?.toDate().toISOString()
+            } as UserProfile;
         }
         return null;
     } catch (error) {
-        console.error("Error fetching user profile on server:", error);
+        console.error("Error fetching user profile with Admin SDK:", error);
         return null;
     }
 }

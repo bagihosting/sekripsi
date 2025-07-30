@@ -1,50 +1,29 @@
-
 rules_version = '2';
-
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    function isOwner(userId) {
-      return request.auth != null && request.auth.uid == userId;
-    }
-
+    // Helper function to check for admin role
     function isAdmin() {
-      // Allow if the user is an admin, based on their custom claim or a role in their user document.
-      // This example checks a field in the user's own profile document.
-      return request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
 
-    // PUBLIC DATA: Anyone can read this data.
-    match /blogPosts/{postId} {
-      allow read: if true;
-      allow write: if isAdmin();
+    // Users can only read/update their own profile. Admins can do anything.
+    match /users/{userId} {
+      allow read, update: if request.auth.uid == userId || isAdmin();
+      allow create, delete: if isAdmin();
     }
-    match /ai_tools/{toolId} {
-      allow read: if true;
-      allow write: if isAdmin();
-    }
-    match /pricingPlans/{planId} {
+
+    // Public collections are readable by anyone, but only writable by admins.
+    match /(blogPosts|ai_tools|pricingPlans|recent_upgrades)/{docId} {
         allow read: if true;
         allow write: if isAdmin();
     }
-    match /recent_upgrades/{upgradeId} {
-      allow read: if true;
-      allow write: if isAdmin(); // Only admins can write here (via server action)
-    }
 
-    // USER DATA: Only the owner can access their own data.
-    match /users/{userId} {
-      allow read: if isOwner(userId) || isAdmin();
-      allow create: if request.auth != null; // Any authenticated user can create their own profile
-      allow update: if isOwner(userId) || isAdmin();
-      allow delete: if isAdmin();
-    }
-    
-    // PAYMENT DATA: Only owners can create, only admins can view/update.
+    // Payments can be created by any authenticated user.
+    // Only admins can read all payments and update them.
     match /payments/{paymentId} {
-        allow create: if request.auth != null; // Authenticated users can submit payments
-        allow read, update: if isAdmin(); // Only admins can see and process payments
-        allow delete: if false; // Don't allow deletion of payment records
+      allow create: if request.auth != null;
+      allow read, update, delete: if isAdmin();
     }
   }
 }

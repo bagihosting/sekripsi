@@ -5,11 +5,11 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowRight, Calendar, User } from "lucide-react";
 import Link from 'next/link';
 import Image from "next/image";
-import { collection, query, where, orderBy, getDocs, Timestamp } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { adminDb } from "@/lib/firebase-admin";
 import { BlogPost } from "@/lib/firestore";
+import { Timestamp } from "firebase-admin/firestore";
 
-// Define a serializable version of BlogPost
+
 interface SerializableBlogPost extends Omit<BlogPost, 'createdAt' | 'updatedAt'> {
     id: string;
     createdAt: string;
@@ -19,12 +19,13 @@ interface SerializableBlogPost extends Omit<BlogPost, 'createdAt' | 'updatedAt'>
 
 
 async function getBlogPosts(): Promise<SerializableBlogPost[]> {
-    const postsCollection = collection(db, 'blogPosts');
-    const q = query(postsCollection, where('status', '==', 'published'), orderBy('createdAt', 'desc'));
-    const querySnapshot = await getDocs(q);
+    if (!adminDb) return [];
+    const postsCollection = adminDb.collection('blogPosts');
+    const q = postsCollection.where('status', '==', 'published').orderBy('createdAt', 'desc');
+    const querySnapshot = await q.get();
 
     const posts = querySnapshot.docs.map(doc => {
-        const data = doc.data() as BlogPost;
+        const data = doc.data();
         const createdAt = data.createdAt instanceof Timestamp ? data.createdAt.toDate() : new Date();
         const updatedAt = data.updatedAt instanceof Timestamp ? data.updatedAt.toDate() : new Date();
 
@@ -33,11 +34,10 @@ async function getBlogPosts(): Promise<SerializableBlogPost[]> {
             id: doc.id,
             createdAt: createdAt.toISOString(),
             updatedAt: updatedAt.toISOString(),
-            // Convert Firestore Timestamp to a serializable format (string)
             date: createdAt.toLocaleDateString('id-ID', {
                 year: 'numeric', month: 'long', day: 'numeric'
             }),
-        };
+        } as SerializableBlogPost;
     });
 
     return posts;

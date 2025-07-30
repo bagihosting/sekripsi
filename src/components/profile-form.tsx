@@ -14,6 +14,7 @@ import { Loader2, Save } from 'lucide-react';
 import { UserProfile } from '@/lib/firestore';
 import Image from 'next/image';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { useAuth } from '@/hooks/use-auth';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
@@ -37,6 +38,7 @@ interface ProfileFormProps {
 
 export default function ProfileForm({ userProfile }: ProfileFormProps) {
   const { toast } = useToast();
+  const { reloadProfile } = useAuth();
   const [isPending, startTransition] = useTransition();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -74,6 +76,7 @@ export default function ProfileForm({ userProfile }: ProfileFormProps) {
           title: 'Update Berhasil!',
           description: 'Profil Anda telah berhasil diperbarui.',
         });
+        reloadProfile(); // Reload profile data from server
         form.reset({ ...form.getValues(), password: '' });
       }
     });

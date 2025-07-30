@@ -2,8 +2,8 @@
 "use client";
 
 import { useEffect, useState, useTransition } from 'react';
-import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { adminDb } from '@/lib/firebase-admin-client';
+import { collection, onSnapshot, query, orderBy, Timestamp } from 'firebase/firestore';
 import { BlogPost } from '@/lib/firestore';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from './ui/card';
 import { Button } from './ui/button';
@@ -16,24 +16,48 @@ import { deleteBlogPost } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from './ui/alert-dialog';
 
+function convertToClientBlogPost(doc: any): BlogPost {
+    const data = doc.data();
+    return {
+        id: doc.id,
+        title: data.title,
+        slug: data.slug,
+        content: data.content,
+        category: data.category,
+        author: data.author,
+        imageUrl: data.imageUrl,
+        aiHint: data.aiHint,
+        status: data.status,
+        createdAt: data.createdAt.toDate(),
+        updatedAt: data.updatedAt.toDate(),
+    } as BlogPost;
+}
+
+
 export default function BlogManagement() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
-    const q = query(collection(db, 'blogPosts'), orderBy('createdAt', 'desc'));
+    if (!adminDb) {
+      setLoading(false);
+      return;
+    }
+    const q = query(collection(adminDb, 'blogPosts'), orderBy('createdAt', 'desc'));
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const allPosts: BlogPost[] = [];
-      querySnapshot.forEach((doc) => {
-        allPosts.push({ id: doc.id, ...doc.data() } as BlogPost);
-      });
+      const allPosts = querySnapshot.docs.map(convertToClientBlogPost);
       setPosts(allPosts);
       setLoading(false);
+    }, (error) => {
+        console.error("Error fetching blog posts:", error);
+        toast({title: "Gagal Memuat Artikel", description: "Tidak dapat mengambil data. Pastikan Anda memiliki izin yang benar.", variant: "destructive"});
+        setLoading(false);
     });
     return () => unsubscribe();
-  }, []);
+  }, [toast]);
 
   const handleEdit = (post: BlogPost) => {
     setSelectedPost(post);
@@ -66,6 +90,20 @@ export default function BlogManagement() {
       </Card>
     );
   }
+  
+   if (!adminDb) {
+     return (
+        <Card>
+        <CardHeader>
+          <CardTitle>Konfigurasi Admin Diperlukan</CardTitle>
+          <CardDescription>Manajemen blog memerlukan konfigurasi Firebase Admin SDK di server.</CardDescription>
+        </CardHeader>
+        <CardContent>
+            <p className="text-sm text-muted-foreground">Silakan atur variabel lingkungan FIREBASE_SERVICE_ACCOUNT_KEY untuk mengaktifkan fitur ini.</p>
+        </CardContent>
+      </Card>
+     )
+   }
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={handleDialogClose}>
@@ -128,7 +166,7 @@ function PostListItem({ post, onEdit }: { post: BlogPost, onEdit: (post: BlogPos
             <div className="flex-1 space-y-1">
                 <p className="font-medium">{post.title}</p>
                 <p className="text-sm text-muted-foreground">
-                Kategori: {post.category} | Dibuat pada: {post.createdAt.toDate().toLocaleDateString()}
+                Kategori: {post.category} | Dibuat pada: {new Date(post.createdAt).toLocaleDateString()}
                 </p>
                 <Badge variant={post.status === 'published' ? 'default' : 'secondary'}>
                     {post.status === 'published' ? <BookOpen className="h-3 w-3 mr-1.5" /> : <Draft className="h-3 w-3 mr-1.5" />}

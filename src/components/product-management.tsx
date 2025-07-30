@@ -78,7 +78,7 @@ function ToolEditCard({ tool, onToolChange }: ToolEditCardProps) {
     const { toast } = useToast();
     const [isPending, startTransition] = useTransition();
     
-    const IconComponent = typeof tool.icon === 'string' ? iconMap[tool.icon] || Wand : tool.icon;
+    const IconComponent = typeof tool.icon === 'string' ? iconMap[tool.icon] || Wand : Wand;
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
