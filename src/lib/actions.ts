@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { cookies } from 'next/headers';
 import { adminAuth, adminDb } from '@/lib/firebase-admin';
 import { FieldValue, Timestamp } from 'firebase-admin/firestore';
-import type { RecentUpgrade, AiTool, UserProfile } from './types';
+import type { RecentUpgrade, AiTool, UserProfile, BlogPost, Payment } from './types';
 import { initialTools } from './initial-data';
 import { getUserProfile } from './user-actions';
 import { uploadToCloudinary } from './cloudinary';
@@ -83,6 +83,15 @@ export async function register(values: z.infer<typeof registerSchema>) {
     };
   }
 }
+
+export async function login(idToken: string) {
+  const validatedIdToken = z.string().min(1).safeParse(idToken);
+  if (!validatedIdToken.success) {
+    return { error: 'ID Token tidak valid.' };
+  }
+  return createSession(validatedIdToken.data);
+}
+
 
 export async function createSession(idToken: string) {
     if (!adminAuth) {
@@ -221,9 +230,7 @@ export async function updateUserProfile(formData: FormData) {
         if (validationResult.data.photo) {
             const fileBuffer = await validationResult.data.photo.arrayBuffer();
             const mime = validationResult.data.photo.type;
-            const encoding = 'base64';
-            const base64Data = Buffer.from(fileBuffer).toString('base64');
-            const fileUri = `data:${mime};${encoding},${base64Data}`;
+            const fileUri = `data:${mime};base64,${Buffer.from(fileBuffer).toString('base64')}`;
             
             const result = await uploadToCloudinary(fileUri, `profile_pictures/${user.uid}`);
             const downloadURL = result.secure_url;
@@ -451,6 +458,7 @@ export async function deleteBlogPost(postId: string) {
     
     revalidatePath('/blog');
     revalidatePath('/dashboard');
+    return { success: true, postId };
 }
 
 const aiToolSchema = z.object({
@@ -525,6 +533,46 @@ export async function getRecentUpgrades(): Promise<RecentUpgrade[]> {
         return [];
     }
 }
+
+export async function getBlogPosts(): Promise<BlogPost[] | null> {
+    if (!adminDb) return null;
+    try {
+        const q = adminDb.collection('blogPosts').orderBy('createdAt', 'desc');
+        const querySnapshot = await q.get();
+        return querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+                id: doc.id,
+                ...data,
+                createdAt: (data.createdAt as Timestamp).toDate().toISOString(),
+                updatedAt: (data.updatedAt as Timestamp).toDate().toISOString(),
+            } as BlogPost;
+        });
+    } catch (error) {
+        console.error("Error getting blog posts:", error);
+        return null;
+    }
+}
+
+export async function getPendingPayments(): Promise<Payment[] | null> {
+    if (!adminDb) return null;
+    try {
+        const q = adminDb.collection('payments').where('status', '==', 'pending');
+        const querySnapshot = await q.get();
+        return querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+                id: doc.id,
+                ...data,
+                createdAt: (data.createdAt as Timestamp).toDate().toISOString(),
+            } as Payment;
+        });
+    } catch (error) {
+        console.error("Error getting pending payments:", error);
+        return null;
+    }
+}
+
 
 export async function getAllTools(): Promise<AiTool[]> {
   if (!adminDb) {
@@ -602,5 +650,3 @@ export async function getSession(): Promise<{ userProfile: UserProfile | null }>
     return { userProfile: null };
   }
 }
-
-    

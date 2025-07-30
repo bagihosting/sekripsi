@@ -2,37 +2,17 @@
 "use client";
 
 import { useEffect, useState, useTransition } from 'react';
-import { adminDb } from '@/lib/firebase-admin-client';
-import { collection, onSnapshot, query, orderBy, Timestamp } from 'firebase/firestore';
+import { getBlogPosts, deleteBlogPost } from '@/lib/actions';
 import { BlogPost } from '@/lib/types';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Skeleton } from './ui/skeleton';
-import { PlusCircle, Pencil, Trash2, Loader2, BookOpen, Draft } from 'lucide-react';
+import { PlusCircle, Pencil, Trash2, Loader2, BookOpen, FilePenLine } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from './ui/dialog';
 import BlogEditor from './blog-editor';
-import { deleteBlogPost } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from './ui/alert-dialog';
-
-function convertToClientBlogPost(doc: any): BlogPost {
-    const data = doc.data();
-    return {
-        id: doc.id,
-        title: data.title,
-        slug: data.slug,
-        content: data.content,
-        category: data.category,
-        author: data.author,
-        imageUrl: data.imageUrl,
-        aiHint: data.aiHint,
-        status: data.status,
-        createdAt: data.createdAt.toDate().toISOString(),
-        updatedAt: data.updatedAt.toDate().toISOString(),
-    } as BlogPost;
-}
-
 
 export default function BlogManagement() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
@@ -41,23 +21,21 @@ export default function BlogManagement() {
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
   const { toast } = useToast();
 
-  useEffect(() => {
-    if (!adminDb) {
-      setLoading(false);
-      return;
+  const fetchPosts = async () => {
+    setLoading(true);
+    const fetchedPosts = await getBlogPosts();
+    if (fetchedPosts) {
+      setPosts(fetchedPosts);
+    } else {
+      toast({title: "Gagal Memuat Artikel", description: "Tidak dapat mengambil data. Pastikan Anda memiliki izin yang benar.", variant: "destructive"});
     }
-    const q = query(collection(adminDb, 'blogPosts'), orderBy('createdAt', 'desc'));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const allPosts = querySnapshot.docs.map(convertToClientBlogPost);
-      setPosts(allPosts);
-      setLoading(false);
-    }, (error) => {
-        console.error("Error fetching blog posts:", error);
-        toast({title: "Gagal Memuat Artikel", description: "Tidak dapat mengambil data. Pastikan Anda memiliki izin yang benar.", variant: "destructive"});
-        setLoading(false);
-    });
-    return () => unsubscribe();
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchPosts();
   }, [toast]);
+  
 
   const handleEdit = (post: BlogPost) => {
     setSelectedPost(post);
@@ -76,6 +54,11 @@ export default function BlogManagement() {
     setIsDialogOpen(open);
   }
 
+  const handleSave = () => {
+    setIsDialogOpen(false);
+    fetchPosts(); // Refetch posts after saving
+  }
+
   if (loading) {
     return (
       <Card>
@@ -90,20 +73,6 @@ export default function BlogManagement() {
       </Card>
     );
   }
-  
-   if (!adminDb) {
-     return (
-        <Card>
-        <CardHeader>
-          <CardTitle>Konfigurasi Admin Diperlukan</CardTitle>
-          <CardDescription>Manajemen blog memerlukan konfigurasi Firebase Admin SDK di server.</CardDescription>
-        </CardHeader>
-        <CardContent>
-            <p className="text-sm text-muted-foreground">Silakan atur variabel lingkungan FIREBASE_SERVICE_ACCOUNT_KEY untuk mengaktifkan fitur ini.</p>
-        </CardContent>
-      </Card>
-     )
-   }
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={handleDialogClose}>
@@ -124,7 +93,7 @@ export default function BlogManagement() {
                 <p className="text-sm text-muted-foreground">Belum ada artikel. Mulai tulis artikel pertamamu!</p>
                 ) : (
                 posts.map((post) => (
-                    <PostListItem key={post.id} post={post} onEdit={handleEdit} />
+                    <PostListItem key={post.id} post={post} onEdit={handleEdit} onDeleteSuccess={fetchPosts} />
                 ))
                 )}
             </CardContent>
@@ -137,7 +106,7 @@ export default function BlogManagement() {
                 </DialogDescription>
             </DialogHeader>
             <div className="flex-grow overflow-auto pr-6 -mr-6">
-              <BlogEditor post={selectedPost} onSave={() => setIsDialogOpen(false)} />
+              <BlogEditor post={selectedPost} onSave={handleSave} />
             </div>
         </DialogContent>
     </Dialog>
@@ -145,7 +114,7 @@ export default function BlogManagement() {
 }
 
 
-function PostListItem({ post, onEdit }: { post: BlogPost, onEdit: (post: BlogPost) => void }) {
+function PostListItem({ post, onEdit, onDeleteSuccess }: { post: BlogPost, onEdit: (post: BlogPost) => void, onDeleteSuccess: () => void }) {
     const { toast } = useToast();
     const [isPending, startTransition] = useTransition();
 
@@ -157,6 +126,7 @@ function PostListItem({ post, onEdit }: { post: BlogPost, onEdit: (post: BlogPos
                 toast({ title: "Gagal Menghapus", description: result.error, variant: 'destructive' });
             } else {
                 toast({ title: "Berhasil!", description: "Artikel telah dihapus." });
+                onDeleteSuccess();
             }
         });
     }
@@ -169,7 +139,7 @@ function PostListItem({ post, onEdit }: { post: BlogPost, onEdit: (post: BlogPos
                 Kategori: {post.category} | Dibuat pada: {new Date(post.createdAt).toLocaleDateString()}
                 </p>
                 <Badge variant={post.status === 'published' ? 'default' : 'secondary'}>
-                    {post.status === 'published' ? <BookOpen className="h-3 w-3 mr-1.5" /> : <Draft className="h-3 w-3 mr-1.5" />}
+                    {post.status === 'published' ? <BookOpen className="h-3 w-3 mr-1.5" /> : <FilePenLine className="h-3 w-3 mr-1.5" />}
                     {post.status}
                 </Badge>
             </div>

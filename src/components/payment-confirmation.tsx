@@ -2,18 +2,15 @@
 "use client";
 
 import { useEffect, useState, useTransition } from 'react';
-import { adminDb } from '@/lib/firebase-admin-client'; // Using a client-safe admin instance
-import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Skeleton } from './ui/skeleton';
 import Image from 'next/image';
-import { confirmPayment } from '@/lib/actions';
+import { confirmPayment, getPendingPayments } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Package, ShoppingCart } from 'lucide-react';
-import { Payment } from '@/lib/firestore';
-
+import { Payment } from '@/lib/types';
 
 export default function PaymentConfirmation() {
   const [payments, setPayments] = useState<Payment[]>([]);
@@ -22,33 +19,22 @@ export default function PaymentConfirmation() {
   const [isPending, startTransition] = useTransition();
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
 
+  const fetchPayments = async () => {
+    setLoading(true);
+    const fetchedPayments = await getPendingPayments();
+    if (fetchedPayments) {
+        setPayments(fetchedPayments);
+    } else {
+        toast({ title: "Gagal Memuat Pembayaran", description: "Tidak dapat mengambil data pembayaran. Anda mungkin tidak memiliki izin.", variant: 'destructive' });
+    }
+    setLoading(false);
+  };
+  
   useEffect(() => {
-    if (!adminDb) {
-      setLoading(false);
-      return;
-    };
-    const q = query(collection(adminDb, 'payments'), where('status', '==', 'pending'));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const pendingPayments: Payment[] = [];
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        pendingPayments.push({
-             id: doc.id,
-             ...data,
-             // Ensure Timestamps are converted if they exist
-             createdAt: data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : new Date().toISOString(),
-        } as Payment);
-      });
-      setPayments(pendingPayments);
-      setLoading(false);
-    }, (error) => {
-      console.error("Error fetching payments:", error);
-      toast({ title: "Gagal Memuat Pembayaran", description: "Tidak dapat mengambil data pembayaran. Anda mungkin tidak memiliki izin.", variant: 'destructive' });
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, [toast]);
+    fetchPayments();
+    const interval = setInterval(fetchPayments, 30000); // Poll for new payments every 30 seconds
+    return () => clearInterval(interval);
+  }, []);
 
   const handleConfirm = (paymentId: string, userId: string, toolId?: string) => {
     setConfirmingId(paymentId);
@@ -65,6 +51,7 @@ export default function PaymentConfirmation() {
           title: 'Konfirmasi Berhasil!',
           description: 'Akses pengguna telah berhasil diperbarui.',
         });
+        fetchPayments(); // Refetch after confirming
       }
       setConfirmingId(null);
     });
@@ -84,20 +71,6 @@ export default function PaymentConfirmation() {
       </Card>
     );
   }
-  
-   if (!adminDb) {
-     return (
-        <Card>
-        <CardHeader>
-          <CardTitle>Konfigurasi Admin Diperlukan</CardTitle>
-          <CardDescription>Manajemen pembayaran memerlukan konfigurasi Firebase Admin SDK di server.</CardDescription>
-        </CardHeader>
-        <CardContent>
-            <p className="text-sm text-muted-foreground">Silakan atur variabel lingkungan FIREBASE_SERVICE_ACCOUNT_KEY untuk mengaktifkan fitur ini.</p>
-        </CardContent>
-      </Card>
-     )
-   }
 
   return (
     <Card>
