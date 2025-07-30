@@ -8,16 +8,20 @@ cloudinary.config({
   secure: true,
 });
 
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
+
 export async function uploadToCloudinary(fileUri: string, folder: string) {
   try {
     const result = await cloudinary.uploader.upload(fileUri, {
       folder: folder,
       invalidate: true,
+      resource_type: 'auto',
+      max_bytes: MAX_FILE_SIZE,
     });
     return result;
   } catch (error) {
     console.error('Error uploading to Cloudinary:', error);
-    throw new Error('Gagal mengunggah file ke Cloudinary. Periksa konfigurasi Anda.');
+    throw new Error('Gagal mengunggah file. Pastikan file tidak melebihi 5MB dan formatnya didukung.');
   }
 }
 

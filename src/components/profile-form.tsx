@@ -11,8 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { updateUserProfile } from '@/lib/actions';
 import { useTransition } from 'react';
 import { Loader2, Save } from 'lucide-react';
-import { UserProfile } from '@/lib/firestore';
-import Image from 'next/image';
+import type { UserProfile } from '@/lib/types';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { useAuth } from '@/hooks/use-auth';
 

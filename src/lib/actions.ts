@@ -112,6 +112,13 @@ export async function logout() {
     redirect('/login');
 }
 
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+
+const fileSchema = z.instanceof(File)
+  .refine((file) => file.size <= MAX_FILE_SIZE, `Ukuran file maksimal 5MB.`)
+  .refine((file) => ACCEPTED_IMAGE_TYPES.includes(file.type), "Hanya format .jpg, .jpeg, .png, dan .webp yang didukung.");
+
 
 export async function requestUpgrade(formData: FormData): Promise<{ success: boolean; error?: string; }> {
     if (!adminAuth || !adminDb) {
@@ -129,13 +136,18 @@ export async function requestUpgrade(formData: FormData): Promise<{ success: boo
     
     const user = { uid: decodedToken.uid, email: decodedToken.email };
     
-    const proof = formData.get('proof') as File;
+    const proof = formData.get('proof') as File | null;
     const toolId = formData.get('toolId') as string | null;
 
     if (!proof) {
         return { success: false, error: "File bukti transfer tidak ditemukan." };
     }
     
+    const validationResult = fileSchema.safeParse(proof);
+    if (!validationResult.success) {
+        return { success: false, error: validationResult.error.errors[0].message };
+    }
+
     try {
         const fileBuffer = await proof.arrayBuffer();
         const mime = proof.type;
@@ -213,6 +225,11 @@ export async function updateUserProfile(formData: FormData) {
         }
 
         if (photo && photo.size > 0) {
+            const validationResult = fileSchema.safeParse(photo);
+            if (!validationResult.success) {
+                return { error: validationResult.error.errors[0].message };
+            }
+            
             const fileBuffer = await photo.arrayBuffer();
             const mime = photo.type;
             const encoding = 'base64';
@@ -373,6 +390,10 @@ export async function saveBlogPost(formData: FormData) {
 
     try {
         if (image && image.size > 0) {
+            const validationResult = fileSchema.safeParse(image);
+            if (!validationResult.success) {
+                return { error: validationResult.error.errors[0].message };
+            }
             const fileBuffer = await image.arrayBuffer();
             const mime = image.type;
             const encoding = 'base64';
